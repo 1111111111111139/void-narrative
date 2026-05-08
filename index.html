@@ -235,6 +235,115 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   }
 }
 
+/* ===== Mobile: touch targets & layout ===== */
+@media (max-width: 480px) {
+  /* Full-width overlays */
+  .modal-card,
+  .char-detail-card {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    margin: 0;
+  }
+  .confirm-card {
+    width: 85vw; max-width: 320px;
+  }
+  .thought-card { max-width: 85vw; }
+
+  /* Close button to top-left for thumb reach */
+  .modal-header,
+  .preset-header,
+  .lore-editor-header {
+    flex-direction: row;
+  }
+  .modal-close,
+  .preset-close,
+  .quest-panel-close {
+    order: -1;
+    margin-right: auto;
+  }
+
+  /* Touch targets: min 44px */
+  button, .btn-sm, .btn-accent, .btn-ghost, .btn-outline,
+  .nav-item, .me-row, .me-mask-row, .lore-item, .plot-card,
+  .char-option-card, .char-picker-row, .char-manager-item,
+  .preset-settings-btn, .archive-row {
+    min-height: 44px;
+  }
+  .preset-form-input,
+  .preset-form-textarea,
+  .modal-select,
+  .chat-input {
+    min-height: 44px;
+    font-size: 16px; /* prevent iOS zoom on focus */
+  }
+  .toggle-switch {
+    min-width: 44px;
+  }
+  .nav-item svg { width: 20px; height: 20px; }
+
+  /* Font floor */
+  body, input, textarea, select, button {
+    font-size: max(12px, inherit);
+  }
+  .nav-label { font-size: 11px; }
+
+  /* Card margins */
+  .view { padding: 12px; }
+  .card, .preset-form-card, .archive-settings-section {
+    margin-left: 0; margin-right: 0;
+  }
+
+  /* Horizontal scroll strips keep native scroll */
+  .preset-strip,
+  .lore-filter-strip,
+  .mem-filter-strip {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Fixed bottom nav */
+  .nav {
+    position: sticky; bottom: 0;
+    z-index: 100;
+  }
+  body { position: relative; }
+
+  /* Side panels full-width on mobile */
+  .quest-panel,
+  .time-panel,
+  .char-manager-panel {
+    width: 100vw; max-width: 100vw;
+  }
+
+  /* Char detail card mobile */
+  .char-detail-card {
+    max-height: 90vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  /* Chat input area */
+  .chat-input-area {
+    padding: 8px 12px 12px;
+  }
+  .chat-input {
+    padding: 10px 14px;
+  }
+  .chat-send-btn,
+  .chat-mode-btn {
+    width: 44px; height: 44px;
+  }
+  .chat-send-btn svg,
+  .chat-mode-btn svg {
+    width: 18px; height: 18px;
+  }
+
+  /* Settings buttons */
+  .preset-settings-btn {
+    padding: 12px;
+    font-size: 13px;
+  }
+}
+
 /* ===== Utility ===== */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
@@ -313,9 +422,11 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 }
 .preset-form-card {
   background: var(--surface);
+  backdrop-filter: blur(12px) saturate(0.8);
+  -webkit-backdrop-filter: blur(12px) saturate(0.8);
   border: 0.5px solid var(--border);
   border-radius: var(--radius);
-  padding: 18px;
+  padding: 16px;
   box-shadow: var(--shadow);
   margin-bottom: 16px;
   animation: fadeIn 0.2s ease;
@@ -382,7 +493,10 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 .modal-card {
   width: 100%; max-width: 420px;
   max-height: 80vh;
-  background: var(--surface-f);
+  background: var(--surface);
+  backdrop-filter: blur(24px) saturate(0.8);
+  -webkit-backdrop-filter: blur(24px) saturate(0.8);
+  border: 0.5px solid var(--border);
   border-radius: 18px 18px 0 0;
   overflow: hidden;
   display: flex; flex-direction: column;
@@ -500,7 +614,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%; padding: 20px;
   background: var(--surface);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) saturate(0.8); -webkit-backdrop-filter: blur(12px) saturate(0.8);
   border: 1px solid var(--border); border-radius: var(--radius);
   font-size: 16px; font-weight: 500; color: var(--text);
   cursor: pointer; transition: border 0.2s, box-shadow 0.2s;
@@ -512,7 +626,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 /* Plot list cards */
 .plot-card {
   background: var(--surface);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px) saturate(0.8); -webkit-backdrop-filter: blur(12px) saturate(0.8);
   border: 0.5px solid var(--border); border-radius: var(--radius);
   padding: 16px; margin-top: 10px;
   cursor: pointer; transition: border 0.2s;
@@ -539,7 +653,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 .char-option-overlay {
   position: fixed; inset: 0; z-index: 600;
   background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   display: none; flex-direction: column;
   justify-content: center; align-items: center;
   padding: 20px; gap: 14px;
@@ -548,7 +662,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 .char-option-card {
   width: 100%; max-width: 360px;
   background: var(--surface);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(12px) saturate(0.8); -webkit-backdrop-filter: blur(12px) saturate(0.8);
   border: 0.5px solid var(--border); border-radius: var(--radius);
   padding: 20px;
   cursor: pointer; transition: border 0.2s, box-shadow 0.2s;
@@ -565,6 +679,118 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   font-size: 11px; color: var(--text-3);
   text-align: center; padding: 4px 0;
 }
+
+/* Selected chars preview (multi-select) */
+.char-selected-strip {
+  width: 100%; max-width: 360px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 10px; min-height: 0;
+}
+.char-selected-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px 5px 6px;
+  background: var(--accent-bg); border: 0.5px solid var(--accent);
+  border-radius: 20px; font-size: 12px;
+  color: var(--text); animation: fadeIn 0.2s ease;
+}
+.char-selected-chip-avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--surface); overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.char-selected-chip-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.char-selected-chip-avatar svg { width: 13px; height: 13px; stroke: var(--text-3); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.char-selected-chip-remove {
+  cursor: pointer; color: var(--text-3); font-size: 14px;
+  line-height: 1; margin-left: 1px;
+}
+
+/* Char list row with checkbox */
+.char-picker-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface);
+  backdrop-filter: blur(12px) saturate(0.8); -webkit-backdrop-filter: blur(12px) saturate(0.8);
+  border: 0.5px solid var(--border); border-radius: var(--radius);
+  padding: 14px; cursor: pointer; transition: border 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow);
+}
+.char-picker-row.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.char-picker-row:active { background: var(--accent-bg); }
+.char-picker-check {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.char-picker-row.selected .char-picker-check {
+  background: var(--accent); border-color: var(--accent);
+}
+.char-picker-check::after {
+  content: ''; display: none;
+  width: 6px; height: 10px; border: solid #fff;
+  border-width: 0 2px 2px 0; transform: rotate(45deg);
+  margin-top: -1px;
+}
+.char-picker-row.selected .char-picker-check::after { display: block; }
+.char-picker-row-body { flex: 1; min-width: 0; }
+.char-picker-row-name { font-size: 14px; font-weight: 500; color: var(--text); }
+.char-picker-row-desc { font-size: 11px; color: var(--text-2); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.char-picker-row-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent-bg); overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.char-picker-row-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.char-picker-row-avatar svg { width: 17px; height: 17px; stroke: var(--text-3); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Confirm bar in picker */
+.char-picker-confirm {
+  width: 100%; max-width: 360px;
+  padding: 12px 0 4px;
+}
+.char-picker-confirm .btn-accent:disabled {
+  opacity: 0.4; pointer-events: none;
+}
+
+/* Character management panel */
+.char-manager-panel {
+  position: fixed; top: 0; right: 0; width: 300px; max-width: 85vw;
+  height: 100dvh; z-index: 1500;
+  background: var(--surface-f);
+  border-left: 0.5px solid var(--border);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+  display: none; flex-direction: column;
+  animation: slideIn 0.25s ease;
+}
+.char-manager-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; border-bottom: 0.5px solid var(--border);
+}
+.char-manager-check {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.char-manager-check.on {
+  background: var(--accent); border-color: var(--accent);
+}
+.char-manager-check.on::after {
+  content: ''; width: 6px; height: 10px; border: solid #fff;
+  border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -1px;
+}
+.char-manager-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent-bg); overflow: hidden; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.char-manager-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.char-manager-avatar svg { width: 18px; height: 18px; stroke: var(--text-3); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.char-manager-info { flex: 1; min-width: 0; }
+.char-manager-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.char-manager-bio { font-size: 11px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.char-manager-empty { text-align: center; padding: 40px 16px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
 .char-option-back {
   background: none; border: none; color: var(--text-2);
   font-size: 13px; cursor: pointer; padding: 8px;
@@ -653,7 +879,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 20px 10px;
   background: var(--surface);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(0.8); -webkit-backdrop-filter: blur(24px) saturate(0.8);
   border-bottom: 0.5px solid var(--border);
 }
 .lore-editor-back {
@@ -703,6 +929,186 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 .confirm-ok { color: #d93025; font-weight: 550; }
 .confirm-ok:active { background: rgba(217,48,37,0.06); }
 .confirm-cancel:active { background: var(--accent-bg); }
+
+/* API missing hint */
+.api-hint-card {
+  width: 300px; max-width: 85vw;
+  background: var(--surface-f); border-radius: 16px;
+  padding: 24px 20px 20px; text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  animation: fadeIn 0.2s ease;
+}
+.api-hint-icon {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--accent-bg); margin: 0 auto 14px;
+  display: flex; align-items: center; justify-content: center;
+}
+.api-hint-icon svg { width: 22px; height: 22px; stroke: var(--text-2); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.api-hint-title { font-size: 15px; font-weight: 550; color: var(--text); margin-bottom: 6px; }
+.api-hint-desc { font-size: 13px; color: var(--text-2); line-height: 1.6; margin-bottom: 18px; }
+.api-hint-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 12px; border-radius: 12px;
+  background: var(--accent); color: #fff; border: none;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  font-family: inherit;
+}
+.api-hint-btn:active { background: var(--accent-h); }
+.api-hint-close {
+  background: none; border: none; color: var(--text-3);
+  font-size: 13px; cursor: pointer; margin-top: 12px;
+  font-family: inherit;
+}
+
+/* Chat API hint bar */
+.api-hint-bar {
+  text-align: center; padding: 20px 16px;
+  font-size: 12px; color: var(--text-3); line-height: 1.7;
+}
+.api-hint-bar a {
+  color: var(--accent); cursor: pointer; text-decoration: none;
+}
+.api-hint-bar a:hover { text-decoration: underline; }
+
+/* ===== Character Detail Panel ===== */
+.char-detail-overlay {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: none; justify-content: center; align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+@media (min-width: 480px) {
+  .char-detail-overlay { align-items: center; }
+}
+.char-detail-card {
+  width: 100%; max-width: 400px; max-height: 85vh;
+  background: var(--surface);
+  backdrop-filter: blur(24px) saturate(0.8);
+  -webkit-backdrop-filter: blur(24px) saturate(0.8);
+  border: 0.5px solid var(--border);
+  border-radius: 18px 18px 0 0; overflow-y: auto;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+  padding: 0 20px 20px;
+}
+@media (min-width: 480px) {
+  .char-detail-card { border-radius: 18px; margin: 20px; }
+}
+.char-detail-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 0 14px; position: sticky; top: 0;
+  background: var(--surface); z-index: 1;
+}
+.char-detail-name { font-size: 17px; font-weight: 550; }
+.char-detail-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-bg); border: none; cursor: pointer;
+  font-size: 16px; color: var(--text-2); display: flex;
+  align-items: center; justify-content: center;
+}
+.char-detail-avatar {
+  width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 14px;
+  background: var(--accent-bg); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.char-detail-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.char-detail-avatar svg { width: 36px; height: 36px; stroke: var(--text-3); stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.char-detail-bio { text-align: center; font-size: 13px; color: var(--text-2); margin-bottom: 14px; }
+.char-detail-tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-bottom: 16px; }
+.char-detail-tag {
+  padding: 3px 10px; border-radius: 12px; font-size: 11px;
+  background: var(--accent-bg); color: var(--text);
+}
+.char-detail-section { margin-bottom: 14px; }
+.char-detail-section-title {
+  font-size: 11px; font-weight: 600; color: var(--text-3);
+  letter-spacing: 0.05em; margin-bottom: 6px;
+}
+.char-detail-affection {
+  display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: var(--accent-bg); border-radius: 12px;
+}
+.char-detail-affection-bar {
+  flex: 1; height: 6px; background: var(--border); border-radius: 3px;
+  overflow: hidden;
+}
+.char-detail-affection-fill {
+  height: 100%; background: var(--accent); border-radius: 3px;
+  transition: width 0.3s;
+}
+.char-detail-affection-val { font-size: 13px; font-weight: 550; color: var(--text); }
+.char-detail-affection-tier { font-size: 12px; color: var(--text-2); }
+.char-detail-text {
+  font-size: 12px; color: var(--text-2); line-height: 1.7;
+  white-space: pre-wrap; max-height: 120px; overflow-y: auto;
+}
+.char-detail-stat-row {
+  display: flex; justify-content: space-between; padding: 6px 0;
+  font-size: 12px; color: var(--text); border-bottom: 0.5px solid var(--border);
+}
+.char-detail-stat-row:last-child { border-bottom: none; }
+.char-detail-stat-val { color: var(--text-2); }
+.char-detail-aff-log {
+  font-size: 11px; color: var(--text-2); line-height: 1.6;
+  max-height: 150px; overflow-y: auto;
+}
+.char-detail-aff-item {
+  display: flex; justify-content: space-between; padding: 4px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.char-detail-aff-delta { font-weight: 500; }
+.char-detail-aff-delta.pos { color: #07c160; }
+.char-detail-aff-delta.neg { color: #d93025; }
+.char-detail-aff-time { color: var(--text-3); font-size: 10px; }
+
+/* ===== New Plot Button (circular) ===== */
+.plot-create-fab {
+  position: absolute; top: 14px; right: 20px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface);
+  backdrop-filter: blur(12px) saturate(0.8); -webkit-backdrop-filter: blur(12px) saturate(0.8);
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; transition: all 0.2s;
+  z-index: 10;
+}
+.plot-create-fab:hover { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.plot-create-fab svg { width: 20px; height: 20px; stroke: var(--accent); stroke-width: 2; fill: none; stroke-linecap: round; }
+
+/* ===== Archive Settings Overlay (full-screen) ===== */
+.archive-settings-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: var(--bg);
+  display: none; flex-direction: column;
+  animation: fadeIn 0.2s ease;
+}
+.archive-settings-body {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+}
+.archive-settings-section {
+  background: var(--surface);
+  backdrop-filter: blur(12px) saturate(0.8);
+  -webkit-backdrop-filter: blur(12px) saturate(0.8);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px; margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.archive-settings-section-title {
+  font-size: 13px; font-weight: 550; color: var(--text);
+  margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--border);
+}
+.archive-settings-footer {
+  flex-shrink: 0; padding: 12px 20px 20px;
+}
+.archive-settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 0; font-size: 13px;
+}
+.archive-settings-label { color: var(--text); }
+.archive-settings-desc { font-size: 11px; color: var(--text-2); margin-top: 2px; }
 
 /* ===== Character Card Editor ===== */
 .char-editor-overlay {
@@ -832,7 +1238,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 16px 8px;
   background: var(--surface);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(0.8); -webkit-backdrop-filter: blur(24px) saturate(0.8);
   border-bottom: 0.5px solid var(--border);
 }
 .chat-header-back {
@@ -1122,7 +1528,7 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   display: flex; align-items: center; gap: 8px;
   padding: 10px 14px 14px;
   background: var(--surface);
-  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(0.8); -webkit-backdrop-filter: blur(24px) saturate(0.8);
   border-top: 0.5px solid var(--border);
 }
 .chat-mode-btn {
@@ -1256,6 +1662,11 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 .me-btn.danger { color: #d93025; }
 .me-btn.danger:active { background: rgba(217,48,37,0.06); }
 .me-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Required field marker */
+.field-required { color: #d93025; margin-left: 2px; font-weight: 400; }
+.field-error { font-size: 11px; color: #d93025; margin-top: 3px; display: none; }
+.field-error.show { display: block; }
 </style>
 </head>
 <body class="light">
@@ -1266,11 +1677,10 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 </header>
 
 <!-- Plot View -->
-<section id="view-plot" class="view active">
+<section id="view-plot" class="view active" style="position:relative;">
   <div class="view-title">剧情</div>
-  <button class="plot-create-btn" onclick="PlotFlow.start()">
+  <button class="plot-create-fab" onclick="PlotFlow.start()" title="新建剧情">
     <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    新建剧情
   </button>
   <div id="plot-list"></div>
 </section>
@@ -1339,6 +1749,9 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
       <button class="chat-header-btn" id="chat-quest-btn" onclick="ChatEngine._openQuests()" title="任务进度">
         <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       </button>
+      <button class="chat-header-btn" id="chat-chars-btn" onclick="ChatEngine._openCharManager()" title="管理在场角色">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </button>
       <button class="chat-header-btn" onclick="ChatEngine._openArchiveSettings()" title="存档设置">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
@@ -1357,17 +1770,30 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
     <button class="sys-call-btn" onclick="ChatEngine._callSystem()" title="呼叫系统">@</button>
   </div>
   <div class="chat-input-area">
-    <button class="chat-mode-btn" id="chat-mode-btn" onclick="ChatEngine.toggleSendMode()" title="发送模式">
-      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    <button class="chat-mode-btn" id="chat-ai-btn" onclick="ChatEngine.triggerAI()" title="AI 回复">
+      <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
     </button>
-    <input class="chat-input" id="chat-input" placeholder="输入对话或动作..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ChatEngine.send();}">
-    <button class="chat-send-btn" onclick="ChatEngine.send()">
+    <input class="chat-input" id="chat-input" placeholder="输入对话或动作..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ChatEngine.sendUserMsg();}">
+    <button class="chat-send-btn" onclick="ChatEngine.sendUserMsg()" title="发送消息">
       <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
 </section>
 
-<!-- Archive Settings Modal -->
+<!-- Archive Settings (Full-screen Overlay) -->
+<section id="archive-settings-overlay" class="archive-settings-overlay">
+  <div class="lore-editor-header">
+    <button class="lore-editor-back" onclick="ChatEngine._closeArchiveSettings()">返回</button>
+    <span class="lore-editor-title" id="archive-settings-title">存档设置</span>
+    <button class="lore-editor-save" onclick="ChatEngine._saveAllArchiveSettings()">保存</button>
+  </div>
+  <div class="archive-settings-body" id="archive-settings-body"></div>
+  <div class="archive-settings-footer">
+    <button class="btn-accent" onclick="ChatEngine._saveAllArchiveSettings()">保存设置</button>
+  </div>
+</section>
+
+<!-- Archive Settings Modal (legacy, kept for compatibility) -->
 <div id="archive-modal" class="modal-overlay" onclick="if(event.target===this)ChatEngine._closeArchiveSettings()">
   <div class="modal-card" style="max-height:85vh;">
     <div class="modal-header">
@@ -1416,6 +1842,19 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
     <button class="quest-panel-close" onclick="ChatEngine._closeQuests()">&times;</button>
   </div>
   <div class="quest-panel-body" id="quest-panel-body"></div>
+</div>
+
+<!-- Character Manager Panel -->
+<div id="char-manager-panel" class="char-manager-panel">
+  <div class="quest-panel-header">
+    <span class="quest-panel-title">在场角色</span>
+    <span style="display:flex;align-items:center;gap:6px;">
+      <span style="font-size:11px;color:var(--text-3);" id="char-mode-label">手动</span>
+      <div class="toggle-switch" id="char-mode-toggle" onclick="ChatEngine._toggleAutoCharMode()" style="margin:0;"></div>
+      <button class="quest-panel-close" onclick="ChatEngine._closeCharManager()" style="margin-left:6px;">&times;</button>
+    </span>
+  </div>
+  <div class="quest-panel-body" id="char-manager-body"></div>
 </div>
 
 <!-- Memory View -->
@@ -1688,6 +2127,14 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 
 <!-- Character Option Overlay -->
 <div id="char-option-overlay" class="char-option-overlay">
+  <div id="mask-selector-area" style="width:100%;max-width:360px;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;box-shadow:var(--shadow);">
+    <div style="font-size:11px;font-weight:500;color:var(--text-3);margin-bottom:6px;">用户面具 <span style="color:#d93025;">*</span></div>
+    <select class="modal-select" id="create-mask-select" onchange="PlotFlow._onMaskChange()" style="margin-bottom:4px;">
+      <option value="">-- 请选择面具 --</option>
+    </select>
+    <div class="field-error" id="create-mask-err">请选择面具</div>
+    <div id="create-mask-no-data" style="display:none;font-size:11px;color:var(--text-2);margin-top:4px;">暂无面具，请先在<a style="color:var(--accent);cursor:pointer;" onclick="PlotFlow.closeCharOptions();document.querySelector('.nav-item[data-view=me]').click();">用户中心</a>创建。</div>
+  </div>
   <div class="char-option-card" onclick="PlotFlow.showCharPicker()">
     <div class="char-option-card-title">从设定库选择角色卡</div>
     <div class="char-option-card-desc">从已有的角色卡中选择，没有则先去设定中心创建</div>
@@ -1700,14 +2147,22 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
   <button class="char-option-back" onclick="PlotFlow.closeCharOptions()">返回</button>
 </div>
 
-<!-- Character Picker Overlay -->
+<!-- Character Picker Overlay (Multi-select) -->
 <div id="char-picker-overlay" class="char-option-overlay">
-  <div style="width:100%;max-width:360px;text-align:center;margin-bottom:8px;">
+  <div style="width:100%;max-width:360px;text-align:center;margin-bottom:6px;">
     <span style="font-size:15px;font-weight:500;color:var(--text);">选择角色卡</span>
+    <span style="font-size:11px;color:var(--text-3);">（至少选择 1 位）</span>
   </div>
-  <div id="char-picker-list" style="width:100%;max-width:360px;max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+  <div class="char-selected-strip" id="char-selected-strip"></div>
+  <div id="char-picker-list" style="width:100%;max-width:360px;max-height:45vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
   <div id="char-picker-empty" style="display:none;text-align:center;color:var(--text-2);font-size:13px;line-height:1.7;padding:20px;">
     暂无角色卡。<br>请先在<a style="color:var(--accent);cursor:pointer;" onclick="PlotFlow.closeCharPicker();PlotFlow.closeCharOptions();document.querySelector('.nav-item[data-view=lore]').click();">设定中心</a>创建角色卡。
+  </div>
+  <div class="char-picker-confirm">
+    <button class="btn-accent" id="char-picker-confirm-btn" disabled onclick="PlotFlow.confirmSelection()">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      确认选择
+    </button>
   </div>
   <button class="char-option-back" onclick="PlotFlow.closeCharPicker()">返回</button>
 </div>
@@ -1749,6 +2204,16 @@ body.light .theme-toggle svg.moon { stroke: var(--text-2); }
 </nav>
 
 <script>
+/* ==================================================================
+   Security: canonical HTML escape
+   ================================================================== */
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeHtmlAttr(s) {
+  return escapeHtml(s).replace(/"/g,'&quot;');
+}
+
 /* ==================================================================
    Module 2: Data Layer & Storage
    ================================================================== */
@@ -1963,6 +2428,8 @@ const Store = {
       affection: 0, systemMessages: [], completedQuests: [], activeQuests: [],
       plotNodes: [], systemMemory: { self: [], characterObservations: {}, worldEvents: [], userProfile: {} }
     };
+    if (plot.autoCharMode === undefined) plot.autoCharMode = false;
+    if (!plot.manualCharIds) plot.manualCharIds = [...(plot.charIds || [])];
   }
 };
 
@@ -2348,7 +2815,7 @@ const WorldPresets = {
   },
 
   // ---- Escape helper ----
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); },
+  _esc(s) { return escapeHtmlAttr(s); },
 
   // ---- System Settings Modal ----
   openSysSettings() {
@@ -2462,6 +2929,8 @@ const WorldPresets = {
 const PlotFlow = {
   _pendingLore: null,     // lore created from preset, waiting for char
   _pendingChar: null,     // generated char data, waiting for user edit
+  _pendingMaskId: null,   // selected mask ID
+  _selectedIds: new Set(), // selected char IDs for multi-select
 
   // ---- Render plot list ----
   renderList() {
@@ -2469,25 +2938,34 @@ const PlotFlow = {
     if (!container) return;
     const plots = Store.plots();
     if (plots.length === 0) {
-      container.innerHTML = '<div class="plot-empty">还没有剧情存档。<br>点击上方按钮创建你的第一个故事。</div>';
+      container.innerHTML = '<div class="plot-empty">还没有剧情存档。<br>点击右上角 + 创建你的第一个故事。</div>';
       return;
     }
-    container.innerHTML = plots.map((p, i) => {
+    // Sort by lastModified descending
+    const sorted = [...plots].sort((a, b) => (b.lastModified || 0) - (a.lastModified || 0));
+    container.innerHTML = sorted.map((p) => {
       const world = Store.lore(p.globalId);
-      const char  = Store.lore(p.charIds?.[0]);
+      const chars = (p.charIds || []).map(id => Store.lore(id)).filter(Boolean);
+      const charNames = chars.map(c => c.title || '未命名').join('、');
+      const charCount = chars.length;
+      const modTime = p.lastModified ? new Date(p.lastModified).toLocaleString() : '--';
+      // Find the original index for enter()
+      const origIdx = plots.indexOf(p);
       return `
-        <div class="plot-card" onclick="PlotFlow.enter(${i})">
+        <div class="plot-card" onclick="PlotFlow.enter(${origIdx})">
           <div class="plot-card-name">${this._esc(p.name || '未命名')}</div>
           <div class="plot-card-meta">
             <span>${world ? world.title : '未选世界'}</span>
-            ${char ? '<span>' + this._esc(char.title || '未命名角色') + '</span>' : ''}
+            ${charCount ? '<span>' + charCount + ' 位角色</span>' : ''}
+            <span style="margin-left:auto;font-size:10px;">${modTime}</span>
           </div>
+          ${charNames ? '<div style="font-size:11px;color:var(--text-3);margin-top:4px;">' + this._esc(charNames) + '</div>' : ''}
         </div>
       `;
     }).join('');
   },
 
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); },
+  _esc(s) { return escapeHtml(s); },
 
   // ---- Entry: open world selector ----
   start() {
@@ -2502,16 +2980,37 @@ const PlotFlow = {
 
   // ---- Show character options ----
   showCharOptions() {
+    // Populate mask selector
+    const sel = document.getElementById('create-mask-select');
+    const masks = Store.masks();
+    const activeId = Store.activeMaskId();
+    if (sel) {
+      sel.innerHTML = '<option value="">-- 请选择面具 --</option>' +
+        masks.map(m => '<option value="' + m.id + '"' + (m.id === activeId ? ' selected' : '') + '>' + this._esc(m.name || '未命名') + '</option>').join('');
+    }
+    const noData = document.getElementById('create-mask-no-data');
+    if (noData) noData.style.display = masks.length === 0 ? 'block' : 'none';
+    if (masks.length === 0 && sel) sel.style.display = 'none';
+    else if (sel) sel.style.display = '';
+
+    this._pendingMaskId = activeId || (masks.length > 0 ? masks[0].id : null);
+
     document.getElementById('char-option-overlay').style.display = 'flex';
   },
   closeCharOptions() {
     document.getElementById('char-option-overlay').style.display = 'none';
     this._pendingLore = null;
+    this._pendingMaskId = null;
   },
 
-  // ---- Option A: pick char from lore library ----
+  _onMaskChange() {
+    this._pendingMaskId = document.getElementById('create-mask-select')?.value || null;
+  },
+
+  // ---- Option A: pick chars from lore library (multi-select) ----
   showCharPicker() {
     this.closeCharOptions();
+    this._selectedIds = new Set(); // reset selection
     const chars = Store.lores('char');
     const list = document.getElementById('char-picker-list');
     const empty = document.getElementById('char-picker-empty');
@@ -2522,33 +3021,82 @@ const PlotFlow = {
     } else {
       if (list) list.style.display = 'flex';
       if (empty) empty.style.display = 'none';
-      list.innerHTML = chars.map(c => `
-        <div class="char-option-card" onclick="PlotFlow.selectChar('${c.id}')" style="max-width:100%;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-              ${c.avatar ? '<img src="' + c.avatar + '" style="width:100%;height:100%;object-fit:cover;">' : '<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-3);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
+      list.innerHTML = chars.map(c => {
+        const selected = this._selectedIds.has(c.id);
+        return `
+          <div class="char-picker-row${selected ? ' selected' : ''}" id="cp-row-${c.id}" onclick="PlotFlow.toggleChar('${c.id}')">
+            <div class="char-picker-row-avatar">
+              ${c.avatar ? '<img src="' + c.avatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
             </div>
-            <div>
-              <div class="char-option-card-title">${this._esc(c.title || '未命名')}</div>
-              <div class="char-option-card-desc">${this._esc((c.bio || c.content || '').slice(0, 40))}</div>
+            <div class="char-picker-row-body">
+              <div class="char-picker-row-name">${this._esc(c.title || '未命名')}</div>
+              <div class="char-picker-row-desc">${this._esc((c.bio || c.content || '').slice(0, 40))}</div>
             </div>
+            <div class="char-picker-check"></div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
+    this._updateConfirmButton();
     document.getElementById('char-picker-overlay').style.display = 'flex';
   },
 
   closeCharPicker() {
     document.getElementById('char-picker-overlay').style.display = 'none';
+    this._selectedIds = new Set();
   },
 
-  selectChar(charId) {
+  // Toggle a character selection
+  toggleChar(charId) {
+    if (this._selectedIds.has(charId)) {
+      this._selectedIds.delete(charId);
+    } else {
+      this._selectedIds.add(charId);
+    }
+    // Update row highlight
+    const row = document.getElementById('cp-row-' + charId);
+    if (row) row.classList.toggle('selected', this._selectedIds.has(charId));
+    this._renderSelectedPreview();
+    this._updateConfirmButton();
+  },
+
+  // Show selected characters as chips above the list
+  _renderSelectedPreview() {
+    const strip = document.getElementById('char-selected-strip');
+    if (!strip) return;
+    if (this._selectedIds.size === 0) {
+      strip.innerHTML = '';
+      return;
+    }
+    strip.innerHTML = Array.from(this._selectedIds).map(id => {
+      const c = Store.lore(id);
+      if (!c) return '';
+      return `
+        <div class="char-selected-chip">
+          <div class="char-selected-chip-avatar">
+            ${c.avatar ? '<img src="' + c.avatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
+          </div>
+          <span>${this._esc(c.title || '未命名')}</span>
+          <span class="char-selected-chip-remove" onclick="event.stopPropagation();PlotFlow.toggleChar('${c.id}')">&times;</span>
+        </div>
+      `;
+    }).join('');
+  },
+
+  // Enable confirm button only when at least 1 char selected
+  _updateConfirmButton() {
+    const btn = document.getElementById('char-picker-confirm-btn');
+    if (btn) btn.disabled = this._selectedIds.size === 0;
+  },
+
+  // Confirm selection and create plot
+  confirmSelection() {
+    if (this._selectedIds.size === 0) return;
+    const charCards = Array.from(this._selectedIds).map(id => Store.lore(id)).filter(Boolean);
+    if (charCards.length === 0) return;
     this.closeCharPicker();
-    const charCard = Store.lore(charId);
-    if (!charCard) return;
-    this._createPlotAndEnter(this._pendingLore, charCard);
+    this._createPlotAndEnter(this._pendingLore, charCards);
   },
 
   // ---- Option B: AI generate random char ----
@@ -2556,9 +3104,17 @@ const PlotFlow = {
     const lore = this._pendingLore;
     if (!lore) return;
 
+    // Validate mask
+    this._pendingMaskId = this._pendingMaskId || Store.activeMaskId();
+    if (!this._pendingMaskId) {
+      const err = document.getElementById('create-mask-err');
+      if (err) err.classList.add('show');
+      return;
+    }
+
     const apiCfg = Store.apiCfg();
     if (!apiCfg.key || !apiCfg.url) {
-      alert('请先在「我」页面配置 API');
+      ChatEngine._showAPIMissingHint();
       return;
     }
 
@@ -2646,11 +3202,10 @@ const PlotFlow = {
       };
 
       Store.addLore(charCard);
-      this._pendingChar = charCard;
       this.closeCharOptions();
 
-      // Create plot and enter
-      this._createPlotAndEnter(this._pendingLore, charCard);
+      // Create plot with just the generated char
+      this._createPlotAndEnter(this._pendingLore, [charCard]);
 
     } catch (e) {
       card.innerHTML = `
@@ -2663,22 +3218,33 @@ const PlotFlow = {
   },
 
   // ---- Final step: create plot archive + enter ----
-  _createPlotAndEnter(lore, charCard) {
+  _createPlotAndEnter(lore, charCards) {
+    // Validate: mask is required
+    const maskId = this._pendingMaskId || Store.activeMaskId();
+    if (!maskId) {
+      const err = document.getElementById('create-mask-err');
+      if (err) err.classList.add('show');
+      return;
+    }
+    const primaryChar = charCards[0];
+    const name = lore.title + (charCards.length === 1
+      ? ' · ' + primaryChar.title
+      : ' · ' + charCards.map(c => c.title).join('、'));
     const plot = {
       id: 'plot_' + Date.now(),
-      name: lore.title + ' · ' + charCard.title,
-      maskId: Store.activeMaskId() || null,
+      name: name,
+      maskId: maskId,
       globalId: lore.id,
-      charIds: [charCard.id],
+      charIds: charCards.map(c => c.id),
       localIds: [],
       chats: [],
       state: {
-        affection: charCard.initialAffection || 0,
+        affection: primaryChar.initialAffection || 0,
         emotion: '平静',
         location: '未知'
       },
       worldState: {
-        affection: charCard.initialAffection || 0,
+        affection: primaryChar.initialAffection || 0,
         currentTime: null,
         systemMessages: [],
         completedQuests: [],
@@ -2692,11 +3258,16 @@ const PlotFlow = {
       starredThoughts: [],
       lastSummaryIdx: 0,
       pendingMemory: null,
-      lastProactiveTime: 0
+      lastProactiveTime: 0,
+      autoCharMode: false,
+      manualCharIds: charCards.map(c => c.id),
+      lastModified: Date.now()
     };
     Store.addPlot(plot);
     this._pendingLore = null;
     this._pendingChar = null;
+    this._pendingMaskId = null;
+    this._selectedIds = new Set();
     this.renderList();
   },
 
@@ -2784,21 +3355,26 @@ const LoreCenter = {
       container.innerHTML = '<div class="lore-empty">' + (emptyMsg[this._filter] || '暂无设定条目。') + '</div>';
       return;
     }
-    container.innerHTML = items.map(l => `
+    container.innerHTML = items.map(l => {
+      const world = l.type === 'storyline' && l.globalId ? Store.lore(l.globalId) : null;
+      const preview = l.type === 'storyline' && world
+        ? '关联世界：' + (world.title || '未知')
+        : this._esc((l.content || l.bio || '').slice(0, 50));
+      return `
       <div class="lore-item" onclick="LoreCenter.openEditor('${l.id}')">
         <div class="lore-item-icon">
           <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--text-2);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;">${this._typeSvg(l.type)}</svg>
         </div>
         <div class="lore-item-body">
           <div class="lore-item-name">${this._esc(l.title || '未命名')}</div>
-          <div class="lore-item-preview">${this._esc((l.content || l.bio || '').slice(0, 50))}</div>
+          <div class="lore-item-preview">${preview}</div>
         </div>
         <div class="lore-item-type">${this._typeLabel(l.type)}</div>
       </div>
-    `).join('');
+    `; }).join('');
   },
 
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); },
+  _esc(s) { return escapeHtml(s); },
 
   // ---- New local setting (quick create) ----
   newLocal() {
@@ -2844,7 +3420,8 @@ const LoreCenter = {
       enableDiary: false,
       memories: { core: [], rawChats: [] },
       memorySettings: { autoExtract: false, extractInterval: 30, coreThreshold: 0.9 },
-      extractCounter: 0
+      extractCounter: 0,
+      forbiddenConfig: { enabled: true, words: [], actions: [], patterns: [] }
     };
     Store.addLore(lore);
     this.renderList();
@@ -2891,11 +3468,13 @@ const LoreCenter = {
     const isGlobal = lore.type === 'global';
 
     // Render editor body
+    const reqName = (lore.type !== 'local'); // global, char, storyline all require name explicitly
     document.getElementById('lore-editor-body').innerHTML = `
       <div class="preset-form-card">
         <div class="preset-form-group">
-          <div class="preset-form-label">名称</div>
+          <div class="preset-form-label">名称<span class="field-required">*</span></div>
           <input class="preset-form-input" id="le-name" value="${this._esc(lore.title || '')}">
+          <div class="field-error" id="le-name-err">名称不能为空</div>
         </div>
         ${lore.type === 'char' ? `
         <div class="preset-form-group">
@@ -2910,11 +3489,12 @@ const LoreCenter = {
         `}
         ${lore.type === 'storyline' ? `
         <div class="preset-form-group">
-          <div class="preset-form-label">绑定大世界</div>
+          <div class="preset-form-label">关联大世界 <small style="font-weight:400;color:#d93025;">（必选）</small></div>
           <select class="modal-select" id="le-global">
-            <option value="">-- 不绑定 --</option>
+            <option value="">-- 请选择大世界 --</option>
             ${Store.lores('global').map(g => '<option value="' + g.id + '"' + (lore.globalId === g.id ? ' selected' : '') + '>' + this._esc(g.title) + '</option>').join('')}
           </select>
+          ${Store.lores('global').length === 0 ? '<div style="font-size:11px;color:var(--text-3);margin-top:4px;">暂无大世界，请先在「大世界」分类中创建。</div>' : ''}
         </div>
         ` : ''}
         ${lore.type === 'local' ? `
@@ -2924,8 +3504,9 @@ const LoreCenter = {
         </div>
         ` : ''}
         <div class="preset-form-group">
-          <div class="preset-form-label">${lore.type === 'char' ? '角色设定' : '基础设定'}</div>
+          <div class="preset-form-label">${lore.type === 'char' ? '角色设定' : '基础设定'}<span class="field-required">*</span></div>
           <textarea class="preset-form-textarea" id="le-content">${this._esc(lore.content || '')}</textarea>
+          <div class="field-error" id="le-content-err">内容不能为空</div>
         </div>
         ${isGlobal ? `
         <div class="preset-settings-row">
@@ -2965,6 +3546,16 @@ const LoreCenter = {
   },
 
   closeEditor() {
+    // Auto-delete empty card if user never saved any content
+    if (this._editId) {
+      const lore = Store.lore(this._editId);
+      const name = (document.getElementById('le-name')?.value || '').trim();
+      const content = (document.getElementById('le-content')?.value || '').trim();
+      if (!name && !content && lore) {
+        Store.deleteLore(this._editId);
+        this.renderList();
+      }
+    }
     document.getElementById('lore-editor-overlay').style.display = 'none';
     this._editId = null;
   },
@@ -2972,11 +3563,24 @@ const LoreCenter = {
   // ---- Save editor ----
   saveEditor() {
     if (!this._editId) return;
-    const name    = document.getElementById('le-name')?.value.trim() || '未命名';
+    const name    = document.getElementById('le-name')?.value.trim() || '';
     const desc    = document.getElementById('le-desc')?.value.trim() || '';
     const content = document.getElementById('le-content')?.value.trim() || '';
 
     const lore = Store.lore(this._editId);
+
+    // Validate required fields
+    let valid = true;
+    if (!name) { document.getElementById('le-name-err').classList.add('show'); valid = false; }
+      else { document.getElementById('le-name-err').classList.remove('show'); }
+    if (!content) { document.getElementById('le-content-err').classList.add('show'); valid = false; }
+      else { document.getElementById('le-content-err').classList.remove('show'); }
+    if (lore.type === 'storyline') {
+      const gid = document.getElementById('le-global')?.value || '';
+      if (!gid) { alert('请为故事线选择关联的大世界'); return; }
+    }
+    if (!valid) return;
+
     const data = { title: name, content: content };
     if (lore.type === 'char') { data.bio = desc; } else { data.desc = desc; }
 
@@ -3087,6 +3691,15 @@ const CharEditor = {
   },
 
   close() {
+    // Auto-delete empty card if user never saved any content
+    if (this._id) {
+      const name = (document.getElementById('ce-name')?.value || '').trim();
+      const persona = (document.getElementById('ce-persona')?.value || '').trim();
+      if (!name && !persona) {
+        Store.deleteLore(this._id);
+        LoreCenter.renderList();
+      }
+    }
     document.getElementById('char-editor-overlay').style.display = 'none';
     this._id = null;
   },
@@ -3110,8 +3723,9 @@ const CharEditor = {
 
       <!-- Name -->
       <div class="preset-form-group">
-        <div class="preset-form-label">角色名称</div>
+        <div class="preset-form-label">角色名称<span class="field-required">*</span></div>
         <input class="preset-form-input" id="ce-name" value="${this._esc(c.title || '')}" placeholder="必填">
+        <div class="field-error" id="ce-name-err">角色名称不能为空</div>
       </div>
 
       <!-- Initial Affection -->
@@ -3164,8 +3778,13 @@ const CharEditor = {
         </div>
         <div class="char-collapse-body" id="ce-advanced-body">
           <div class="preset-form-group">
-            <div class="preset-form-label">详细背景与性格</div>
+            <div class="preset-form-label">详细背景与性格<span class="field-required">*</span></div>
             <textarea class="preset-form-textarea" id="ce-persona" rows="3" placeholder="角色的背景故事、性格特点、动机...">${this._esc(this._extractSection(c.content, '性格背景'))}</textarea>
+            <div class="field-error" id="ce-persona-err">性格背景不能为空</div>
+          </div>
+          <div class="preset-form-group">
+            <div class="preset-form-label">说话风格</div>
+            <textarea class="preset-form-textarea" id="ce-style" rows="2" placeholder="语气、句式、用词习惯...">${this._esc(this._extractSection(c.content, '说话风格'))}</textarea>
           </div>
           <div class="preset-form-group">
             <div class="preset-form-label">行为规则</div>
@@ -3286,7 +3905,7 @@ const CharEditor = {
     const raw = document.getElementById('ce-parse-input')?.value.trim();
     if (!raw) return;
     const cfg = Store.apiCfg();
-    if (!cfg.key || !cfg.url) { alert('请先在「我」页面配置 API'); return; }
+    if (!cfg.key || !cfg.url) { ChatEngine._showAPIMissingHint(); return; }
 
     const btn = document.querySelector('#ce-parse-body .btn-sm');
     if (btn) { btn.textContent = '解析中...'; btn.disabled = true; }
@@ -3344,24 +3963,15 @@ const CharEditor = {
       }
       // Parse structured sections
       const persona = this._extractFromResult(result, '性格背景');
+      const style = this._extractFromResult(result, '说话风格');
       const rules = this._extractFromResult(result, '行为规则');
       const examples = this._extractFromResult(result, '示例对话');
 
-      // Rebuild content
-      const content = [
-        persona ? '【性格背景】\n' + persona : '',
-        result.match(/【说话风格】([\s\S]*?)(?=【|$)/)?.[1]?.trim() ? '【说话风格】\n' + result.match(/【说话风格】([\s\S]*?)(?=【|$)/)[1].trim() : '',
-        rules ? '【行为规则】\n' + rules : '',
-        examples ? '【示例对话】\n' + examples : ''
-      ].filter(Boolean).join('\n\n');
-
-      // Store parsed content in hidden state for save
-      this._parsedContent = content;
-
       this._render();
-      // Re-fill advanced fields
+      // Fill form fields after re-render
       setTimeout(() => {
         if (document.getElementById('ce-persona')) document.getElementById('ce-persona').value = persona;
+        if (document.getElementById('ce-style')) document.getElementById('ce-style').value = style;
         if (document.getElementById('ce-rules')) document.getElementById('ce-rules').value = rules;
         if (document.getElementById('ce-examples')) document.getElementById('ce-examples').value = examples;
         // Open advanced
@@ -3386,11 +3996,18 @@ const CharEditor = {
   // ---- Save ----
   save() {
     if (!this._id) return;
-    const name = document.getElementById('ce-name')?.value.trim();
-    if (!name) { alert('角色名称不能为空'); return; }
+    const name = document.getElementById('ce-name')?.value.trim() || '';
+    const persona = document.getElementById('ce-persona')?.value.trim() || '';
+
+    // Validate required
+    let valid = true;
+    if (!name) { document.getElementById('ce-name-err').classList.add('show'); valid = false; }
+      else { document.getElementById('ce-name-err').classList.remove('show'); }
+    if (!persona) { document.getElementById('ce-persona-err').classList.add('show'); valid = false; }
+      else { document.getElementById('ce-persona-err').classList.remove('show'); }
+    if (!valid) return;
 
     // Build content from advanced fields
-    const persona  = document.getElementById('ce-persona')?.value.trim() || '';
     const rules    = document.getElementById('ce-rules')?.value.trim() || '';
     const examples = document.getElementById('ce-examples')?.value.trim() || '';
     const styleRaw = document.getElementById('ce-style')?.value.trim() || '';
@@ -3473,7 +4090,7 @@ const CharEditor = {
     input.click();
   },
 
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  _esc(s) { return escapeHtmlAttr(s); }
 };
 
 // ---- Update LoreCenter to delegate char type to CharEditor ----
@@ -3522,7 +4139,6 @@ const AFFECTION_TIERS = [
 
 const ChatEngine = {
   _idx: null,
-  _sendMode: 'instant',  // 'instant' | 'pending'
   _menuTimer: null,
 
   // ---- Affection helpers ----
@@ -3647,7 +4263,9 @@ const ChatEngine = {
         if (plot.diaries.length > 50) plot.diaries.shift();
         Store.save();
       }
-    } catch (e) { /* silent */ }
+    } catch (e) {
+      this._notifyBgFail(plot, 'diary', '自动日记生成失败，可稍后重试');
+    }
   },
 
   // ---- Analyze affection change via API ----
@@ -3680,7 +4298,10 @@ const ChatEngine = {
       const data = await res.json();
       const m = (data.choices?.[0]?.message?.content || '').match(/\{[\s\S]*\}/);
       if (m) { const p = JSON.parse(m[0]); return p.delta || 0; }
-    } catch (e) { /* fall through */ }
+    } catch (e) {
+      const plot = Store.plot(this._idx);
+      if (plot) this._notifyBgFail(plot, 'affection', '好感度分析失败，已切换为本地评估');
+    }
     return 0;
   },
 
@@ -3693,12 +4314,13 @@ const ChatEngine = {
 
     // First-time welcome
     if (!plot.chats || plot.chats.length === 0) {
-      const char = Store.lore(plot.charIds?.[0]);
       const world = Store.lore(plot.globalId);
+      const chars = (plot.charIds || []).map(id => Store.lore(id)).filter(Boolean);
+      const charList = chars.map(c => c.title).join('、');
       plot.chats.push({
         role: 'system',
         content: '欢迎来到「' + (world?.title || '未知世界') + '」。' +
-          (char?.title ? '你正在与 ' + char.title + ' 对话。' : '') +
+          (charList ? '当前在场角色：' + charList + '。' : '') +
           '输入你的第一句话，开始故事。',
         timestamp: Date.now()
       });
@@ -3732,9 +4354,12 @@ const ChatEngine = {
     const flow = document.getElementById('chat-flow');
     if (!plot || !flow) return;
     const char = Store.lore(plot.charIds?.[0]);
+    const apiCfg = Store.apiCfg();
+    const apiOk = !!(apiCfg.key && apiCfg.url);
     const wasAtBottom = flow.scrollHeight - flow.scrollTop - flow.clientHeight < 60;
 
-    flow.innerHTML = (plot.chats || []).map((msg, i) => {
+    flow.innerHTML = (apiOk ? '' : '<div class="api-hint-bar">尚未配置 API，AI 不会回复。<br><a onclick="ChatEngine._showAPIMissingHint()">点击此处配置</a></div>')
+      + (plot.chats || []).map((msg, i) => {
       // Narrator
       if (msg.role === 'narrator') {
         let t = msg.content.replace(/^[（(]/, '').replace(/[）)]$/, '');
@@ -3754,7 +4379,7 @@ const ChatEngine = {
         const userAvatar = mask?.avatar || '';
         return `
           <div class="msg-row user${isSystemDialog ? ' user-system' : ''}">
-            <div class="msg-avatar-block" style="flex-shrink:0;width:34px;text-align:center;">
+            <div class="msg-avatar-block" onclick="ChatEngine._openUserDetail()" style="flex-shrink:0;width:34px;text-align:center;cursor:pointer;">
               <div class="msg-avatar">${userAvatar ? '<img src="' + userAvatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}</div>
             </div>
             <div class="bubble user-bubble" data-idx="${i}" data-latest="true">
@@ -3775,7 +4400,7 @@ const ChatEngine = {
         : '';
       return `
         <div class="msg-row ai">
-          <div class="msg-avatar-block" onclick="ChatEngine._openDetail()">
+          <div class="msg-avatar-block" onclick="ChatEngine._openDetail('${msg.charId || msgChar?.id || msgCharByName?.id || ''}')">
             <div class="msg-avatar">${avatar ? '<img src="' + avatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}</div>
             <div class="msg-avatar-name">${this._esc(charName)}</div>
           </div>
@@ -3899,7 +4524,7 @@ const ChatEngine = {
     Store.save();
     this.render();
     const input = document.getElementById('chat-input');
-    if (input) { input.value = msg.content; this.send(); }
+    if (input) { input.value = msg.content; this.sendUserMsg(); setTimeout(() => this.triggerAI(), 100); }
   },
 
   // ---- Regenerate AI ----
@@ -3911,12 +4536,7 @@ const ChatEngine = {
     plot.chats.pop();
     Store.save();
     this.render();
-    // Re-send last user message
-    const lastUser = plot.chats.filter(c => c.role === 'user').pop();
-    if (lastUser) {
-      const input = document.getElementById('chat-input');
-      if (input) { input.value = lastUser.content; this.send(); }
-    }
+    this.triggerAI();
   },
 
   // ---- Thought overlay ----
@@ -3940,19 +4560,8 @@ const ChatEngine = {
     document.body.appendChild(overlay);
   },
 
-  // ---- Send Mode ----
-  toggleSendMode() {
-    this._sendMode = this._sendMode === 'instant' ? 'pending' : 'instant';
-    const btn = document.getElementById('chat-mode-btn');
-    if (btn) {
-      btn.innerHTML = this._sendMode === 'pending'
-        ? '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
-        : '<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
-    }
-  },
-
-  // ---- SEND (main flow) ----
-  async send() {
+  // ---- Send user message (no AI) ----
+  sendUserMsg() {
     const input = document.getElementById('chat-input');
     if (!input?.value.trim()) return;
     const userMsg = input.value.trim();
@@ -3962,10 +4571,21 @@ const ChatEngine = {
     Store.ensureState(plot);
 
     plot.chats.push({ role: 'user', content: userMsg, timestamp: Date.now() });
+    plot.lastModified = Date.now();
     Store.save();
     this.render();
+  },
 
-    if (this._sendMode === 'pending') return;
+  // ---- Trigger AI response ----
+  async triggerAI() {
+    const plot = Store.plot(this._idx);
+    if (!plot) return;
+
+    // Find the last user message
+    const lastUserIdx = [...(plot.chats || [])].reverse().findIndex(c => c.role === 'user');
+    if (lastUserIdx === -1) return; // No user message to respond to
+    const lastUser = plot.chats[plot.chats.length - 1 - lastUserIdx];
+    const userMsg = lastUser.content;
 
     // Show loading indicator (typing dots)
     const loadId = 'loading_' + Date.now();
@@ -3984,10 +4604,33 @@ const ChatEngine = {
       // 2. Local settings matching keywords
       const localCtx = this._buildLocalCtx(plot, userMsg);
 
-      // 3. 在场角色列表
-      const presentCtx = allChars.length > 1
-        ? '【在场角色】' + allChars.map(c => c.title).join('、') + '。只有以上列出的角色可以在对话中出现。不在场的角色绝对不能出现，除非由用户或旁白引入。'
+      // 3. 在场角色列表（只输出当前在场角色，不止场的绝对不能出现）
+      const allBoundChars = Store.lores('char').filter(c => plot.charIds?.includes(c.id));
+      const presentCtx = allBoundChars.length > 0
+        ? '【在场角色】' + allBoundChars.map(c => c.title).join('、') + '。只有以上列出的角色可以在对话中出现。不在场的角色绝对不能出现，除非由用户或旁白引入。'
         : '';
+
+      // 3b. Auto char mode: available characters (not present, can be introduced by AI)
+      let availableCtx = '';
+      if (plot.autoCharMode) {
+        const presentIds = new Set(plot.charIds || []);
+        const manualIds = new Set(plot.manualCharIds || []);
+        const allLoreChars = Store.lores('char');
+        const available = allLoreChars.filter(c => !presentIds.has(c.id));
+        if (available.length > 0) {
+          availableCtx = '【可引入角色】以下角色当前不在场，但可根据剧情需要随时引入（通过旁白描述其登场）：' +
+            available.map(c => c.title + '（' + ((c.bio || c.content || '').slice(0, 30)) + '）').join('、') +
+            '。引入角色时在回复末尾加 [CHAR_JOIN: 角色名] 标记。不要引入与当前场景无关的角色。';
+        }
+        // List manually-placed characters that AI should NOT remove
+        const manualPresent = (plot.charIds || []).filter(id => manualIds.has(id));
+        if (manualPresent.length > 0) {
+          availableCtx += ' 【受保护角色】' + manualPresent.map(id => {
+            const mc = Store.lore(id);
+            return mc?.title || '未知';
+          }).join('、') + ' 是用户手动放置的，你绝对不能移除。';
+        }
+      }
 
       // 4. Affection context (primary character)
       const affection = plot.worldState?.affection ?? (char?.initialAffection ?? 0);
@@ -4014,6 +4657,7 @@ const ChatEngine = {
         worldCtx,
         localCtx,
         presentCtx,
+        availableCtx,
         affectionCtx,
         memoryCtx,
         recentWindow,
@@ -4047,14 +4691,18 @@ const ChatEngine = {
         '【好感度规则】好感度影响态度，但不能违背角色核心人设。变化必须循序渐进，不能OOC。',
         '【优先级】雷区设定（最高）> 大世界设定 > 故事线 > 局部设定 > 角色设定 > 好感度影响。低优先级不可覆盖高优先级。',
         '【多角色规则】每次判断该由谁回应（可能单人，可能2-3个角色）。角色之间可互动但不能喧宾夺主。用户永远是对话核心。不在场角色绝对不能出现。私密/亲密场景禁止其他角色闯入。角色间互动控制在2-3个气泡内。',
-        '【任务标记】如果剧情推进出新的阶段性目标，在回复末尾附上：[QUEST: 任务名称, 目标好感度数值]。如不需要则不输出。'
+        '【任务标记】如果剧情推进出新的阶段性目标，在回复末尾附上：[QUEST: 任务名称, 目标好感度数值]。如不需要则不输出。',
+        (plot.autoCharMode
+          ? '【角色进出标记】根据可引入角色列表，如果剧情发展需要某个在场外的角色加入，在回复末尾附上：[CHAR_JOIN: 角色名]。如果有AI自动引入的不在场角色应该离开当前场景，附上：[CHAR_LEAVE: 角色名]。旁白需要同时描述角色的进出（如"XX推门走了进来"）。手动放置的角色不能移除。每次最多加入1位角色。'
+          : '')
       ].join('\n');
 
       const apiCfg = Store.apiCfg();
       if (!apiCfg.key || !apiCfg.url) {
         plot.chats = plot.chats.filter(c => c._loadId !== loadId);
-        plot.chats.push({ role: 'system', content: '请先在「我」页面配置 API', timestamp: Date.now() });
-        Store.save(); this.render(); return;
+        Store.save(); this.render();
+        this._showAPIMissingHint();
+        return;
       }
 
       // Validate + retry loop
@@ -4105,6 +4753,13 @@ const ChatEngine = {
                 this._updateSceneBar(plot);
               }
               b.content = b.content.replace(/\[ENV:\s*.*?\]/, '').trim();
+            }
+          }
+
+          // Parse CHAR_JOIN / CHAR_LEAVE tags (auto mode only)
+          if (plot.autoCharMode) {
+            for (const b of bubbles) {
+              this._processCharTags(plot, b);
             }
           }
 
@@ -4192,6 +4847,27 @@ const ChatEngine = {
         }
       }
 
+      // Process auto char events (narrator messages for AI-initiated joins/leaves)
+      if (plot._autoCharEvents && plot._autoCharEvents.length > 0) {
+        for (const evt of plot._autoCharEvents) {
+          if (evt.type === 'join') {
+            plot.chats.push({
+              role: 'narrator',
+              content: '（' + evt.charName + '加入了对话）',
+              timestamp: Date.now()
+            });
+          } else if (evt.type === 'leave') {
+            plot.chats.push({
+              role: 'narrator',
+              content: '（' + evt.charName + '离开了当前场景）',
+              timestamp: Date.now()
+            });
+          }
+        }
+        delete plot._autoCharEvents;
+      }
+
+      plot.lastModified = Date.now();
       Store.save();
       this.render();
 
@@ -4271,12 +4947,14 @@ const ChatEngine = {
         ctx += '---\n';
       }
     }
-    // Storylines
-    const storylines = Store.lores('storyline').filter(s => s.globalId === plot.globalId);
-    if (storylines.length) {
-      ctx += '\n【原故事线（仅供参考，不强制遵循）】\n';
-      storylines.forEach(s => ctx += '◎ ' + s.title + '\n' + s.content + '\n---\n');
-      ctx += '根据实际剧情推进判断是否触发以上节点。用户行为可以改写原故事线。\n';
+    // Storyline: only inject the one bound to this plot
+    if (plot.storylineId) {
+      const storyline = Store.lore(plot.storylineId);
+      if (storyline && storyline.globalId === plot.globalId) {
+        ctx += '\n【原故事线（仅供参考，不强制遵循）】\n';
+        ctx += '◎ ' + storyline.title + '\n' + storyline.content + '\n';
+        ctx += '以上是可选的参考剧情。根据实际对话推进判断是否触发该节点。用户行为可以改写原故事线。\n';
+      }
     }
     return ctx;
   },
@@ -4292,10 +4970,15 @@ const ChatEngine = {
   _buildLocalCtx(plot, input) {
     const locals = Store.lores('local').filter(l => plot.localIds?.includes(l.id));
     if (!locals.length) return '';
-    const lower = input.toLowerCase();
+    // Tokenize user input: split on commas, periods, spaces, Chinese punctuation
+    const tokens = (input || '').toLowerCase().split(/[\s,，。.、；;：:！!？?]+/).filter(t => t.length > 0);
     const matched = locals.filter(l => {
       if (!l.keywords?.length) return l.content && l.content.length < 300;
-      return l.keywords.some(k => lower.includes(k.toLowerCase()));
+      return l.keywords.some(k => {
+        const kw = k.toLowerCase().trim();
+        if (!kw) return false;
+        return tokens.some(t => t === kw || t.includes(kw) || kw.includes(t));
+      });
     });
     return matched.length ? '【当前情境准则】\n' + matched.map(l => l.content).join('\n') : '';
   },
@@ -4336,12 +5019,24 @@ const ChatEngine = {
     Store.save();
   },
 
+  // Deduped background failure notification — shown once per plot per key
+  _notifyBgFail(plot, key, msg) {
+    if (!plot._bgFailNotified) plot._bgFailNotified = {};
+    if (plot._bgFailNotified[key]) return; // already shown
+    plot._bgFailNotified[key] = true;
+    plot.chats.push({ role: 'system', content: msg, timestamp: Date.now() });
+    Store.save();
+    this.render();
+  },
+
   async _autoExtractMemories(plot, char) {
     const rawChats = char.memories?.rawChats || [];
     if (rawChats.length < 10) return;
     try {
       await this._performExtraction(char, rawChats);
-    } catch (e) { /* silent */ }
+    } catch (e) {
+      this._notifyBgFail(plot, 'extract', '记忆自动提取失败，可在存档设置中手动触发');
+    }
   },
 
   async _performExtraction(char, chats) {
@@ -4399,6 +5094,24 @@ const ChatEngine = {
     for (const p of GLOBAL_FORBIDDEN.forbiddenPatterns) {
       if (p.test(text)) return { ok: false, reason: '禁用句式: ' + p };
     }
+    // Per-character forbidden config
+    const plot = Store.plot(this._idx);
+    const char = Store.lore(plot?.charIds?.[0]);
+    const fc = char?.forbiddenConfig;
+    if (fc && fc.enabled !== false) {
+      for (const w of (fc.words || [])) {
+        if (w && text.includes(w)) return { ok: false, reason: '角色禁用词: ' + w };
+      }
+      for (const a of (fc.actions || [])) {
+        if (a && text.includes(a)) return { ok: false, reason: '角色禁用动作: ' + a };
+      }
+      for (const raw of (fc.patterns || [])) {
+        if (raw) {
+          try { if (new RegExp(raw).test(text)) return { ok: false, reason: '角色禁用句式: ' + raw }; }
+          catch (e) { /* invalid regex, skip */ }
+        }
+      }
+    }
     // AI identity check
     const aiPatterns = [/作为.?AI/, /作为.?人工智能/, /我是.?语言模型/, /我是.?助手/, /训练数据/, /知识截止/, /以.?身份.*扮演/];
     for (const p of aiPatterns) {
@@ -4439,6 +5152,42 @@ const ChatEngine = {
       return true;
     }
     return false;
+  },
+
+  // ---- Auto Char Mode: process CHAR_JOIN / CHAR_LEAVE tags ----
+  _processCharTags(plot, bubble) {
+    if (!plot.autoCharMode) return;
+    if (!plot.manualCharIds) plot.manualCharIds = [];
+    const manualIds = new Set(plot.manualCharIds);
+
+    // CHAR_JOIN
+    const joinMatch = bubble.content.match(/\[CHAR_JOIN:\s*(.+?)\]/);
+    if (joinMatch) {
+      const charName = joinMatch[1].trim();
+      const char = Store.lores('char').find(c => c.title === charName);
+      if (char && !(plot.charIds || []).includes(char.id) && (plot.charIds || []).length < 5) {
+        plot.charIds.push(char.id);
+        // Do NOT add to manualCharIds — AI-placed chars can be removed by AI
+        // Add narrator message about the join (will be rendered next)
+        plot._autoCharEvents = plot._autoCharEvents || [];
+        plot._autoCharEvents.push({ type: 'join', charId: char.id, charName: char.title });
+      }
+      bubble.content = bubble.content.replace(/\[CHAR_JOIN:\s*.+?\]/, '').trim();
+    }
+
+    // CHAR_LEAVE
+    const leaveMatch = bubble.content.match(/\[CHAR_LEAVE:\s*(.+?)\]/);
+    if (leaveMatch) {
+      const charName = leaveMatch[1].trim();
+      const char = Store.lores('char').find(c => c.title === charName);
+      if (char && (plot.charIds || []).includes(char.id) && !manualIds.has(char.id) && (plot.charIds || []).length > 1) {
+        const idx = plot.charIds.indexOf(char.id);
+        if (idx !== -1) plot.charIds.splice(idx, 1);
+        plot._autoCharEvents = plot._autoCharEvents || [];
+        plot._autoCharEvents.push({ type: 'leave', charId: char.id, charName: char.title });
+      }
+      bubble.content = bubble.content.replace(/\[CHAR_LEAVE:\s*.+?\]/, '').trim();
+    }
   },
 
   _checkQuestCompletion(plot) {
@@ -4515,15 +5264,346 @@ const ChatEngine = {
     document.getElementById('quest-panel').style.display = 'none';
   },
 
-  // ---- Archive Settings Panel ----
-  _openArchiveSettings() {
+  // ---- Character Manager Panel ----
+  _openCharManager() {
+    document.getElementById('char-manager-panel').style.display = 'flex';
+    this._renderCharManager();
+  },
+  _closeCharManager() {
+    document.getElementById('char-manager-panel').style.display = 'none';
+  },
+
+  _renderCharManager() {
     const plot = Store.plot(this._idx);
-    document.getElementById('archive-modal-title').textContent = (plot?.name || '存档') + ' - 设置';
-    document.getElementById('archive-modal').style.display = 'flex';
+    if (!plot) return;
+    const body = document.getElementById('char-manager-body');
+    if (!body) return;
+
+    // Update mode toggle
+    const toggle = document.getElementById('char-mode-toggle');
+    const label = document.getElementById('char-mode-label');
+    if (toggle) {
+      if (plot.autoCharMode) toggle.classList.add('on'); else toggle.classList.remove('on');
+    }
+    if (label) label.textContent = plot.autoCharMode ? '自动' : '手动';
+
+    const allChars = Store.lores('char');
+    const presentIds = new Set(plot.charIds || []);
+    const manualIds = new Set(plot.manualCharIds || []);
+
+    if (allChars.length === 0) {
+      body.innerHTML = '<div class="char-manager-empty">暂无角色卡。<br>请先在设定中心创建角色。</div>';
+      return;
+    }
+
+    body.innerHTML = allChars.map(c => {
+      const isPresent = presentIds.has(c.id);
+      const isManual = manualIds.has(c.id);
+      const sourceLabel = plot.autoCharMode && isPresent
+        ? (isManual ? '<span style="font-size:10px;color:var(--accent);">手动</span>'
+                    : '<span style="font-size:10px;color:var(--text-3);">AI</span>')
+        : '';
+      return `
+        <div class="char-manager-item">
+          <div class="char-manager-check${isPresent ? ' on' : ''}" onclick="ChatEngine._toggleCharPresence('${c.id}')"></div>
+          <div class="char-manager-avatar">
+            ${c.avatar ? '<img src="' + c.avatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
+          </div>
+          <div class="char-manager-info">
+            <div class="char-manager-name">${sourceLabel} ${this._esc(c.title || '未命名')}</div>
+            <div class="char-manager-bio">${this._esc((c.bio || c.content || '').slice(0, 30))}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  _toggleAutoCharMode() {
+    const plot = Store.plot(this._idx);
+    if (!plot) return;
+    plot.autoCharMode = !plot.autoCharMode;
+    if (!plot.manualCharIds) plot.manualCharIds = [];
+    if (!plot.autoCharMode) {
+      // Switching to manual: all current chars become manual
+      plot.manualCharIds = [...(plot.charIds || [])];
+    }
+    // Switching to auto: keep current manualCharIds as protected set
+    Store.save();
+    this._renderCharManager();
+    // Update system prompt hint
+    const toggle = document.getElementById('char-mode-toggle');
+    const label = document.getElementById('char-mode-label');
+    if (toggle) {
+      if (plot.autoCharMode) toggle.classList.add('on'); else toggle.classList.remove('on');
+    }
+    if (label) label.textContent = plot.autoCharMode ? '自动' : '手动';
+  },
+
+  _toggleCharPresence(charId) {
+    const plot = Store.plot(this._idx);
+    if (!plot) return;
+    if (!plot.charIds) plot.charIds = [];
+    if (!plot.manualCharIds) plot.manualCharIds = [];
+
+    const char = Store.lore(charId);
+    if (!char) return;
+
+    const idx = plot.charIds.indexOf(charId);
+    if (idx === -1) {
+      // Add character to scene
+      if (plot.charIds.length >= 5) { alert('最多同时在场 5 位角色'); return; }
+      plot.charIds.push(charId);
+      // User manually added → protect from AI removal
+      const midx = plot.manualCharIds.indexOf(charId);
+      if (midx === -1) plot.manualCharIds.push(charId);
+      plot.chats.push({
+        role: 'narrator',
+        content: '（' + (char.title || '角色') + '加入了对话）',
+        timestamp: Date.now()
+      });
+    } else {
+      // Remove character from scene
+      if (plot.charIds.length <= 1) { alert('至少保留 1 位在场角色'); return; }
+      plot.charIds.splice(idx, 1);
+      // Also remove from manual protection
+      const midx = plot.manualCharIds.indexOf(charId);
+      if (midx !== -1) plot.manualCharIds.splice(midx, 1);
+      plot.chats.push({
+        role: 'narrator',
+        content: '（' + (char.title || '角色') + '离开了对话）',
+        timestamp: Date.now()
+      });
+    }
+
+    Store.save();
+    this.render();
+    this._renderCharManager();
+  },
+
+  // ---- Archive Settings Panel (full-screen overlay) ----
+  _openArchiveSettings() {
+    document.getElementById('archive-settings-overlay').style.display = 'flex';
     this._renderArchiveSettings();
   },
   _closeArchiveSettings() {
-    document.getElementById('archive-modal').style.display = 'none';
+    document.getElementById('archive-settings-overlay').style.display = 'none';
+  },
+
+  _renderArchiveSettings() {
+    const plot = Store.plot(this._idx);
+    const char = Store.lore(plot?.charIds?.[0]);
+    const world = Store.lore(plot?.globalId);
+    const body = document.getElementById('archive-settings-body');
+    if (!body) return;
+    const ms = char?.memorySettings || { autoExtract: false, extractInterval: 30, coreThreshold: 0.7 };
+    const mem = char?.memories || { core: [], rawChats: [] };
+    const plotNodes = plot?.worldState?.plotNodes || [];
+    const sc = world?.systemConfig || {};
+    const fc = char?.forbiddenConfig || { enabled: true, words: [], actions: [], patterns: [] };
+    const chain = world?.systemConfig?.questChains?.[0] || { steps: [] };
+
+    document.getElementById('archive-settings-title').textContent = plot?.name || '存档设置';
+
+    body.innerHTML = `
+      <!-- 1. Basic Info -->
+      <div class="archive-settings-section">
+        <div class="archive-settings-section-title">基础信息</div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">存档名称</div>
+          <input class="preset-form-input" id="as-name" value="${escapeHtmlAttr(plot.name || '')}">
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">大世界</div>
+          <select class="modal-select" disabled style="opacity:0.6;">
+            ${Store.lores('global').map(g => '<option value="' + g.id + '"' + (plot.globalId === g.id ? ' selected' : '') + '>' + escapeHtml(g.title) + '</option>').join('')}
+          </select>
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">用户面具<span class="field-required">*</span></div>
+          <select class="modal-select" id="as-mask">
+            ${Store.masks().map(m => '<option value="' + m.id + '"' + (plot.maskId === m.id ? ' selected' : '') + '>' + escapeHtml(m.name || '未命名') + '</option>').join('')}
+          </select>
+          ${Store.masks().length === 0 ? '<div style="font-size:11px;color:var(--text-2);margin-top:4px;">暂无面具，请先在用户中心创建。</div>' : ''}
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">绑定角色 <span style="font-weight:400;color:var(--text-3);">（已选 ${(plot?.charIds || []).length} 位）</span></div>
+          ${this._renderCharBindingList(plot)}
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">故事线</div>
+          <select class="modal-select" id="as-storyline">
+            <option value="">-- 无 --</option>
+            ${Store.lores('storyline').filter(s => s.globalId === plot.globalId).map(s => '<option value="' + s.id + '"' + (plot.storylineId === s.id ? ' selected' : '') + '>' + escapeHtml(s.title) + '</option>').join('')}
+          </select>
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">局部设定 <span style="font-weight:400;color:var(--text-3);">（已绑定 ${(plot?.localIds || []).length} 项）</span></div>
+          ${this._renderLocalSettingsList(plot)}
+        </div>
+      </div>
+
+      <!-- 2. System Settings -->
+      <div class="archive-settings-section">
+        <div class="archive-settings-section-title">系统设置</div>
+        <div class="archive-settings-row">
+          <div>
+            <span class="archive-settings-label">启用世界系统</span>
+            <div class="archive-settings-desc">AI 助手在对话中提供提醒和通知</div>
+          </div>
+          <div class="toggle-switch${sc.enabled !== false ? ' on' : ''}" id="as-sys-on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="preset-form-group" style="margin-top:8px;">
+          <div class="preset-form-label">系统名称</div>
+          <input class="preset-form-input" id="as-sys-name" value="${escapeHtmlAttr(sc.name || '小D')}">
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">系统风格</div>
+          <select class="modal-select" id="as-sys-style">
+            ${['gentle','humorous','sarcastic','tsundere','serious','cold'].map(st => {
+              const labels = { gentle:'温柔', humorous:'搞笑', sarcastic:'毒舌', tsundere:'傲娇', serious:'正经', cold:'高冷' };
+              return '<option value="' + st + '"' + ((sc.stylePreset || 'humorous') === st ? ' selected' : '') + '>' + labels[st] + '</option>';
+            }).join('')}
+          </select>
+        </div>
+        <div class="range-row">
+          <div class="range-label-row">
+            <span class="range-label">话唠程度</span>
+            <span class="range-value" id="as-sys-freq-val">${sc.talkFrequency || 3}</span>
+          </div>
+          <input type="range" class="range-input" id="as-sys-freq" min="1" max="10" value="${sc.talkFrequency || 3}" oninput="document.getElementById('as-sys-freq-val').textContent=this.value">
+        </div>
+      </div>
+
+      <!-- 3. Quest Chain -->
+      <div class="archive-settings-section">
+        <div class="archive-settings-section-title">任务链 <span style="font-weight:400;font-size:11px;color:var(--text-3);">（${chain.steps?.length || 0} 步）</span></div>
+        <div id="as-quest-body">${this._renderQuestEditor(plot)}</div>
+      </div>
+
+      <!-- 4. Forbidden Config -->
+      <div class="archive-settings-section">
+        <div class="archive-settings-section-title">雷区设定 <span style="font-weight:400;font-size:11px;color:var(--text-3);">（${char?.title || '角色'}）</span></div>
+        <div class="archive-settings-row" style="padding-bottom:8px;">
+          <div>
+            <span class="archive-settings-label">启用角色雷区</span>
+            <div class="archive-settings-desc">额外拦截规则，补充全局默认规则</div>
+          </div>
+          <div class="toggle-switch${fc.enabled !== false ? ' on' : ''}" id="as-fc-on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">禁用词 <small style="font-weight:400;color:var(--text-3);">（逗号分隔）</small></div>
+          <input class="preset-form-input" id="as-fc-words" value="${escapeHtmlAttr((fc.words || []).join(', '))}" placeholder="如：血, 死, 杀">
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">禁用动作 <small style="font-weight:400;color:var(--text-3);">（逗号分隔）</small></div>
+          <input class="preset-form-input" id="as-fc-actions" value="${escapeHtmlAttr((fc.actions || []).join(', '))}" placeholder="如：邪魅一笑, 舔嘴唇">
+        </div>
+        <div class="preset-form-group">
+          <div class="preset-form-label">禁用句式 <small style="font-weight:400;color:var(--text-3);">（每行一个正则表达式）</small></div>
+          <textarea class="preset-form-textarea" id="as-fc-patterns" rows="3" placeholder="如：让全天下.*陪葬">${escapeHtml((fc.patterns || []).join('\n'))}</textarea>
+        </div>
+      </div>
+
+      <!-- 5. Character Mode -->
+      <div class="archive-settings-section">
+        <div class="archive-settings-section-title">角色管理</div>
+        <div class="archive-settings-row">
+          <div>
+            <span class="archive-settings-label">自动模式</span>
+            <div class="archive-settings-desc">AI 根据对话自动判断角色进出</div>
+          </div>
+          <div class="toggle-switch${plot.autoCharMode ? ' on' : ''}" id="as-auto-char" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <!-- 6. Memory Settings -->
+      <div class="archive-settings-section">
+        <div class="archive-settings-section-title">记忆设置</div>
+        <div class="archive-settings-row" style="padding-bottom:8px;">
+          <div>
+            <span class="archive-settings-label">自动提取</span>
+            <div class="archive-settings-desc">每 N 轮对话自动提取核心记忆</div>
+          </div>
+          <div class="toggle-switch${ms.autoExtract ? ' on' : ''}" id="as-auto-extract" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="archive-row">
+          <span class="archive-row-label">提取间隔（轮）</span>
+          <input type="number" class="preset-form-input" id="as-interval" value="${ms.extractInterval || 30}" min="5" max="200" style="width:70px;padding:4px 8px;font-size:12px;margin:0;">
+        </div>
+        <div class="range-row" style="padding:0;">
+          <div class="range-label-row">
+            <span class="range-label">核心记忆阈值</span>
+            <span class="range-value" id="as-threshold-val">${Math.round((ms.coreThreshold || 0.7) * 100)}%</span>
+          </div>
+          <input type="range" class="range-input" id="as-threshold" min="0.5" max="1" step="0.05" value="${ms.coreThreshold || 0.7}" oninput="document.getElementById('as-threshold-val').textContent=Math.round(this.value*100)+'%'">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="btn-sm" onclick="ChatEngine._manualExtract()">手动提取</button>
+          <button class="btn-sm" onclick="ChatEngine._memoryDiagnose()" style="background:var(--surface);color:var(--text);border:0.5px solid var(--border);">诊断</button>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:0.5px solid var(--border);">
+          <div class="archive-row">
+            <span class="archive-row-label">核心记忆</span>
+            <span class="archive-row-val">${mem.core?.length || 0} 条</span>
+          </div>
+          <div class="archive-row">
+            <span class="archive-row-label">待提取对话</span>
+            <span class="archive-row-val">${mem.rawChats?.length || 0} 条</span>
+          </div>
+          <div class="archive-row">
+            <span class="archive-row-label">剧情节点</span>
+            <span class="archive-row-val">${plotNodes.length} 个</span>
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  _saveAllArchiveSettings() {
+    const plot = Store.plot(this._idx);
+    const char = Store.lore(plot?.charIds?.[0]);
+    const world = Store.lore(plot?.globalId);
+    if (!plot) return;
+
+    // Basic info
+    plot.name = document.getElementById('as-name')?.value.trim() || '未命名存档';
+    plot.maskId = document.getElementById('as-mask')?.value || plot.maskId;
+    const slId = document.getElementById('as-storyline')?.value || '';
+    plot.storylineId = slId || null;
+    document.getElementById('chat-title').textContent = plot.name;
+
+    // System config
+    if (world) {
+      if (!world.systemConfig) world.systemConfig = {};
+      const sc = world.systemConfig;
+      sc.enabled = document.getElementById('as-sys-on')?.classList.contains('on') !== false;
+      sc.name = document.getElementById('as-sys-name')?.value.trim() || '小D';
+      sc.stylePreset = document.getElementById('as-sys-style')?.value || 'humorous';
+      sc.talkFrequency = parseInt(document.getElementById('as-sys-freq')?.value) || 3;
+    }
+
+    // Forbidden config
+    if (char) {
+      if (!char.forbiddenConfig) char.forbiddenConfig = { enabled: true, words: [], actions: [], patterns: [] };
+      const fc = char.forbiddenConfig;
+      fc.enabled = document.getElementById('as-fc-on')?.classList.contains('on') !== false;
+      fc.words = (document.getElementById('as-fc-words')?.value || '').split(/[,，]/).map(s => s.trim()).filter(s => s);
+      fc.actions = (document.getElementById('as-fc-actions')?.value || '').split(/[,，]/).map(s => s.trim()).filter(s => s);
+      fc.patterns = (document.getElementById('as-fc-patterns')?.value || '').split('\n').map(s => s.trim()).filter(s => s);
+
+      // Memory config
+      if (!char.memorySettings) char.memorySettings = {};
+      char.memorySettings.autoExtract = document.getElementById('as-auto-extract')?.classList.contains('on') || false;
+      char.memorySettings.extractInterval = parseInt(document.getElementById('as-interval')?.value) || 30;
+      char.memorySettings.coreThreshold = parseFloat(document.getElementById('as-threshold')?.value) || 0.7;
+    }
+
+    // Character mode
+    plot.autoCharMode = document.getElementById('as-auto-char')?.classList.contains('on') || false;
+    if (!plot.autoCharMode) plot.manualCharIds = [...(plot.charIds || [])];
+
+    Store.save();
+    this._closeArchiveSettings();
   },
 
   _toggleArchiveModule(header) {
@@ -4533,70 +5613,52 @@ const ChatEngine = {
     if (arrow) arrow.classList.toggle('open');
   },
 
-  _renderArchiveSettings() {
+  // ---- Section Save Methods ----
+  _saveBasicInfo() {
     const plot = Store.plot(this._idx);
-    const char = Store.lore(plot?.charIds?.[0]);
-    const body = document.getElementById('archive-modal-body');
-    if (!body) return;
-    const ms = char?.memorySettings || { autoExtract: false, extractInterval: 30, coreThreshold: 0.7 };
-    const mem = char?.memories || { core: [], rawChats: [] };
-    const plotNodes = plot?.worldState?.plotNodes || [];
-    const starred = plot?.starredThoughts || [];
-
-    body.innerHTML = `
-      <!-- Memory Settings -->
-      <div class="archive-section">
-        <div class="archive-section-title">记忆设置</div>
-        <div class="toggle-row" style="padding:0 0 8px;">
-          <span class="toggle-label" style="font-size:13px;">自动提取</span>
-          <div class="toggle-switch' + (ms.autoExtract ? ' on' : '') + '" id="as-auto-extract" onclick="this.classList.toggle(\'on\');ChatEngine._saveArchiveSettings()"></div>
-        </div>
-        <div class="archive-row">
-          <span class="archive-row-label">提取间隔（轮）</span>
-          <input type="number" class="preset-form-input" id="as-interval" value="${ms.extractInterval || 30}" min="5" max="200" style="width:70px;padding:4px 8px;font-size:12px;margin:0;" onchange="ChatEngine._saveArchiveSettings()">
-        </div>
-        <div class="range-row" style="padding:0;">
-          <div class="range-label-row">
-            <span class="range-label" style="font-size:12px;">核心记忆阈值</span>
-            <span class="range-value" id="as-threshold-val">${Math.round((ms.coreThreshold || 0.7) * 100)}%</span>
-          </div>
-          <input type="range" class="range-input" id="as-threshold" min="0.5" max="1" step="0.05" value="${ms.coreThreshold || 0.7}" oninput="document.getElementById('as-threshold-val').textContent=Math.round(this.value*100)+'%';ChatEngine._saveArchiveSettings()">
-        </div>
-        <div style="display:flex;gap:8px;margin-top:10px;">
-          <button class="btn-sm" onclick="ChatEngine._manualExtract()">手动提取</button>
-          <button class="btn-sm" onclick="ChatEngine._memoryDiagnose()" style="background:var(--surface);color:var(--text);border:0.5px solid var(--border);">诊断</button>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="archive-section">
-        <div class="archive-section-title">记忆统计</div>
-        <div class="archive-row">
-          <span class="archive-row-label">核心记忆</span>
-          <span class="archive-row-val">${mem.core?.length || 0} 条</span>
-        </div>
-        <div class="archive-row">
-          <span class="archive-row-label">待提取对话</span>
-          <span class="archive-row-val">${mem.rawChats?.length || 0} 条</span>
-        </div>
-        <div class="archive-row">
-          <span class="archive-row-label">剧情节点</span>
-          <span class="archive-row-val">${plotNodes.length} 个</span>
-        </div>
-        <div class="archive-row">
-          <span class="archive-row-label">收藏记忆</span>
-          <span class="archive-row-val">${starred.length} 条</span>
-        </div>
-        <div class="archive-row">
-          <span class="archive-row-label">提取计数</span>
-          <span class="archive-row-val">${char?.extractCounter || 0} / ${ms.extractInterval || 30}</span>
-        </div>
-      </div>
-
-    `;
+    if (!plot) return;
+    plot.name = document.getElementById('as-name')?.value.trim() || '未命名存档';
+    const slId = document.getElementById('as-storyline')?.value || '';
+    plot.storylineId = slId || null;
+    Store.save();
+    document.getElementById('chat-title').textContent = plot.name;
   },
 
-  _saveArchiveSettings() {
+  _saveSysCfg() {
+    const plot = Store.plot(this._idx);
+    const world = Store.lore(plot?.globalId);
+    if (!world) return;
+    if (!world.systemConfig) world.systemConfig = {};
+    const sc = world.systemConfig;
+    sc.enabled = document.getElementById('as-sys-on')?.classList.contains('on') !== false;
+    sc.name = document.getElementById('as-sys-name')?.value.trim() || '小D';
+    sc.stylePreset = document.getElementById('as-sys-style')?.value || 'humorous';
+    sc.talkFrequency = parseInt(document.getElementById('as-sys-freq')?.value) || 3;
+    Store.save();
+  },
+
+  _saveForbidden() {
+    const plot = Store.plot(this._idx);
+    const char = Store.lore(plot?.charIds?.[0]);
+    if (!char) return;
+    if (!char.forbiddenConfig) char.forbiddenConfig = { enabled: true, words: [], actions: [], patterns: [] };
+    const fc = char.forbiddenConfig;
+    fc.enabled = document.getElementById('as-fc-on')?.classList.contains('on') !== false;
+    fc.words = (document.getElementById('as-fc-words')?.value || '').split(/[,，]/).map(s => s.trim()).filter(s => s);
+    fc.actions = (document.getElementById('as-fc-actions')?.value || '').split(/[,，]/).map(s => s.trim()).filter(s => s);
+    fc.patterns = (document.getElementById('as-fc-patterns')?.value || '').split('\n').map(s => s.trim()).filter(s => s);
+    Store.save();
+  },
+
+  _saveAutoCharMode() {
+    const plot = Store.plot(this._idx);
+    if (!plot) return;
+    plot.autoCharMode = document.getElementById('as-auto-char')?.classList.contains('on') || false;
+    if (!plot.autoCharMode) plot.manualCharIds = [...(plot.charIds || [])];
+    Store.save();
+  },
+
+  _saveMemoryCfg() {
     const plot = Store.plot(this._idx);
     const char = Store.lore(plot?.charIds?.[0]);
     if (!char) return;
@@ -4605,6 +5667,150 @@ const ChatEngine = {
     char.memorySettings.extractInterval = parseInt(document.getElementById('as-interval')?.value) || 30;
     char.memorySettings.coreThreshold = parseFloat(document.getElementById('as-threshold')?.value) || 0.7;
     Store.save();
+  },
+
+  // ---- Quest Editor ----
+  _renderQuestEditor(plot) {
+    const world = Store.lore(plot?.globalId);
+    if (!world?.systemConfig) world.systemConfig = {};
+    if (!world.systemConfig.questChains) world.systemConfig.questChains = [];
+    if (!world.systemConfig.questChains[0]) world.systemConfig.questChains[0] = { chainId: 'main', name: '主线任务', steps: [] };
+    const steps = world.systemConfig.questChains[0].steps;
+    if (!steps.length) return '<div style="font-size:12px;color:var(--text-2);padding:8px 0;">暂无任务步骤，AI 将在对话中自动生成。</div>';
+    return steps.map((s, i) => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:10px;background:var(--bg);border-radius:8px;">
+        <span style="font-size:12px;color:var(--text-3);flex-shrink:0;">${i + 1}.</span>
+        <div style="flex:1;min-width:0;">
+          <input class="preset-form-input" value="${escapeHtmlAttr(s.name || '')}" placeholder="步骤名称" style="padding:4px 8px;font-size:12px;margin-bottom:4px;" onchange="ChatEngine._updateQuestStep(${i},'name',this.value)">
+          <div style="display:flex;gap:6px;">
+            <input class="preset-form-input" type="number" value="${s.targetAffection || 0}" placeholder="目标好感度" style="width:80px;padding:4px 8px;font-size:11px;" onchange="ChatEngine._updateQuestStep(${i},'targetAffection',parseInt(this.value))">
+            <input class="preset-form-input" value="${escapeHtmlAttr(s.reward || '')}" placeholder="奖励描述" style="flex:1;padding:4px 8px;font-size:11px;" onchange="ChatEngine._updateQuestStep(${i},'reward',this.value)">
+          </div>
+        </div>
+        <button style="background:none;border:none;color:var(--text-3);cursor:pointer;font-size:16px;padding:4px;flex-shrink:0;" onclick="ChatEngine._deleteQuestStep(${i})" title="删除">&times;</button>
+      </div>
+    `).join('') + `
+      <button class="btn-sm" onclick="ChatEngine._addQuestStepUI()" style="background:var(--surface);color:var(--text);border:0.5px solid var(--border);margin-top:4px;">添加步骤</button>
+    `;
+  },
+
+  _updateQuestStep(idx, field, val) {
+    const plot = Store.plot(this._idx);
+    const world = Store.lore(plot?.globalId);
+    const steps = world?.systemConfig?.questChains?.[0]?.steps;
+    if (!steps || !steps[idx]) return;
+    steps[idx][field] = val;
+    Store.save();
+  },
+
+  _deleteQuestStep(idx) {
+    const plot = Store.plot(this._idx);
+    const world = Store.lore(plot?.globalId);
+    const steps = world?.systemConfig?.questChains?.[0]?.steps;
+    if (!steps) return;
+    steps.splice(idx, 1);
+    Store.save();
+    this._renderArchiveSettings();
+  },
+
+  _addQuestStepUI() {
+    const plot = Store.plot(this._idx);
+    const world = Store.lore(plot?.globalId);
+    if (!world?.systemConfig) world.systemConfig = {};
+    if (!world.systemConfig.questChains) world.systemConfig.questChains = [];
+    if (!world.systemConfig.questChains[0]) world.systemConfig.questChains[0] = { chainId: 'main', name: '主线任务', steps: [] };
+    world.systemConfig.questChains[0].steps.push({
+      id: 'q_' + Date.now(),
+      order: world.systemConfig.questChains[0].steps.length + 1,
+      name: '新步骤',
+      targetAffection: 0,
+      reward: ''
+    });
+    Store.save();
+    this._renderArchiveSettings();
+  },
+
+  // ---- Character Binding List ----
+  _renderCharBindingList(plot) {
+    const chars = Store.lores('char');
+    const boundIds = new Set(plot?.charIds || []);
+    if (chars.length === 0) {
+      return '<div style="font-size:12px;color:var(--text-2);padding:8px 0;">暂无角色卡。请先在设定中心创建。</div>';
+    }
+    return chars.map(c => {
+      const isBound = boundIds.has(c.id);
+      return `
+        <div class="archive-row" style="cursor:pointer;" onclick="ChatEngine._toggleCharBinding('${c.id}')">
+          <span class="archive-row-label" style="flex:1;display:flex;align-items:center;gap:8px;">
+            <span style="display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid ${isBound ? 'var(--accent)' : 'var(--border)'};background:${isBound ? 'var(--accent)' : 'transparent'};flex-shrink:0;position:relative;transition:all 0.15s;">
+              ${isBound ? '<span style="position:absolute;top:1px;left:4px;width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);display:inline-block;"></span>' : ''}
+            </span>
+            <span style="width:28px;height:28px;border-radius:50%;background:var(--accent-bg);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+              ${c.avatar ? '<img src="' + c.avatar + '" style="width:100%;height:100%;object-fit:cover;">' : '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--text-3);stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
+            </span>
+            ${this._esc(c.title || '未命名')}
+          </span>
+          <span style="font-size:10px;color:var(--text-3);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this._esc((c.bio || '').slice(0, 15))}</span>
+        </div>
+      `;
+    }).join('');
+  },
+
+  _toggleCharBinding(charId) {
+    const plot = Store.plot(this._idx);
+    if (!plot) return;
+    if (!plot.charIds) plot.charIds = [];
+    const idx = plot.charIds.indexOf(charId);
+    if (idx === -1) {
+      plot.charIds.push(charId);
+    } else {
+      if (plot.charIds.length <= 1) { alert('至少绑定 1 位角色'); return; }
+      plot.charIds.splice(idx, 1);
+      // Also remove from manual protection
+      if (plot.manualCharIds) {
+        const midx = plot.manualCharIds.indexOf(charId);
+        if (midx !== -1) plot.manualCharIds.splice(midx, 1);
+      }
+    }
+    Store.save();
+    this._renderArchiveSettings(); // re-render the list
+  },
+
+  // ---- Local Settings Binding ----
+  _renderLocalSettingsList(plot) {
+    const locals = Store.lores('local');
+    const boundIds = new Set(plot?.localIds || []);
+    if (locals.length === 0) {
+      return '<div style="font-size:12px;color:var(--text-2);padding:8px 0;">暂无局部设定。请先在设定中心创建。</div>';
+    }
+    return locals.map(l => {
+      const isBound = boundIds.has(l.id);
+      return `
+        <div class="archive-row" style="cursor:pointer;" onclick="ChatEngine._toggleLocalSetting('${l.id}')">
+          <span class="archive-row-label" style="flex:1;">
+            <span style="display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid ${isBound ? 'var(--accent)' : 'var(--border)'};background:${isBound ? 'var(--accent)' : 'transparent'};vertical-align:middle;margin-right:8px;position:relative;top:-1px;transition:all 0.15s;">
+              ${isBound ? '<span style="position:absolute;top:1px;left:4px;width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);display:inline-block;"></span>' : ''}
+            </span>
+            ${this._esc(l.title || '未命名')}
+          </span>
+          <span style="font-size:10px;color:var(--text-3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${this._esc((l.keywords || []).join(', ') || '无关键词')}</span>
+        </div>
+      `;
+    }).join('');
+  },
+
+  _toggleLocalSetting(localId) {
+    const plot = Store.plot(this._idx);
+    if (!plot) return;
+    if (!plot.localIds) plot.localIds = [];
+    const idx = plot.localIds.indexOf(localId);
+    if (idx === -1) {
+      plot.localIds.push(localId);
+    } else {
+      plot.localIds.splice(idx, 1);
+    }
+    Store.save();
+    this._renderArchiveSettings(); // re-render the modal
   },
 
   async _manualExtract() {
@@ -4725,13 +5931,151 @@ const ChatEngine = {
     document.getElementById('time-panel').style.display = 'none';
   },
 
-  _openDetail() {
+  _openDetail(charId) {
     const plot = Store.plot(this._idx);
-    const char = Store.lore(plot?.charIds?.[0]);
-    if (char) CharEditor.open(char.id);
+    const id = charId || plot?.charIds?.[0];
+    const char = Store.lore(id);
+    if (!char) return;
+
+    const plotChars = (plot?.charIds || []).map(cid => Store.lore(cid)).filter(Boolean);
+    const primaryChar = plotChars[0];
+    const affection = char.id === primaryChar?.id ? (plot?.worldState?.affection ?? char?.initialAffection ?? 0) : (char?.initialAffection ?? 0);
+    const tier = this._getTier(affection, char);
+
+    // Collect affection history from chat messages for this character
+    const affLog = (plot?.chats || []).filter(c => c.role === 'assistant' && c.charId === char.id && c.affectionDelta).slice(-10).reverse();
+    const totalChats = (plot?.chats || []).filter(c => (c.role === 'assistant' && c.charId === char.id) || c.role === 'user').length;
+    const starredCount = (plot?.starredThoughts || []).filter(s => s.charId === char.id).length;
+    const persona = this._extractSection(char.content, '性格背景');
+    const rules = this._extractSection(char.content, '行为规则');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'char-detail-overlay';
+    overlay.style.display = 'flex';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.innerHTML = `
+      <div class="char-detail-card" onclick="event.stopPropagation()">
+        <div class="char-detail-header">
+          <span class="char-detail-name">${escapeHtml(char.title || '未命名')}</span>
+          <button class="char-detail-close" onclick="this.closest('.char-detail-overlay').remove()">&times;</button>
+        </div>
+        <div class="char-detail-avatar">
+          ${char.avatar ? '<img src="' + char.avatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
+        </div>
+        <div class="char-detail-bio">${escapeHtml(char.bio || '')}</div>
+        ${(char.tags || char.keywords || []).length ? `<div class="char-detail-tags">${(char.tags || char.keywords || []).map(t => '<span class="char-detail-tag">' + escapeHtml(t) + '</span>').join('')}</div>` : ''}
+
+        <div class="char-detail-section">
+          <div class="char-detail-section-title">好感度</div>
+          <div class="char-detail-affection">
+            <span class="char-detail-affection-tier">${tier.name}</span>
+            <div class="char-detail-affection-bar">
+              <div class="char-detail-affection-fill" style="width:${Math.min(100, Math.max(0, ((affection - tier.min) / (tier.max - tier.min + 1)) * 100))}%"></div>
+            </div>
+            <span class="char-detail-affection-val">${affection}</span>
+          </div>
+        </div>
+
+        ${affLog.length ? `
+        <div class="char-detail-section">
+          <div class="char-detail-section-title">好感度变化记录（最近 ${affLog.length} 条）</div>
+          <div class="char-detail-aff-log">
+            ${affLog.map(a => `
+              <div class="char-detail-aff-item">
+                <span>${escapeHtml((a.content || '').slice(0, 40))}</span>
+                <span class="char-detail-aff-delta${a.affectionDelta > 0 ? ' pos' : ' neg'}">${a.affectionDelta > 0 ? '+' : ''}${a.affectionDelta}</span>
+                <span class="char-detail-aff-time">${new Date(a.timestamp).toLocaleTimeString()}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>` : ''}
+
+        ${persona ? `
+        <div class="char-detail-section">
+          <div class="char-detail-section-title">性格背景</div>
+          <div class="char-detail-text">${escapeHtml(persona.slice(0, 200))}</div>
+        </div>` : ''}
+
+        ${rules ? `
+        <div class="char-detail-section">
+          <div class="char-detail-section-title">行为规则</div>
+          <div class="char-detail-text">${escapeHtml(rules.slice(0, 200))}</div>
+        </div>` : ''}
+
+        <div class="char-detail-section">
+          <div class="char-detail-section-title">互动统计</div>
+          <div class="char-detail-stat-row"><span>对话总数</span><span class="char-detail-stat-val">${totalChats} 条</span></div>
+          <div class="char-detail-stat-row"><span>星标记忆</span><span class="char-detail-stat-val">${starredCount} 条</span></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
   },
 
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  _esc(s) { return escapeHtml(s); },
+
+  // ---- User detail popup ----
+  _openUserDetail() {
+    const mask = Store.activeMask();
+    if (!mask) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'char-detail-overlay';
+    overlay.style.display = 'flex';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.innerHTML = `
+      <div class="char-detail-card" onclick="event.stopPropagation()">
+        <div class="char-detail-header">
+          <span class="char-detail-name">${escapeHtml(mask.name || '未命名面具')}</span>
+          <button class="char-detail-close" onclick="this.closest('.char-detail-overlay').remove()">&times;</button>
+        </div>
+        <div class="char-detail-avatar">
+          ${mask.avatar ? '<img src="' + mask.avatar + '">' : '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>'}
+        </div>
+        <div class="char-detail-bio">${escapeHtml(mask.bio || '')}</div>
+        ${(mask.traits || []).length ? `<div class="char-detail-tags">${(mask.traits || []).map(t => '<span class="char-detail-tag">' + escapeHtml(t) + '</span>').join('')}</div>` : ''}
+        <div class="char-detail-section">
+          <div class="char-detail-section-title">面具信息</div>
+          <div class="char-detail-stat-row"><span>身份</span><span class="char-detail-stat-val">你在故事中扮演的角色</span></div>
+          <div class="char-detail-stat-row"><span>特质数</span><span class="char-detail-stat-val">${(mask.traits || []).length} 项</span></div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  },
+
+  // ---- API missing hint ----
+  _showAPIMissingHint() {
+    const overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    overlay.style.display = 'flex';
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.innerHTML = `
+      <div class="api-hint-card" onclick="event.stopPropagation()">
+        <div class="api-hint-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="api-hint-title">尚未配置 API</div>
+        <div class="api-hint-desc">连接 AI 需要配置 API Key 和接口地址。<br>支持所有兼容 OpenAI 格式的服务。</div>
+        <button class="api-hint-btn" onclick="this.closest('.confirm-overlay').remove();ChatEngine._goToAPISettings();">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          去设置
+        </button>
+        <button class="api-hint-close" onclick="this.closest('.confirm-overlay').remove()">稍后再说</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  },
+
+  _goToAPISettings() {
+    // Exit chat if open
+    this.exit();
+    // Switch to Me tab
+    const meTab = document.querySelector('.nav-item[data-view="me"]');
+    if (meTab) meTab.click();
+    // Open main API modal
+    setTimeout(() => MePage._openAPIModal('main'), 300);
+  }
 };
 
 // ---- Wire PlotFlow to ChatEngine ----
@@ -4739,8 +6083,8 @@ const _origEnter = PlotFlow.enter;
 PlotFlow.enter = function(idx) { ChatEngine.enter(idx); };
 
 const _origCreate = PlotFlow._createPlotAndEnter;
-PlotFlow._createPlotAndEnter = function(lore, charCard) {
-  _origCreate.call(PlotFlow, lore, charCard);
+PlotFlow._createPlotAndEnter = function(lore, charCards) {
+  _origCreate.call(PlotFlow, lore, charCards);
   const idx = Store.plots().length - 1;
   setTimeout(() => ChatEngine.enter(idx), 200);
 };
@@ -5034,7 +6378,7 @@ const MePage = {
     });
   },
 
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  _esc(s) { return escapeHtml(s); }
 };
 
 /* ==================================================================
@@ -5196,7 +6540,7 @@ const MemViewer = {
     if (summary) { summary.starred = !summary.starred; Store.save(); this.render(); }
   },
 
-  _esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  _esc(s) { return escapeHtml(s); }
 };
 
 // ---- Bootstrap ----

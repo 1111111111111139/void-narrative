@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Space & Narrative (留白)** — a single-file Chinese-language interactive narrative/dialogue web application. Everything lives in `index.html` (~5200 lines): CSS, HTML, and vanilla JS. No build tools, no frameworks, no dependencies. Open `index.html` directly in a browser.
+**VOID / NARRATIVE** — a single-file Chinese-language infinite-stream horror text game. The app lives in `horror-game.html` (~2100 lines): CSS, HTML, and vanilla JS. No build tools, no frameworks, no dependencies. Open `horror-game.html` directly in a browser. AI serves as the game master, narrating the environment, role-playing all NPCs, adjudicating rules, and advancing the plot.
 
 ## Architecture
 

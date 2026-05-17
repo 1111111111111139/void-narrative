@@ -3210,7 +3210,14 @@ var AI = {
         case 'san': p.san = Math.max(0, Math.min(p.maxSan, p.san + parseInt(item.args[0]))); break;
         case 'affection': {
           var c = Store.characters().find(function(ch) { return ch.name === item.args[0].trim(); });
-          if (c) { c.affection = Math.max(-100, Math.min(100, c.affection + parseInt(item.args[1]))); }
+          if (c) {
+            var oldAff = c.affection;
+            c.affection = Math.max(-100, Math.min(100, c.affection + parseInt(item.args[1])));
+            var delta = c.affection - oldAff;
+            if (Math.abs(delta) >= 10 && !c.isNPC) {
+              Store.addCharMemory(c.id, '好感度' + (delta > 0 ? '+' : '') + delta + '，当前' + c.affection, 0.7);
+            }
+          }
           break;
         }
         case 'item_add': {
@@ -3372,11 +3379,16 @@ var AI = {
           var memImp = parseFloat(item.args[1]) || 0.5;
           var memContent = (item.args[2] || '').trim();
           if (!memContent) break;
-          var ch = Store.characters().find(function(x) { return x.name === memName && !x.isNPC; });
+          var ch = Store.characters().find(function(x) { return x.name === memName; });
           if (ch && memImp >= 0.4) {
-            Store.addCharMemory(ch.id, memContent, memImp);
-            if (ch.isNPC && (ch.simpleMemories||[]).length >= 5) ch.simpleMemories.shift();
-            if (ch.isNPC) { ch.simpleMemories = ch.simpleMemories || []; ch.simpleMemories.push({ summary: memContent.slice(0,50), time: Date.now() }); }
+            if (ch.isNPC) {
+              Store.addNPCMemory(ch.id, memContent);
+              if ((ch.simpleMemories||[]).length >= 5) ch.simpleMemories.shift();
+              ch.simpleMemories = ch.simpleMemories || [];
+              ch.simpleMemories.push({ summary: memContent.slice(0,50), time: Date.now() });
+            } else {
+              Store.addCharMemory(ch.id, memContent, memImp);
+            }
           }
           if (memImp >= 0.7) Store.addGlobalMemory(memContent, ['事件'], memImp);
           break;
@@ -3985,6 +3997,7 @@ var App = {
     Store.save();
     this._closeForumPostSheet();
     this.renderForum();
+    Store.addForumMemory('发布[' + (board === 'will' ? '遗言' : board === 'intel' ? '情报' : board === 'party' ? '组队' : board === 'trade' ? '交易' : '杂谈') + ']帖：' + title);
     if (board === 'will') {
       Store.addMessage({ type:'system', content:'遗言已发布。如果这是你的最后一帖——愿后来者记得。' });
     }
@@ -4826,6 +4839,15 @@ var App = {
   },
 
   _closePrivateChat: function() {
+    // Merge recent chat into character memory
+    if (this._pcCharId) {
+      var chats = Store._db.privateChats;
+      var msgs = (chats[this._pcCharId] && chats[this._pcCharId].messages) ? chats[this._pcCharId].messages : [];
+      if (msgs.length > 0) {
+        var summary = msgs.slice(-6).map(function(m) { return (m.role === 'user' ? '用户' : '角色') + '：' + (m.content||'').slice(0,20); }).join('；');
+        Store.addCharMemory(this._pcCharId, '终端私聊：' + summary, 0.5);
+      }
+    }
     document.getElementById('page-private-chat').classList.remove('active');
     this._pcCharId = null;
     this.navigateTo('terminal');
@@ -5897,9 +5919,18 @@ var App = {
     var segs = AI.parseResponse(response);
     segs.forEach(function(s) { Store.addMessage({ type:s.type, content:s.content, characterName:s.characterName||null, characterId:s.characterId||null }); });
 
-    // Update lastSummary
+    // Update lastSummary + auto-store to character/NPC memory
     segs.filter(function(s) { return s.type === 'npc'; }).forEach(function(s) {
-      var c = Store.character(s.characterId); if (c) c.lastSummary = s.content.slice(0, 80);
+      var c = Store.character(s.characterId);
+      if (!c) return;
+      c.lastSummary = s.content.slice(0, 80);
+      if (s.content.length >= 30) {
+        if (c.isNPC) {
+          Store.addNPCMemory(c.id, s.content.slice(0, 50));
+        } else {
+          Store.addCharMemory(c.id, s.content.slice(0, 50), 0.5);
+        }
+      }
     });
 
     // Core memory — SAN change events
@@ -6462,6 +6493,7 @@ var App = {
           p.replies.push({ author:'VOID-' + buyerId, content: this._randomBuyerComment(p.board), time: '刚刚' });
         }
         p._aiPurchaseDone = true;
+        Store.addForumMemory('付费帖被' + buyCount + '人购买，收入' + (p.price * buyCount) + '积分');
         Store.addMessage({ type:'system', content:'终端通知：你的帖子「' + (p.title||'').slice(0,20) + '」被 ' + buyCount + ' 人购买。积分 +' + (p.price * buyCount) });
       }
     }.bind(this));
@@ -6484,6 +6516,7 @@ var App = {
         p.replies.push({ author:'VOID-' + this._randomVoidId(), content: this._randomForumComment(p.board), time: '刚刚' });
       }
       p._aiCommentsDone = true;
+      Store.addForumMemory('帖子收到' + commentCount + '条AI评论');
       Store.addMessage({ type:'system', content:'终端通知：你的帖子「' + (p.title||'').slice(0,20) + '」收到了 ' + commentCount + ' 条新回复。' });
     }.bind(this));
 

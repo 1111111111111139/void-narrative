@@ -440,38 +440,8 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
   background-size:24px 24px;background-position:center center;
 }
 .topo-svg-layer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.topo-line{stroke:var(--text-3);stroke-width:.5;stroke-dasharray:2 3;fill:none}
-.topo-line.active{stroke:var(--accent);stroke-width:.75;stroke-dasharray:none}
-.topo-line.secured{stroke:var(--text-2);stroke-width:.5;stroke-dasharray:none}
 
 .topo-nodes{position:absolute;inset:0}
-.topo-node{
-  position:absolute;display:flex;flex-direction:column;align-items:center;
-  cursor:pointer;z-index:2;transform:translate(-50%,-50%);
-}
-.topo-node-core{
-  width:6px;height:6px;border-radius:50%;background:var(--text-3);
-  border:1px solid var(--bg);position:relative;transition:all .3s;
-}
-.topo-node-core::before{
-  content:'';position:absolute;inset:-4px;border:0.5px solid transparent;
-  border-radius:50%;transition:all .3s;
-}
-.topo-node.visited .topo-node-core{background:var(--text-2)}
-.topo-node.visited .topo-node-core::before{border-color:var(--text-3)}
-.topo-node.current .topo-node-core{background:var(--accent);box-shadow:0 0 8px var(--accent)}
-.topo-node.current .topo-node-core::before{border-color:var(--accent);animation:topoPulse 2s infinite ease-in-out}
-.topo-node.dungeon .topo-node-core{background:var(--bg);border:1.5px solid var(--accent)}
-.topo-node.dungeon .topo-node-core::before{border-color:var(--accent);border-style:dashed}
-.topo-node-label{
-  font-family:var(--font-serif);font-size:9px;color:var(--text);margin-top:4px;
-  white-space:nowrap;letter-spacing:.02em;
-}
-.topo-node-sub{
-  font-family:var(--font-mono);font-size:6px;color:var(--text-3);
-  text-transform:uppercase;margin-top:1px;
-}
-@keyframes topoPulse{0%{transform:scale(.8);opacity:.8}50%{transform:scale(1.4);opacity:.2}100%{transform:scale(.8);opacity:.8}}
 
 /* Terminal — Attributes: pip bars */
 .attrs-id{display:flex;justify-content:space-between;padding:0 0 12px;border-bottom:0.5px solid var(--divider);margin-bottom:12px}
@@ -937,6 +907,52 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--text-3);border-radius:1px}
 @media(min-width:431px){#app{border-left:1px solid var(--divider);border-right:1px solid var(--divider)}}
+
+/* ---- Topology: breathing dot states ---- */
+@keyframes breatheUnknown{0%,100%{opacity:0.2}50%{opacity:0.6}}
+@keyframes breatheCleared{0%,100%{opacity:0.3}50%{opacity:0.65}}
+@keyframes breatheActive{0%,100%{opacity:0.3}50%{opacity:0.7}}
+@keyframes breatheVisited{0%,100%{opacity:0.25}50%{opacity:0.5}}
+@keyframes breatheCurrent{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:0.9;transform:scale(1.35)}}
+@keyframes dungeonRingUnknown{0%,100%{opacity:0.25}50%{opacity:0.55}}
+@keyframes dungeonRingActive{0%,100%{opacity:0.35}50%{opacity:0.75}}
+
+.map-dot{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-50%);cursor:pointer;z-index:2}
+.map-dot-core{width:7px;height:7px;border-radius:50%;position:relative;transition:all .3s}
+.map-dot-core::after{content:'';position:absolute;inset:-5px;border-radius:50%;pointer-events:none}
+.map-dot-label{font-family:var(--font-serif);font-size:9px;color:var(--text);margin-top:4px;white-space:nowrap;letter-spacing:.02em}
+.map-dot-sub{font-family:var(--font-mono);font-size:6px;color:var(--text-3);text-transform:uppercase;margin-top:1px}
+
+.dot-unknown .map-dot-core{background:#8E2A2A}
+.dot-unknown .map-dot-core::after{background:rgba(142,42,42,0.25);animation:breatheUnknown 2s infinite ease-in-out}
+.dot-cleared .map-dot-core{background:#2E7D32}
+.dot-cleared .map-dot-core::after{background:rgba(46,125,50,0.25);animation:breatheCleared 3s infinite ease-in-out}
+.dot-active .map-dot-core{background:#3A6B8C}
+.dot-active .map-dot-core::after{background:rgba(58,107,140,0.3);animation:breatheActive 1.5s infinite ease-in-out}
+.dot-visited .map-dot-core{background:#2E5A72}
+.dot-visited .map-dot-core::after{background:rgba(46,90,114,0.2);animation:breatheVisited 2.5s infinite ease-in-out}
+.dot-current .map-dot-core{background:#EAEAEA;box-shadow:0 0 10px rgba(234,234,234,0.5)}
+.dot-current .map-dot-core::after{background:rgba(234,234,234,0.2);animation:breatheCurrent 0.8s infinite ease-in-out}
+
+/* Dungeon ring */
+.dot-dungeon .map-dot-core::before{content:'';position:absolute;inset:-4px;border-radius:50%;pointer-events:none}
+.dot-dungeon.dot-unknown .map-dot-core::before{border:1px dashed rgba(142,42,42,0.5);animation:dungeonRingUnknown 2s infinite ease-in-out}
+.dot-dungeon.dot-active .map-dot-core::before{border:1px solid rgba(58,107,140,0.6);animation:dungeonRingActive 1.5s infinite ease-in-out}
+.dot-dungeon.dot-cleared .map-dot-core::before{border:1px solid rgba(46,125,50,0.6)}
+.dot-dungeon.dot-cleared .map-dot-core::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2 2 4-4' stroke='%23EAEAEA' stroke-width='1.2' fill='none'/%3E%3C/svg%3E");background-size:cover;animation:none;inset:-8px}
+
+/* Connection lines */
+.topo-line.line-cleared{stroke:#2E7D32;stroke-dasharray:none}
+.topo-line.line-active{stroke:#3A6B8C;stroke-dasharray:none}
+.topo-line.line-partial{stroke:#8E2A2A;stroke-dasharray:3 3}
+.topo-line.line-unknown{stroke:rgba(255,255,255,0.08);stroke-dasharray:2 4}
+
+/* Submap header */
+.submap-header{display:none;align-items:center;gap:8px;padding:6px 0 10px}
+.submap-header.active{display:flex}
+.submap-back{font-size:14px;color:var(--text-2);padding:4px 6px;cursor:pointer;border-radius:4px}
+.submap-back:active{color:var(--text)}
+.submap-region-name{font-family:var(--font-serif);font-size:13px;color:var(--text);flex:1;text-align:center;margin-right:24px}
 </style>
 </head>
 <body class="intro-active">
@@ -1115,21 +1131,36 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
             <div class="map-bar-wrap"><div class="map-bar-fill" id="map-bar-fill" style="width:0%"></div></div>
           </div>
 
-          <!-- Topology map — framework, fill with real data later -->
+          <!-- Submap navigation header -->
+          <div class="submap-header" id="submap-header">
+            <button class="submap-back" onclick="App._exitRegion()">← 返回大地图</button>
+            <span class="submap-region-name" id="submap-region-name"></span>
+          </div>
+
+          <!-- Topology map -->
           <div class="topology-container" id="topology-map">
             <div class="topology-grid"></div>
             <svg class="topo-svg-layer" id="topo-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
-            <div class="topo-nodes" id="topo-nodes">
-              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
-                <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.1em">TOPOLOGY // 待接入</span>
-              </div>
-            </div>
+            <div class="topo-nodes" id="topo-nodes"></div>
           </div>
 
           <div class="glass-card glass-card-flush" style="margin-bottom:6px">
             <div class="map-node-list" id="map-container"></div>
           </div>
           <div class="map-unknown-label">··· 未知区域 ···</div>
+        </div>
+
+        <!-- Go-to location sheet -->
+        <div class="panel-overlay" id="goto-overlay" onclick="App._closeGotoPopup()">
+          <div class="user-panel" id="goto-sheet" style="max-height:40vh">
+            <div class="panel-drag-handle"></div>
+            <div style="text-align:center;padding:12px 0">
+              <div style="font-size:14px;color:var(--text);margin-bottom:4px" id="goto-node-name">--</div>
+              <div style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)" id="goto-node-info">--</div>
+            </div>
+            <button class="btn-accent" style="width:100%;padding:10px;border-radius:8px;font-size:12px" onclick="App._confirmGoTo()">前往此地</button>
+            <div style="text-align:center;font-size:9px;color:var(--text-3);margin-top:6px;font-family:var(--font-mono)">移动功能后续版本接入</div>
+          </div>
         </div>
 
         <!-- Attributes panel -->
@@ -2136,16 +2167,50 @@ var DEMO = {
       { id:'d13', title:'[杂谈] 分享一个让自己冷静下来的方法', content:'盯着终端倒计时看。是的，听起来很蠢。倒计时是VOID给你的最确定的东西。当文字开始重影，当墙壁开始呼吸——看倒计时。那是真实的。', authorId:'9102', price:0, views:198, purchases:0, createdAt:Date.now()-86400000, reports:0, suspicious:false, replies:[], locked:false, isAIGenerated:true }
     ]
   },
-  mapNodes: [
-    { name:'404号公寓', type:'当前位置', style:'current' },
-    { name:'一楼大厅', type:'已探索', style:'visited' },
-    { name:'307号房间', type:'副本入口', style:'dungeon' },
-    { name:'地下室', type:'副本入口', style:'dungeon' },
-    { name:'午夜地铁站', type:'已探索', style:'visited' },
-    { name:'城市废墟·东区', type:'已探索', style:'visited' },
-    { name:'未知区域', type:'未探索', style:'unknown' }
-  ]
 };
+
+// ============================================================
+// DEFAULT MAP REGIONS (6 regions, dual-layer topology)
+// ============================================================
+var DEFAULT_MAP_REGIONS = [
+  { id: 'wasteland_east', name: '荒原·东段', threatLevel: 'safe', state: 'current', x: 25, y: 62,
+    connections: ['east_ruins'],
+    subNodes: [
+      { id: 'wasteland_spawn', name: '初始点', type: 'location', state: 'current', dungeonState: null, x: 40, y: 68, connections: ['wasteland_camp'] },
+      { id: 'wasteland_camp', name: '废弃营地', type: 'location', state: 'visited', dungeonState: null, x: 58, y: 55, connections: [] }
+    ]
+  },
+  { id: 'east_ruins', name: '东墟', threatLevel: 'medium', state: 'unknown', x: 60, y: 45,
+    connections: ['south_ruins'],
+    subNodes: [
+      { id: 'east_apt', name: '旧公寓', type: 'location', state: 'unknown', dungeonState: null, x: 45, y: 55, connections: [] }
+    ]
+  },
+  { id: 'south_ruins', name: '南墟', threatLevel: 'medium', state: 'unknown', x: 72, y: 68,
+    connections: ['iron_dome'],
+    subNodes: [
+      { id: 'south_tower', name: '塔·第一层', type: 'dungeon', state: 'unknown', dungeonState: 'unknown', x: 50, y: 50, connections: [] }
+    ]
+  },
+  { id: 'iron_dome', name: '铁穹', threatLevel: 'high', state: 'unknown', x: 50, y: 28,
+    connections: ['border_zone'],
+    subNodes: [
+      { id: 'iron_factory', name: '锈蚀工厂', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 55, connections: [] }
+    ]
+  },
+  { id: 'border_zone', name: '边界地带', threatLevel: 'fatal', state: 'unknown', x: 35, y: 18,
+    connections: ['sea_of_obsession'],
+    subNodes: [
+      { id: 'border_waste', name: '扭曲荒原', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 55, connections: [] }
+    ]
+  },
+  { id: 'sea_of_obsession', name: '执念之海', threatLevel: 'fatal', state: 'unknown', x: 12, y: 35,
+    connections: [],
+    subNodes: [
+      { id: 'sea_shore', name: '海岸线', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 60, connections: [] }
+    ]
+  }
+];
 
 // ============================================================
 // DEFAULT WORLD PRESET
@@ -2214,15 +2279,7 @@ var Store = {
       this._db = JSON.parse(JSON.stringify({
         version: 1,
         player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: 1842, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false },
-        currentCopy: { name: '404号公寓', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '一楼走廊', completionStatus:'active', terminalInterference:'轻度', mapNodes: [
-          { name:'404号公寓', type:'当前位置', style:'current' },
-          { name:'一楼大厅', type:'已探索', style:'visited' },
-          { name:'307号房间', type:'副本入口', style:'dungeon' },
-          { name:'地下室', type:'副本入口', style:'dungeon' },
-          { name:'午夜地铁站', type:'已探索', style:'visited' },
-          { name:'城市废墟·东区', type:'已探索', style:'visited' },
-          { name:'未知区域', type:'未探索', style:'unknown' }
-        ] },
+        currentCopy: { name: '404号公寓', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '一楼走廊', completionStatus:'active', terminalInterference:'轻度', mapRegions: JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS)) },
         inventory: [],
         skills: [],
         messages: [
@@ -2335,7 +2392,7 @@ var Store = {
         this._db.currentCopy.location = dangerSpots[Math.floor(Math.random() * dangerSpots.length)];
       }
     }
-    if (!this._db.currentCopy.mapNodes) this._db.currentCopy.mapNodes = JSON.parse(JSON.stringify(DEMO.mapNodes));
+    if (!this._db.currentCopy.mapRegions) this._db.currentCopy.mapRegions = JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS));
     if (!this._db.currentCopy.type) this._db.currentCopy.type = '恐怖';
     if (!this._db.currentCopy.difficulty) this._db.currentCopy.difficulty = 'C';
     if (!this._db.currentCopy.discoveredRules) this._db.currentCopy.discoveredRules = [];
@@ -2605,7 +2662,7 @@ var Store = {
     this._db.messages = plot.messages ? JSON.parse(JSON.stringify(plot.messages)) : [];
     this._db.characters = plot.characters ? JSON.parse(JSON.stringify(plot.characters)) : [];
     this._db.inventory = plot.inventory ? JSON.parse(JSON.stringify(plot.inventory)) : [];
-    this._db.currentCopy = plot.currentCopy ? JSON.parse(JSON.stringify(plot.currentCopy)) : { name: plot.name || '未知副本', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '入口', completionStatus:'active', terminalInterference:'轻度', mapNodes: [] };
+    this._db.currentCopy = plot.currentCopy ? JSON.parse(JSON.stringify(plot.currentCopy)) : { name: plot.name || '未知副本', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '入口', completionStatus:'active', terminalInterference:'轻度', mapRegions: [] };
     this._db.config.activePlotIdx = idx;
   },
 
@@ -2626,7 +2683,7 @@ var Store = {
     this._db.messages = [{ id:'m0', type:'system', content:'终端已连接', timestamp: Date.now(), meta: {} }];
     this._db.characters = [];
     this._db.inventory = [];
-    this._db.currentCopy = { name: name, chapter: '第一章', core: '未知', rules: '尚未发现', location: startLoc, mapNodes: [] };
+    this._db.currentCopy = { name: name, chapter: '第一章', core: '未知', rules: '尚未发现', location: startLoc, mapRegions: JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS)) };
     this._db.config.activePlotIdx = newIdx;
     this.save();
     return plot;
@@ -3109,7 +3166,7 @@ var AI = {
       { re: /\[COPY_END\]/g, cmd: 'copy_end' },
       { re: /\[CHAR_JOIN ([^\]:]+)(?::([^\]]*))?(?:\s+(role|npc))?(?:\s+(\d+))?\]/g, cmd: 'char_join' },
       { re: /\[FORUM_POST (\S+):([^\]]+)\]/g, cmd: 'forum_post' },
-      { re: /\[MAP_NODE ([^\]:]+):([^\]]+)\]/g, cmd: 'map_node' },
+      { re: /\[MAP_NODE ([^\]:]+):([^\]:]+):([^\]:]+):([^\]]+)\]/g, cmd: 'map_node' },
       { re: /\[MONSTER (\S+):([^\]]+)\]/g, cmd: 'monster' },
       { re: /\[TIDE_START\]/g, cmd: 'tide_start' },
       { re: /\[TIDE_END\]/g, cmd: 'tide_end' },
@@ -3222,10 +3279,33 @@ var AI = {
         case 'map_node': {
           var nodeName = item.args[0].trim();
           var nodeType = item.args[1].trim();
-          var exists2 = Store._db.currentCopy.mapNodes.find(function(n) { return n.name === nodeName; });
-          if (!exists2) {
-            var style = nodeType === '副本入口' ? 'dungeon' : 'visited';
-            Store._db.currentCopy.mapNodes.push({ name: nodeName, type: nodeType, style: style });
+          var threatLevel = (item.args[2] || '').trim() || 'medium';
+          var regionId = (item.args[3] || '').trim();
+          var regions = Store._db.currentCopy.mapRegions || [];
+          if (regionId) {
+            var region = regions.find(function(r) { return r.id === regionId; });
+            if (region) {
+              region.subNodes = region.subNodes || [];
+              var es = region.subNodes.find(function(s) { return s.name === nodeName; });
+              if (!es) {
+                region.subNodes.push({ id: 'sn_' + Date.now(), name: nodeName, type: nodeType, state: 'unknown', dungeonState: nodeType === 'dungeon' ? 'unknown' : null, threatLevel: threatLevel, x: 20 + Math.floor(Math.random() * 60), y: 20 + Math.floor(Math.random() * 60), connections: [] });
+              } else if (es.state === 'unknown') { es.state = 'visited'; }
+              Store.save();
+            }
+          } else {
+            var found = false;
+            regions.forEach(function(r) {
+              if (found) return;
+              if (r.state === 'current' || r.state === 'visited') {
+                r.subNodes = r.subNodes || [];
+                var es = r.subNodes.find(function(s) { return s.name === nodeName; });
+                if (!es) {
+                  r.subNodes.push({ id: 'sn_' + Date.now(), name: nodeName, type: nodeType, state: 'unknown', dungeonState: nodeType === 'dungeon' ? 'unknown' : null, threatLevel: threatLevel, x: 20 + Math.floor(Math.random() * 60), y: 20 + Math.floor(Math.random() * 60), connections: [] });
+                } else if (es.state === 'unknown') { es.state = 'visited'; }
+                Store.save();
+                found = true;
+              }
+            });
           }
           break;
         }
@@ -3836,7 +3916,7 @@ var App = {
     if (panel) panel.classList.add('active');
     if (tab === 'home') this.renderHome();
     if (tab === 'forum') this.renderForum();
-    if (tab === 'map') this.renderMap();
+    if (tab === 'map') { this._mapLevel = 'region'; this._mapRegionId = null; this.renderMap(); }
     if (tab === 'attrs') this.renderAttributes();
     if (tab === 'contacts') this.renderContacts();
   },
@@ -4206,18 +4286,24 @@ var App = {
     });
   },
 
+  // ============================================================
+  // MAP SYSTEM (dual-layer topology)
+  // ============================================================
+  _mapLevel: 'region',
+  _mapRegionId: null,
+  _gotoNodeId: null,
+  _gotoNodeName: '',
+
   renderMap: function() {
-    var container = document.getElementById('map-container');
-    var nodes = Store._db.currentCopy.mapNodes || DEMO.mapNodes;
-    var explored = nodes.filter(function(n) { return n.style === 'visited' || n.style === 'current'; }).length;
-    var total = nodes.length;
+    var regions = Store._db.currentCopy.mapRegions || [];
+    var explored = 0, total = 0;
+    regions.forEach(function(r) {
+      (r.subNodes || []).forEach(function(s) {
+        total++;
+        if (s.state === 'visited' || s.state === 'current') explored++;
+      });
+    });
     var pct = total > 0 ? Math.round(explored / total * 100) : 0;
-    container.innerHTML = nodes.map(function(n) {
-      return '<div class="map-node">' +
-        '<div class="map-node-dot ' + n.style + '"></div>' +
-        '<div class="map-node-info"><div class="map-node-name">' + App.escapeHtml(n.name) + '</div>' +
-        '<div class="map-node-type">' + App.escapeHtml(n.type) + '</div></div></div>';
-    }).join('');
     var explStat = document.getElementById('map-explored-stat');
     var pctStat = document.getElementById('map-pct-stat');
     var barFill = document.getElementById('map-bar-fill');
@@ -4225,11 +4311,49 @@ var App = {
     if (pctStat) pctStat.textContent = pct + '%';
     if (barFill) barFill.style.width = pct + '%';
 
-    this._renderTopology(nodes);
+    if (this._mapLevel === 'sub' && this._mapRegionId) {
+      this._renderRegionSubMap(this._mapRegionId);
+    } else {
+      this._renderRegionMap(regions);
+    }
+
+    var container = document.getElementById('map-container');
+    if (container) {
+      var items;
+      if (this._mapLevel === 'sub' && this._mapRegionId) {
+        var region = regions.find(function(r) { return r.id === App._mapRegionId; });
+        items = region ? (region.subNodes || []) : [];
+      } else {
+        items = regions;
+      }
+      var self = this;
+      container.innerHTML = items.map(function(n) {
+        var dotCls = self._getNodeStyle(n);
+        var isDungeon = n.type === 'dungeon';
+        var sub = isDungeon ? (n.dungeonState === 'cleared' ? '已通关' : n.dungeonState === 'active' ? '进行中' : '未探索') :
+          (n.state === 'current' ? '当前位置' : n.state === 'visited' ? '已探索' : '未探索');
+        var threatLabels = { safe:'安全', medium:'中等威胁', high:'高威胁', fatal:'致命' };
+        var extra = n.threatLevel ? ' · ' + (threatLabels[n.threatLevel] || n.threatLevel) : '';
+        return '<div class="map-node" style="cursor:pointer" onclick="App._openGoToPopup(\'' + n.id + '\',\'' + (n.name||'').replace(/'/g,'') + '\',\'' + sub + '\')"><div class="map-dot-core ' + dotCls + (isDungeon?' dot-dungeon':'') + '" style="position:relative;flex-shrink:0"></div><div class="map-node-info"><div class="map-node-name">' + App.escapeHtml(n.name) + '</div><div class="map-node-type">' + sub + extra + '</div></div></div>';
+      }).join('');
+    }
   },
 
-  // Topology map — auto-layout from mapNodes. Replace with real coordinates later.
-  _renderTopology: function(nodes) {
+  _renderRegionMap: function(regions) {
+    document.getElementById('submap-header').classList.remove('active');
+    this._renderTopologyGraph(regions, 'region');
+  },
+
+  _renderRegionSubMap: function(regionId) {
+    var regions = Store._db.currentCopy.mapRegions || [];
+    var region = regions.find(function(r) { return r.id === regionId; });
+    if (!region) return;
+    document.getElementById('submap-header').classList.add('active');
+    document.getElementById('submap-region-name').textContent = region.name;
+    this._renderTopologyGraph(region.subNodes || [], 'sub');
+  },
+
+  _renderTopologyGraph: function(nodes, level) {
     var svg = document.getElementById('topo-svg');
     var nodeLayer = document.getElementById('topo-nodes');
     if (!svg || !nodeLayer) return;
@@ -4238,33 +4362,65 @@ var App = {
       svg.innerHTML = '';
       return;
     }
-    // Auto-arrange nodes in a circle
-    var cx = 50, cy = 50, rx = 38, ry = 35;
-    var count = nodes.length;
-    var svgLines = '';
-    var nodesHTML = '';
-
-    nodes.forEach(function(n, i) {
-      var angle = (i / count) * Math.PI * 2 - Math.PI / 2;
-      var x = cx + rx * Math.cos(angle);
-      var y = cy + ry * Math.sin(angle);
-      var cls = n.style === 'current' ? 'current' : n.style === 'dungeon' ? 'dungeon' : n.style === 'visited' ? 'visited' : '';
-      nodesHTML += '<div class="topo-node ' + cls + '" style="left:' + x + '%;top:' + y + '%">' +
-        '<div class="topo-node-core"></div>' +
-        '<div class="topo-node-label">' + App.escapeHtml(n.name) + '</div>' +
-        '<div class="topo-node-sub">' + App.escapeHtml(n.type||'') + '</div>' +
-        '</div>';
-      // Connect to previous node
-      if (i > 0) {
-        var prevAngle = ((i-1) / count) * Math.PI * 2 - Math.PI / 2;
-        var px = cx + rx * Math.cos(prevAngle);
-        var py = cy + ry * Math.sin(prevAngle);
-        var lineCls = cls === 'current' ? 'active' : (cls === 'visited' ? 'secured' : '');
-        svgLines += '<line class="topo-line ' + lineCls + '" x1="' + px + '%" y1="' + py + '%" x2="' + x + '%" y2="' + y + '%"/>';
-      }
+    var svgLines = '', nodesHTML = '', drawnLines = {};
+    var nodeMap = {};
+    nodes.forEach(function(n) { nodeMap[n.id] = n; });
+    nodes.forEach(function(n) {
+      (n.connections || []).forEach(function(targetId) {
+        var target = nodeMap[targetId];
+        if (!target) return;
+        var lineKey = [n.id, targetId].sort().join('-');
+        if (drawnLines[lineKey]) return;
+        drawnLines[lineKey] = true;
+        svgLines += '<line class="topo-line ' + App._getLineClass(n, target) + '" x1="' + n.x + '%" y1="' + n.y + '%" x2="' + target.x + '%" y2="' + target.y + '%"/>';
+      });
+    });
+    nodes.forEach(function(n) {
+      var dotCls = App._getNodeStyle(n);
+      var isDungeon = n.type === 'dungeon';
+      var clickHandler = level === 'region' ? 'App._enterRegion(\'' + n.id + '\')' : 'App._openGoToPopup(\'' + n.id + '\',\'' + (n.name||'').replace(/'/g,'') + '\',\'' + (n.state||'') + '\')';
+      nodesHTML += '<div class="map-dot ' + dotCls + (isDungeon?' dot-dungeon':'') + '" style="left:' + n.x + '%;top:' + n.y + '%" onclick="' + clickHandler + '"><div class="map-dot-core"></div><div class="map-dot-label">' + App.escapeHtml(n.name) + '</div>' + (level === 'region' ? '<div class="map-dot-sub">' + ((n.subNodes||[]).length) + ' 地点</div>' : '') + '</div>';
     });
     svg.innerHTML = svgLines;
     nodeLayer.innerHTML = nodesHTML;
+  },
+
+  _enterRegion: function(regionId) {
+    this._mapLevel = 'sub'; this._mapRegionId = regionId; this.renderMap();
+  },
+  _exitRegion: function() {
+    this._mapLevel = 'region'; this._mapRegionId = null; this.renderMap();
+  },
+  _openGoToPopup: function(nodeId, nodeName, info) {
+    this._gotoNodeId = nodeId; this._gotoNodeName = nodeName;
+    document.getElementById('goto-node-name').textContent = nodeName;
+    document.getElementById('goto-node-info').textContent = info || '';
+    document.getElementById('goto-overlay').classList.add('open');
+  },
+  _closeGotoPopup: function() {
+    document.getElementById('goto-overlay').classList.remove('open');
+  },
+  _confirmGoTo: function() {
+    Store.addMessage({ type:'system', content: '前往「' + this._gotoNodeName + '」——移动功能将在后续版本接入。' });
+    this._closeGotoPopup(); this.renderMessages(); App.scrollToBottom();
+  },
+  _getNodeStyle: function(n) {
+    if (n.type === 'dungeon') {
+      if (n.dungeonState === 'cleared') return 'dot-cleared';
+      if (n.dungeonState === 'active') return 'dot-active';
+      return 'dot-unknown';
+    }
+    if (n.state === 'current') return 'dot-current';
+    if (n.state === 'visited') return 'dot-visited';
+    if (n.state === 'active') return 'dot-active';
+    return 'dot-unknown';
+  },
+  _getLineClass: function(a, b) {
+    var sa = App._getNodeStyle(a), sb = App._getNodeStyle(b);
+    if ((sa === 'dot-cleared' || sa === 'dot-visited') && (sb === 'dot-cleared' || sb === 'dot-visited')) return 'line-cleared';
+    if (sa === 'dot-current' || sb === 'dot-current' || sa === 'dot-active' || sb === 'dot-active') return 'line-active';
+    if (sa === 'dot-unknown' && sb === 'dot-unknown') return 'line-unknown';
+    return 'line-partial';
   },
 
   renderForum: function() {
@@ -4522,11 +4678,16 @@ var App = {
     // Nearby dungeons
     var nearbyContainer = document.getElementById('home-nearby-list');
     if (nearbyContainer) {
-      var dungeonNodes = (Store._db.currentCopy.mapNodes || []).filter(function(n) { return n.style === 'dungeon'; });
-      if (dungeonNodes.length === 0) {
+      var allDungeons = [];
+      (Store._db.currentCopy.mapRegions || []).forEach(function(r) {
+        (r.subNodes || []).forEach(function(s) {
+          if (s.type === 'dungeon' && s.state !== 'visited' && s.dungeonState !== 'cleared') allDungeons.push({ name: s.name, type: s.dungeonState || 'unknown' });
+        });
+      });
+      if (allDungeons.length === 0) {
         nearbyContainer.innerHTML = '<span style="color:var(--text-3)">附近暂未发现入口</span>';
       } else {
-        nearbyContainer.innerHTML = dungeonNodes.map(function(n) {
+        nearbyContainer.innerHTML = allDungeons.map(function(n) {
           return '<div class="nearby-item"><span>' + App.escapeHtml(n.name) + '</span><span class="nearby-type">' + App.escapeHtml(n.type || '') + '</span></div>';
         }).join('');
       }

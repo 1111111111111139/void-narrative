@@ -1977,15 +1977,40 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
 </div>
 
 <!-- ============================================================
-     CENTER MODAL: 终端设置
+     SUB-PAGE: 终端设置
      ============================================================ -->
-<div class="center-modal-overlay" id="modal-term-settings">
-  <div class="center-modal-box">
-    <div class="center-modal-header">
-      <span class="center-modal-title">终端设置</span>
-      <button class="modal-close-btn" onclick="App.closeModal('modal-term-settings')">×</button>
+<div id="page-term-settings" class="page sub-page">
+  <div class="sub-header">
+    <button class="sub-back" data-back="settings">←</button>
+    <span class="sub-title">终端设置</span>
+  </div>
+  <div class="sub-content">
+    <div class="form-section">
+      <div class="form-section-title">终端显示</div>
+      <div class="form-group">
+        <label class="form-label">终端昵称</label>
+        <input class="form-input" id="ts-nickname" type="text" placeholder="输入终端显示名称" maxlength="20">
+        <span class="form-hint">显示在终端主页的昵称，默认为"VOID-XXXX"</span>
+      </div>
     </div>
-    <div style="text-align:center;padding:40px 0;font-family:var(--font-mono);font-size:10px;color:#444">功能开发中...</div>
+    <div class="form-section">
+      <div class="form-section-title">通讯权限</div>
+      <div class="form-group">
+        <label class="form-label">终端通讯权限</label>
+        <select class="form-select" id="ts-comm-perm">
+          <option value="all">所有人 — 任何角色都可发送通讯请求</option>
+          <option value="contacts">仅已知联系人 — 只有通讯录中已有的角色可发消息</option>
+          <option value="none">关闭 — 不接受任何通讯请求和消息</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-accent" style="width:100%;margin-top:8px" onclick="App._saveTermSettings()">保存</button>
+    <div class="toast" id="ts-toast">已保存</div>
+    <div class="form-section" style="margin-top:32px">
+      <div class="form-section-title">终端状态</div>
+      <div class="about-row"><span>终端ID</span><span id="ts-void-id" style="font-family:var(--font-mono);font-size:10px">--</span></div>
+      <div class="about-row"><span>运行状态</span><span id="ts-status" style="font-family:var(--font-mono);font-size:10px">--</span></div>
+    </div>
   </div>
 </div>
 
@@ -2296,7 +2321,7 @@ var Store = {
         characters: JSON.parse(JSON.stringify(DEMO.characters)),
         memories: { global: [], npc: {}, copy: {}, character: {}, forum: [] },
         forumPosts: { intel:[], party:[], trade:[], will:[], chat:[] },
-        settings: { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium' },
+        settings: { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' },
         config: { activePresetId: 'default', activePlotIdx: 0 },
         worldPresets: [JSON.parse(JSON.stringify(DEFAULT_WORLD_PRESET))],
         plots: [{ id: 'p1', globalId: 'default', name: '404号公寓', createdAt: Date.now(), updatedAt: Date.now() }],
@@ -2374,7 +2399,8 @@ var Store = {
     }
     if (!this._db.forumPosts || !this._db.forumPosts.intel) this._db.forumPosts = { intel:[], party:[], trade:[], will:[], chat:[] };
     if (this._db.terminalMessages) { this._db.forumPosts = this._db.terminalMessages; delete this._db.terminalMessages; }
-    if (!this._db.settings) this._db.settings = { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium' };
+    if (!this._db.settings) this._db.settings = { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' };
+    if (!this._db.settings.termCommPerm) this._db.settings.termCommPerm = 'all';
     if (!this._db.settings.memoryApi) this._db.settings.memoryApi = { key: '', url: '', model: '', useMain: true };
     if (!this._db.settings.stateApi) this._db.settings.stateApi = { key: '', url: '', model: '', useMain: true };
     if (!this._db.player.attributes) this._db.player.attributes = { strength:1, agility:1, insight:1, calm:1 };
@@ -3406,17 +3432,23 @@ var AI = {
         case 'char_msg': {
           var chName = item.args[0].trim();
           var msgContent = item.args[1].trim();
+          var perm = Store._db.settings.termCommPerm || 'all';
+          if (perm === 'none') break;
           var ch = Store.characters().find(function(x) { return x.name === chName && x.initiativeEnabled; });
           if (ch) {
+            if (perm === 'contacts' && !ch.contactAccepted) break;
             App._showNotify(ch.id, msgContent);
             Store.addMessage({ type:'system', content:'📩 ' + chName + ' 发来消息。点击通知横幅或通讯录查看。' });
           }
           break;
         }
         case 'contact_req': {
+          var perm = Store._db.settings.termCommPerm || 'all';
+          if (perm === 'none') break;
           var reqName = item.args[0].trim();
           var reqCh = Store.characters().find(function(x) { return x.name === reqName && !x.isNPC; });
           if (reqCh && !reqCh.contactAccepted) {
+            if (perm === 'contacts' && !reqCh.contactEstablished) break;
             reqCh.contactRequested = true;
             Store.addMessage({ type:'system', content:'📡 ID未公开 请求添加你为通讯联系人。在角色设定中可查看详情。' });
           }
@@ -3704,13 +3736,14 @@ var App = {
     if (page === 'lores') this.renderLoreList();
     if (page === 'memories-view') this.renderMemViewer();
     if (page === 'char-list') this.renderCharList();
+    if (page === 'term-settings') this._loadTermSettings();
     this.renderAll();
   },
 
   // Settings navigation
   openSettingsItem: function(target) {
-    var modals = { api:'modal-api', 'term-settings':'modal-term-settings', appearance:'modal-appearance' };
-    var pages = { profile:1, 'world-presets':1, 'preset-edit':1, plots:1, lores:1, 'lore-edit':1, 'char-list':1, 'global-rules':1, saves:1, 'memories-view':1, about:1, 'char-edit':1 };
+    var modals = { api:'modal-api', appearance:'modal-appearance' };
+    var pages = { profile:1, 'world-presets':1, 'preset-edit':1, plots:1, lores:1, 'lore-edit':1, 'char-list':1, 'global-rules':1, saves:1, 'memories-view':1, about:1, 'char-edit':1, 'term-settings':1 };
     if (modals[target]) {
       if (target === 'api') { this._openApiModal(); return; }
       if (target === 'appearance') { this._syncAppearanceModal(); }
@@ -7028,6 +7061,26 @@ var App = {
       var labels = { small: '小', medium: '中', large: '大' };
       fsSelect.value = labels[fs] || '中';
     }
+  },
+
+  _loadTermSettings: function() {
+    var s = Store._db.settings;
+    document.getElementById('ts-nickname').value = s.termNickname || '';
+    document.getElementById('ts-comm-perm').value = s.termCommPerm || 'all';
+    var copy = Store._db.currentCopy;
+    document.getElementById('ts-void-id').textContent = 'VOID-' + (Store.player().voidId || '0000');
+    var interference = copy.terminalInterference || '无';
+    document.getElementById('ts-status').textContent = interference === '无' ? '正常运行' : '受干扰（' + interference + '）';
+    document.getElementById('ts-status').style.color = interference === '无' ? '#2E7D32' : 'var(--accent)';
+  },
+
+  _saveTermSettings: function() {
+    var s = Store._db.settings;
+    s.termNickname = document.getElementById('ts-nickname').value.trim();
+    s.termCommPerm = document.getElementById('ts-comm-perm').value;
+    Store.save();
+    var toast = document.getElementById('ts-toast');
+    if (toast) { toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 1500); }
   },
 
   _apiTab: 'main',

@@ -882,7 +882,7 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
    LIGHT THEME & SCROLLBAR & DESKTOP
    ============================================================ */
 body.light,body.light-theme{
-  --bg:#F5F5F3;--text:#1A1A1A;--text-2:#8A8A8A;--text-3:#B0B0B0;
+  --bg:#F5F5F3;--text:#1A1A1A;--text-2:#555555;--text-3:#777777;
   --accent:#8E2A2A;--accent-dim:rgba(142,42,42,.1);
   --divider:rgba(0,0,0,.06);--divider-strong:rgba(0,0,0,.1);
   --glass:rgba(248,248,248,.82);--surface:rgba(255,255,255,0.75);
@@ -903,6 +903,30 @@ body.light-theme .dock,
 body.light .dock{background:rgba(248,248,246,0.82)}
 body.light-theme .msg-narrative .msg-content,
 body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
+body.light-theme .center-modal-box,
+body.light .center-modal-box{background:rgba(248,248,246,0.97);border-color:rgba(0,0,0,0.08)}
+body.light-theme .user-panel,
+body.light .user-panel{background:rgba(248,248,246,0.97);border-color:rgba(0,0,0,0.08)}
+body.light-theme .dialog-box,
+body.light .dialog-box{background:var(--bg);border-color:rgba(0,0,0,0.1)}
+body.light-theme .copy-panel,
+body.light .copy-panel{background:rgba(248,248,246,0.97)}
+body.light-theme #ctx-menu,
+body.light #ctx-menu{background:rgba(248,248,246,0.97);border-color:rgba(0,0,0,0.08)}
+body.light-theme .modal-sheet,
+body.light .modal-sheet{background:var(--bg)}
+body.light-theme #page-rules,
+body.light #page-rules{background:var(--bg)}
+body.light-theme #page-private-chat,
+body.light #page-private-chat{background:var(--bg)}
+body.light-theme #page-private-chat .sub-header,
+body.light #page-private-chat .sub-header{background:var(--glass)}
+body.light-theme #notify-banner,
+body.light #notify-banner{background:var(--glass);border-color:var(--accent)}
+body.light-theme #death-bg,
+body.light #death-bg{background:var(--bg)}
+body.light-theme #death-dialog,
+body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 ::-webkit-scrollbar{width:2px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--text-3);border-radius:1px}
@@ -1240,7 +1264,6 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
     <div class="settings-group">
       <div class="settings-group-label">角色</div>
       <div class="settings-list">
-        <button class="settings-item" data-target="profile">个人设定<span class="settings-arrow">›</span></button>
         <button class="settings-item" data-target="char-list">角色设定<span class="settings-arrow">›</span></button>
       </div>
     </div>
@@ -2033,14 +2056,6 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
         <button class="toggle-btn active">深色</button>
         <button class="toggle-btn">浅色</button>
       </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">字号</label>
-      <select class="form-select">
-        <option>小</option>
-        <option selected>中</option>
-        <option>大</option>
-      </select>
     </div>
   </div>
 </div>
@@ -3735,7 +3750,6 @@ var App = {
   init: function() {
     Store.init();
     this.applyTheme(Store._db.settings.theme || 'dark');
-    this.applyFontSize(Store._db.settings.fontSize || 'medium');
     this.bindEvents();
     this._lastAnnotations = { user:[{cls:'msg-annot-san',text:'SAN -3'}], npc:{'林医生':[{cls:'',text:'好感 +2'}]} };
     this._checkDeduction();
@@ -4050,11 +4064,6 @@ var App = {
   applyTheme: function(t) {
     document.body.classList.toggle('light-theme', t === 'light');
     Store._db.settings.theme = t; Store.save();
-  },
-  applyFontSize: function(s) {
-    var sizes = { small:'13px', medium:'15px', large:'17px' };
-    document.documentElement.style.fontSize = sizes[s] || '15px';
-    Store._db.settings.fontSize = s; Store.save();
   },
 
   // ============================================================
@@ -6975,10 +6984,6 @@ var App = {
       btn.addEventListener('click', function() { self.applyTheme(btn.textContent === '浅色' ? 'light' : 'dark'); });
     });
 
-    // Appearance modal: font size select
-    var fsSelect = document.querySelector('#modal-appearance .form-select');
-    if (fsSelect) fsSelect.addEventListener('change', function() { self.applyFontSize(this.value); });
-
     // Char editor save & delete
     var ceSave = document.getElementById('ce-save-btn');
     if (ceSave) ceSave.addEventListener('click', function() { self.saveCharEditor(); });
@@ -7270,12 +7275,6 @@ var App = {
     var themeBtns = document.querySelectorAll('#modal-appearance .toggle-btn');
     var theme = Store._db.settings.theme || 'dark';
     themeBtns.forEach(function(b) { b.classList.toggle('active', b.textContent === (theme === 'light' ? '浅色' : '深色')); });
-    var fsSelect = document.querySelector('#modal-appearance .form-select');
-    if (fsSelect) {
-      var fs = Store._db.settings.fontSize || 'medium';
-      var labels = { small: '小', medium: '中', large: '大' };
-      fsSelect.value = labels[fs] || '中';
-    }
   },
 
   _loadTermSettings: function() {

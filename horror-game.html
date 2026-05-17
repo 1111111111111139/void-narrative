@@ -2010,7 +2010,7 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
     </div>
     <div class="form-group">
       <label class="form-label">查看所需积分（0=免费）</label>
-      <input class="form-input" id="fp-price" type="number" value="0" min="0" max="100">
+      <input class="form-input" id="fp-price" type="number" value="0" min="0" max="10" oninput="App._validateForumPrice()">
     </div>
     <div class="form-group" style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)">
       发布者预览：ID:<span id="fp-preview-id">????</span>
@@ -2342,7 +2342,7 @@ var Store = {
     if (!this._db.currentCopy.completionStatus) this._db.currentCopy.completionStatus = 'active';
     if (!this._db.currentCopy.terminalInterference) this._db.currentCopy.terminalInterference = '轻度';
     // Migrate existing characters to have isNPC field
-    (this._db.characters || []).forEach(function(c) { if (c.isNPC === undefined) c.isNPC = false; if (c.isNPC && !c.simpleMemories) c.simpleMemories = []; if (c.contactEstablished === undefined) c.contactEstablished = !c.isNPC; if (c.initiativeEnabled === undefined) c.initiativeEnabled = false; if (c.contactAccepted === undefined) c.contactAccepted = false; if (c.isOnline === undefined) c.isOnline = true; if (c.isAlive === undefined) c.isAlive = true; if (c.deathCause === undefined) c.deathCause = null; if (c.deathTime === undefined) c.deathTime = null; if (c.lastSeenLocation === undefined) c.lastSeenLocation = null; if (c.lastSeenTime === undefined) c.lastSeenTime = null; if (c.killCount === undefined) c.killCount = 0; if (c.hasKillMark === undefined) c.hasKillMark = false; if (c.san === undefined) c.san = 100; if (c.points === undefined) c.points = 100; });
+    (this._db.characters || []).forEach(function(c) { if (c.isNPC === undefined) c.isNPC = false; if (c.isNPC && !c.simpleMemories) c.simpleMemories = []; if (c.contactEstablished === undefined) c.contactEstablished = !c.isNPC; if (c.initiativeEnabled === undefined) c.initiativeEnabled = false; if (c.contactAccepted === undefined) c.contactAccepted = false; if (c.isOnline === undefined) c.isOnline = true; if (c.isAlive === undefined) c.isAlive = true; if (c.deathCause === undefined) c.deathCause = null; if (c.deathTime === undefined) c.deathTime = null; if (c.lastSeenLocation === undefined) c.lastSeenLocation = null; if (c.lastSeenTime === undefined) c.lastSeenTime = null; if (c.killCount === undefined) c.killCount = 0; if (c.hasKillMark === undefined) c.hasKillMark = false; if (c.san === undefined) c.san = 100; if (c.points === undefined) c.points = 100; if (c.attributes === undefined) c.attributes = { strength:1, agility:1, insight:1, calm:1 }; if (c.inventory === undefined) c.inventory = []; if (c.survivalDays === undefined) c.survivalDays = 0; });
     // Seed forum with demo data if all boards are empty
     var fp = this._db.forumPosts;
     var totalPosts = 0;
@@ -2414,6 +2414,9 @@ var Store = {
     data.hasKillMark = data.hasKillMark || false;
     data.san = data.san || 100;
     data.points = data.points || 100;
+    data.attributes = data.attributes || { strength: 1, agility: 1, insight: 1, calm: 1 };
+    data.inventory = data.inventory || [];
+    data.survivalDays = data.survivalDays || 0;
     if (data.isNPC) { data.simpleMemories = data.simpleMemories || []; data.affectionEnabled = false; data.memoryEnabled = false; }
     this._db.characters.push(data); this.save(); return data;
   },
@@ -2808,9 +2811,27 @@ function buildSystemPrompt() {
   presetText += '严格按照角色卡设定输出对话。执念投影：对话受执念循环限制。被同化者：混乱、碎片化、可能突然中断。原住民：自主对话，可能透露VOID信息。NPC说话时出现头像+气泡（动作用斜体灰色放在气泡内、对话之前）；NPC不说话时动作用旁白渲染（虚线框居中）。只有说话才出气泡。对话格式：角色名独占一行，对话内容缩进两个空格，动作在前用斜体、对话在后。\n\n';
   presetText += '### NPC在场规则\n';
   presetText += '在场NPC：用户可直接对话，输入中提及NPC名时自动切换对话模式。NPC可以自主行动，AI在旁白中描述。不在场NPC：用户不能直接对话。NPC之间可以互动，用户不在场时也会发生事情，后续返回时可能体现。进出场景由AI根据剧情判断，在旁白中自然描述。\n\n';
-  presetText += '### NPC创建\n';
-  presetText += '用户不可手动创建NPC。NPC由AI在叙事中通过[CHAR_JOIN]标记引入。[CHAR_JOIN 名称 role]创建角色，[CHAR_JOIN 名称 npc]或默认创建NPC。[CHAR_JOIN 名称:描述 role/npc]附带描述。AI自动创建的NPC：好感度不适用、记忆模块默认关闭、性格标签从描述中提取、角色设定文本从描述提取、isNPC:true。\n';
-  presetText += 'AI注入上下文时包含：在场NPC列表（名称+类型+性格标签摘要）、每个NPC的设定文本前200字、用户与每个NPC的最近3条互动记忆、NPC之间的关系、每个NPC的类型。AI根据以上信息按角色卡设定扮演、按NPC类型决定行为逻辑。\n';
+  presetText += '### 角色/NPC创建\n';
+	  presetText += '用户不可手动创建NPC。角色/NPC由AI在叙事中通过[CHAR_JOIN]标记引入。[CHAR_JOIN 名称 role]创建角色，[CHAR_JOIN 名称 npc]或默认创建NPC。[CHAR_JOIN 名称:描述 role/npc]附带描述。AI自动创建的NPC：好感度不适用、记忆模块默认关闭、性格标签从描述中提取、角色设定文本从描述提取、isNPC:true。\n\n';
+	  presetText += '#### 属性与存活时间挂钩\n';
+	  presetText += 'AI通过[CHAR_JOIN]引入新角色时，属性总和必须与存活时间成正比：\n';
+	  presetText += '- 存活<7天：属性总和4-8（新手，属性偏低）\n';
+	  presetText += '- 存活7-30天：属性总和8-16（有经验）\n';
+	  presetText += '- 存活30-90天：属性总和16-24（老手）\n';
+	  presetText += '- 存活>90天：属性总和24-32（极少数，顶尖轮回者）\n';
+	  presetText += '单项属性范围1-8，不超过8（10是上限，但AI生成的角色不应达到）。\n';
+	  presetText += '属性分配需符合角色性格标签（如"冷静"标签→意志偏高，"潜行者"标签→敏捷偏高，"战士"标签→力量偏高等）。\n\n';
+	  presetText += '#### 携带物品\n';
+	  presetText += 'AI生成角色时可携带物品，通过[ITEM +物品名:类型]标记在角色介绍中体现：\n';
+	  presetText += '- 存活<7天：0-1件基础物品（手术刀、绷带、纸条等）\n';
+	  presetText += '- 存活7-30天：1-3件物品（含1件药物概率高）\n';
+	  presetText += '- 存活30-90天：2-4件物品（可能含稀有物品）\n';
+	  presetText += '- 存活>90天：3-5件物品（可能含执念残留物或遗物）\n';
+	  presetText += '物品必须符合物品系统六种类型限制。\n\n';
+	  presetText += '#### 角色附带信息\n';
+	  presetText += 'AI引入角色时必须在[CHAR_JOIN]标记后附带：存活天数（用于属性分配）、是否有击杀标记（存活>30天的角色5%概率有）、当前位置（符合区域威胁等级）。\n';
+	  presetText += '格式示例：[CHAR_JOIN 山猫 role 23] 无击杀标记，位置东墟。[ITEM +镇定剂:medicine] [ITEM +铁管:weapon]\n\n';
+	  presetText += 'AI注入上下文时包含：在场NPC列表（名称+类型+性格标签摘要）、每个NPC的设定文本前200字、用户与每个NPC的最近3条互动记忆、NPC之间的关系、每个NPC的类型。AI根据以上信息按角色卡设定扮演、按NPC类型决定行为逻辑。\n';
   presetText += '\n';
   presetText += '## 终端\n终端是锚点的延伸——直接投射到意识中的交互界面。在前臂上调用半透明显示屏，仅自己可见。终端不可移除，死亡后随锚点消失。终端不是AI、不是NPC、不是宠物——是VOID安插的监视器，沉默地记录一切，不提供建议不发表意见不回应情感。终端基础功能：积分查询、理智值、位置、背包(只读)、个人状态。在线功能（受副本干扰影响）：论坛、地图、通讯录(仅已建立联系的角色)、排名、属性强化(积分兑换)。\n';
   presetText += '通讯录规则：不是全角色列表，仅显示已建立通讯联系的角色（双方互相同意）。角色在场时可直接对话，不在场时通过终端远程通讯。NPC无终端，不可远程通讯，仅在场时可直接对话。\n';
@@ -3086,7 +3107,7 @@ var AI = {
       { re: /\[SCENE ([^\]]+)\]/g, cmd: 'scene_enter' },
       { re: /\[LEAVE ([^\]]+)\]/g, cmd: 'scene_leave' },
       { re: /\[COPY_END\]/g, cmd: 'copy_end' },
-      { re: /\[CHAR_JOIN ([^\]:]+)(?::([^\]]*))?(?:\s+(role|npc))?\]/g, cmd: 'char_join' },
+      { re: /\[CHAR_JOIN ([^\]:]+)(?::([^\]]*))?(?:\s+(role|npc))?(?:\s+(\d+))?\]/g, cmd: 'char_join' },
       { re: /\[FORUM_POST (\S+):([^\]]+)\]/g, cmd: 'forum_post' },
       { re: /\[MAP_NODE ([^\]:]+):([^\]]+)\]/g, cmd: 'map_node' },
       { re: /\[MONSTER (\S+):([^\]]+)\]/g, cmd: 'monster' },
@@ -3155,9 +3176,24 @@ var AI = {
           var joinName = item.args[0].trim();
           var joinDesc = (item.args[1] || '').trim();
           var joinType = (item.args[2] || '').trim(); // 'role' or 'npc' or empty
+          var joinDays = parseInt(item.args[3]) || 0; // survival days
           var exists = Store.characters().find(function(ch) { return ch.name === joinName; });
           if (!exists) {
             var isNPC = joinType !== 'role'; // default to NPC unless explicitly marked 'role'
+            // Auto-generate attributes based on survival days
+            var survivalDays = joinDays || (isNPC ? 0 : 1);
+            var attrTotal, attrMax;
+            if (survivalDays < 7) { attrTotal = 4 + Math.floor(Math.random() * 5); attrMax = 6; }
+            else if (survivalDays < 30) { attrTotal = 8 + Math.floor(Math.random() * 9); attrMax = 7; }
+            else if (survivalDays < 90) { attrTotal = 16 + Math.floor(Math.random() * 9); attrMax = 8; }
+            else { attrTotal = 24 + Math.floor(Math.random() * 9); attrMax = 8; }
+            var attrs = { strength: 1, agility: 1, insight: 1, calm: 1 };
+            var remaining = attrTotal - 4;
+            var keys = ['strength', 'agility', 'insight', 'calm'];
+            while (remaining > 0) {
+              var k = keys[Math.floor(Math.random() * keys.length)];
+              if (attrs[k] < attrMax) { attrs[k]++; remaining--; }
+            }
             Store.addCharacter({
               name: joinName, gender: '未知', affection: 0, relation: '中立', present: true,
               lastSummary: joinDesc.slice(0, 60), memories: [], tags: [],
@@ -3165,7 +3201,10 @@ var AI = {
               affectionEnabled: !isNPC, tabooEnabled: false, memoryEnabled: !isNPC,
               isAutoCreated: true, isNPC: isNPC,
               npcType: isNPC ? 'projection' : undefined,
-              simpleMemories: isNPC ? [] : undefined
+              simpleMemories: isNPC ? [] : undefined,
+              attributes: attrs,
+              inventory: [],
+              survivalDays: survivalDays
             });
           } else {
             exists.present = true;
@@ -3514,6 +3553,7 @@ var App = {
     var pages = { profile:1, 'world-presets':1, 'preset-edit':1, plots:1, lores:1, 'lore-edit':1, 'char-list':1, 'global-rules':1, saves:1, 'memories-view':1, about:1, 'char-edit':1 };
     if (modals[target]) {
       if (target === 'api') { this._openApiModal(); return; }
+      if (target === 'appearance') { this._syncAppearanceModal(); }
       document.getElementById(modals[target]).classList.add('open');
     } else {
       this.navigateTo(target);
@@ -3820,12 +3860,24 @@ var App = {
   _closeForumPostSheet: function() {
     document.getElementById('forum-post-overlay').classList.remove('open');
   },
+
+  _validateForumPrice: function() {
+    var price = parseInt(document.getElementById('fp-price').value) || 0;
+    var submitBtn = document.getElementById('fp-submit-btn');
+    if (price > 10) {
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.25'; submitBtn.title = '最高收费10积分'; }
+    } else {
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.style.opacity = ''; submitBtn.title = ''; }
+    }
+  },
+
   _submitForumPost: function() {
     var board = document.getElementById('fp-board').value;
     var title = document.getElementById('fp-title').value.trim();
     var content = document.getElementById('fp-content').value.trim();
     var price = parseInt(document.getElementById('fp-price').value) || 0;
     if (!title || !content) { alert('标题和正文不能为空'); return; }
+    if (price > 10) { alert('最高收费10积分'); return; }
     var post = {
       id: 'fp_' + Date.now(),
       board: board, title: title, content: content,
@@ -6207,12 +6259,12 @@ var App = {
     });
     userPosts.forEach(function(p) {
       var prob;
-      if (p.price <= 5) prob = 0.6;
-      else if (p.price <= 15) prob = 0.3;
-      else if (p.price <= 50) prob = 0.1;
-      else prob = 0.05;
+      if (p.price <= 3) prob = 0.6;
+      else if (p.price <= 6) prob = 0.3;
+      else if (p.price <= 9) prob = 0.1;
+      else prob = 0.03;
       if (Math.random() < prob) {
-        var buyCount = p.price <= 15 ? (1 + Math.floor(Math.random() * 3)) : 1;
+        var buyCount = p.price <= 6 ? (1 + Math.floor(Math.random() * 2)) : 1;
         for (var b = 0; b < buyCount; b++) {
           var buyerId = this._randomVoidId();
           p.purchases = (p.purchases || 0) + 1;
@@ -6658,6 +6710,18 @@ var App = {
   },
 
   closeModal: function(id) { document.getElementById(id).classList.remove('open'); },
+
+  _syncAppearanceModal: function() {
+    var themeBtns = document.querySelectorAll('#modal-appearance .toggle-btn');
+    var theme = Store._db.settings.theme || 'dark';
+    themeBtns.forEach(function(b) { b.classList.toggle('active', b.textContent === (theme === 'light' ? '浅色' : '深色')); });
+    var fsSelect = document.querySelector('#modal-appearance .form-select');
+    if (fsSelect) {
+      var fs = Store._db.settings.fontSize || 'medium';
+      var labels = { small: '小', medium: '中', large: '大' };
+      fsSelect.value = labels[fs] || '中';
+    }
+  },
 
   _apiTab: 'main',
   _openApiModal: function() {

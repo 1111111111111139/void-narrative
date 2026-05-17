@@ -1494,11 +1494,12 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
       </div>
       <div class="forum-tabs" id="mem-filter-strip" style="margin-bottom:12px;">
         <button class="forum-tab active" data-mem-filter="all">全部</button>
-        <button class="forum-tab" data-mem-filter="core">核心</button>
+        <button class="forum-tab" data-mem-filter="global">全局</button>
+        <button class="forum-tab" data-mem-filter="character">角色</button>
+        <button class="forum-tab" data-mem-filter="copy">副本</button>
+        <button class="forum-tab" data-mem-filter="npc">NPC</button>
+        <button class="forum-tab" data-mem-filter="forum">论坛</button>
         <button class="forum-tab" data-mem-filter="raw">对话</button>
-        <button class="forum-tab" data-mem-filter="plot">副本</button>
-        <button class="forum-tab" data-mem-filter="summary">摘要</button>
-        <button class="forum-tab" data-mem-filter="starred">收藏</button>
       </div>
       <div class="mem-stats-row" id="mem-stats"><span>已存储 0 条</span></div>
       <div class="mem-list" id="mem-list"></div>
@@ -2293,7 +2294,7 @@ var Store = {
           { id:'m7', type:'player', content:'你在干什么？', timestamp: Date.now()+7, meta: {targetCharName:'林医生'}, pending:true }
         ],
         characters: JSON.parse(JSON.stringify(DEMO.characters)),
-        memories: { core: [], general: [], copy: {}, character: {} },
+        memories: { global: [], npc: {}, copy: {}, character: {}, forum: [] },
         forumPosts: { intel:[], party:[], trade:[], will:[], chat:[] },
         settings: { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium' },
         config: { activePresetId: 'default', activePlotIdx: 0 },
@@ -2354,20 +2355,22 @@ var Store = {
     if (!this._db.worldPresets || this._db.worldPresets.length === 0) {
       this._db.worldPresets = [JSON.parse(JSON.stringify(DEFAULT_WORLD_PRESET))];
     }
-    if (!this._db.memories) this._db.memories = { core: [], general: [], copy: {}, character: {} };
-    if (!this._db.memories.general) this._db.memories.general = [];
+    if (!this._db.memories) this._db.memories = { global: [], npc: {}, copy: {}, character: {}, forum: [] };
+    if (!this._db.memories.global) this._db.memories.global = [];
+    if (!this._db.memories.npc) this._db.memories.npc = {};
     if (!this._db.memories.copy) this._db.memories.copy = {};
     if (!this._db.memories.character) this._db.memories.character = {};
-    // Migrate old flat core to core+general based on importance
-    if (this._db.memories.core && this._db.memories.core.length > 0) {
-      var oldCore = this._db.memories.core;
-      var newCore = []; var newGeneral = [];
-      oldCore.forEach(function(m) {
-        if ((m.importance || 0) >= 0.7) newCore.push(m);
-        else newGeneral.push(m);
-      });
-      this._db.memories.core = newCore.slice(0, 50);
-      this._db.memories.general = newGeneral.concat(this._db.memories.general).slice(0, 100);
+    if (!this._db.memories.forum) this._db.memories.forum = [];
+    // Migrate old core+general → global
+    if (this._db.memories.core) {
+      (this._db.memories.core || []).forEach(function(m) { m.type = 'global'; });
+      this._db.memories.global = (this._db.memories.core || []).concat(this._db.memories.global || []);
+      delete this._db.memories.core;
+    }
+    if (this._db.memories.general) {
+      (this._db.memories.general || []).forEach(function(m) { m.type = 'global'; });
+      this._db.memories.global = (this._db.memories.global || []).concat(this._db.memories.general || []);
+      delete this._db.memories.general;
     }
     if (!this._db.forumPosts || !this._db.forumPosts.intel) this._db.forumPosts = { intel:[], party:[], trade:[], will:[], chat:[] };
     if (this._db.terminalMessages) { this._db.forumPosts = this._db.terminalMessages; delete this._db.terminalMessages; }
@@ -2419,9 +2422,8 @@ var Store = {
   },
   inventory: function() { return this._db.inventory; },
   skills: function() { return this._db.skills; },
-  coreMemories: function() {
-    var m = this._db.memories;
-    return (m.core || []).concat(m.general || []);
+  globalMemories: function() {
+    return this._db.memories.global || [];
   },
   addMessage: function(msg) {
     // TODO: when game-time system is ready, replace Date.now() with game time
@@ -2429,12 +2431,28 @@ var Store = {
     msg.timestamp = Date.now(); msg.meta = msg.meta || {};
     this._db.messages.push(msg); this.save(); return msg;
   },
-  addCoreMemory: function(content, tags, importance) {
+  addGlobalMemory: function(content, tags, importance) {
     var m = this._db.memories;
-    if (!m.core) m.core = []; if (!m.general) m.general = [];
-    var mem = { id: 'c' + Date.now(), type: 'global', targetId: null, summary: (content||'').slice(0,50), importance: importance || 0.5, relatedCopy: (this._db.currentCopy && this._db.currentCopy.name) || null, tags: tags || [], time: Date.now() };
-    if ((importance || 0) >= 0.7) { m.core.unshift(mem); if (m.core.length > 50) m.core.pop(); }
-    else { m.general.unshift(mem); if (m.general.length > 100) m.general.pop(); }
+    if (!m.global) m.global = [];
+    var mem = { id: 'g_' + Date.now(), type: 'global', summary: (content||'').slice(0,50), importance: importance || 0.5, relatedCopy: (this._db.currentCopy && this._db.currentCopy.name) || null, tags: tags || [], time: Date.now() };
+    m.global.unshift(mem);
+    this.save();
+  },
+  addNPCMemory: function(npcId, content) {
+    var m = this._db.memories;
+    if (!m.npc) m.npc = {};
+    if (!m.npc[npcId]) m.npc[npcId] = [];
+    var mem = { id: 'n_' + Date.now(), type: 'npc', targetId: npcId, summary: (content||'').slice(0,30), time: Date.now() };
+    m.npc[npcId].unshift(mem);
+    if (m.npc[npcId].length > 20) m.npc[npcId].pop();
+    this.save();
+  },
+  addForumMemory: function(content) {
+    var m = this._db.memories;
+    if (!m.forum) m.forum = [];
+    var mem = { id: 'f_' + Date.now(), type: 'forum', summary: (content||'').slice(0,50), time: Date.now() };
+    m.forum.unshift(mem);
+    if (m.forum.length > 50) m.forum.pop();
     this.save();
   },
   addCopyMemory: function(content, importance) {
@@ -2444,7 +2462,6 @@ var Store = {
     if (!m.copy[copyName]) m.copy[copyName] = [];
     var mem = { id: 'cp_' + Date.now(), type: 'copy', targetId: null, summary: (content||'').slice(0,50), importance: importance || 0.6, relatedCopy: copyName, tags: [], time: Date.now() };
     m.copy[copyName].unshift(mem);
-    if (m.copy[copyName].length > 30) m.copy[copyName].pop();
     this.save();
   },
   addCharMemory: function(charId, content, importance) {
@@ -2721,7 +2738,6 @@ function buildSystemPrompt() {
   var copy = Store._db.currentCopy;
   var chars = Store.characters();
   var items = Store.inventory();
-  var coreMems = Store.coreMemories().slice(-10);
   var effName = mask.name || p.name || '未知';
   var effIdentity = mask.identity || p.identity || '未知';
   var effGender = mask.gender || p.gender || '未知';
@@ -2743,49 +2759,42 @@ function buildSystemPrompt() {
     : '（无在场NPC）';
 
   var invList = items.length > 0 ? items.map(function(i) { return '- ' + i.name + '：' + (i.description||''); }).join('\n') : '（空）';
-  // Build memory injection (max 5 entries, 300 chars total)
+  // Memory injection: 6 partitions, priority-based, max 8 entries / 400 chars
   var allMems = [];
-  // 1. Copy memories (current copy, last 10)
-  var copyMems = (Store._db.memories.copy && Store._db.memories.copy[copy.name||'']) ? Store._db.memories.copy[copy.name||''].slice(-10) : [];
-  copyMems.forEach(function(m) { allMems.push(m); });
-  // 2. Global core — filter by current copy relevance or high importance
-  (Store._db.memories.core || []).forEach(function(m) {
-    if (m.relatedCopy === (copy.name||'') || (m.importance||0) >= 0.85) allMems.push(m);
+  // 1. Present character memories (last 5 each) — HIGHEST
+  var presentChars = chars.filter(function(c) { return c.present && !c.isNPC; });
+  presentChars.forEach(function(c) {
+    var cm = Store._db.memories.character && Store._db.memories.character[c.id] ? Store._db.memories.character[c.id].slice(-5) : [];
+    cm.forEach(function(m) { allMems.push({ p: 1, m: m }); });
   });
-  // 3. Global general matching current copy
-  (Store._db.memories.general || []).forEach(function(m) {
-    if (m.relatedCopy === (copy.name||'')) allMems.push(m);
-  });
-  // 4. Character memories — present chars + chars with established contact
-  var relevantChars = chars.filter(function(c) {
-    return !c.isNPC && (c.present || c.contactEstablished !== false);
-  });
-  relevantChars.forEach(function(c) {
-    var cm = Store._db.memories.character && Store._db.memories.character[c.id] ? Store._db.memories.character[c.id].slice(-3) : [];
-    cm.forEach(function(m) { allMems.push(m); });
-  });
-  // 5. NPC recent interactions (simpleMemories) — present NPCs
+  // 2. Current copy memory — HIGH
+  var copyMems = (Store._db.memories.copy && Store._db.memories.copy[copy.name||'']) ? Store._db.memories.copy[copy.name||''] : [];
+  copyMems.slice(-5).forEach(function(m) { allMems.push({ p: 2, m: m }); });
+  // 3. Global high-importance (importance >= 0.8, last 5) — HIGH
+  (Store._db.memories.global || []).filter(function(m) { return (m.importance || 0) >= 0.8; }).slice(-5).forEach(function(m) { allMems.push({ p: 3, m: m }); });
+  // 4. Forum memories (last 2) — LOW
+  (Store._db.memories.forum || []).slice(-2).forEach(function(m) { allMems.push({ p: 4, m: m }); });
+  // 5. Present NPC memories (last 5 each) — LOW
   var presentNPCs = chars.filter(function(c) { return c.present && c.isNPC; });
   presentNPCs.forEach(function(c) {
-    (c.simpleMemories || []).slice(-2).forEach(function(m) {
-      allMems.push({ summary: '[NPC:' + (c.name||'') + '] ' + (m.summary||''), importance: 0.4, relatedCopy: copy.name||'', time: m.time });
-    });
+    var npcMems = Store._db.memories.npc && Store._db.memories.npc[c.id] ? Store._db.memories.npc[c.id].slice(-5) : [];
+    npcMems.forEach(function(m) { allMems.push({ p: 5, m: m }); });
   });
-  // Sort by importance desc
-  allMems.sort(function(a, b) { return (b.importance||0) - (a.importance||0); });
+  // Sort by priority then importance desc
+  allMems.sort(function(a, b) { return a.p - b.p || (b.m.importance || 0) - (a.m.importance || 0); });
   // Deduplicate by summary
   var seen = {};
   var uniqueMems = [];
-  allMems.forEach(function(m) {
-    var key = (m.summary||m.content||'').slice(0,30);
-    if (!seen[key]) { seen[key] = true; uniqueMems.push(m); }
+  allMems.forEach(function(e) {
+    var key = (e.m.summary || e.m.content || '').slice(0, 30);
+    if (!seen[key]) { seen[key] = true; uniqueMems.push(e.m); }
   });
-  uniqueMems = uniqueMems.slice(0, 5);
+  uniqueMems = uniqueMems.slice(0, 8);
   var memText = '';
   var memChars = 0;
   uniqueMems.forEach(function(m) {
-    var line = '- ' + (m.summary||m.content||'').slice(0,60) + (m.relatedCopy ? ' [' + m.relatedCopy + ']' : '');
-    if (memChars + line.length <= 300) {
+    var line = '- ' + (m.summary || m.content || '').slice(0, 60) + (m.relatedCopy ? ' [' + m.relatedCopy + ']' : '');
+    if (memChars + line.length <= 400) {
       memText += line + '\n';
       memChars += line.length;
     }
@@ -2793,24 +2802,24 @@ function buildSystemPrompt() {
   if (!memText) memText = '（尚无关键记忆）';
   var effects = (p.statusEffects && p.statusEffects.length > 0) ? p.statusEffects.join('；') : '无';
 
-  // Check if any memory partition needs compression
+  // Compression check
   var compressReq = '';
   var m2 = Store._db.memories;
   // Character memories: >50 → compress
   if (m2.character) {
     Object.keys(m2.character).forEach(function(cid) {
-      if ((m2.character[cid]||[]).length > 50) {
-        compressReq += '### 记忆压缩请求\n角色ID ' + cid + ' 的记忆已达' + m2.character[cid].length + '条，超过50条上限。请在本次回复末尾，将importance最低的旧记忆合并为3-5条更简短的摘要。格式：[MEMORY_COMPRESS character ' + cid + '] 压缩后的摘要1 | 摘要2 | 摘要3 [/MEMORY_COMPRESS]\n';
+      if ((m2.character[cid] || []).length > 50) {
+        compressReq += '### 记忆压缩请求\n角色ID ' + cid + ' 的记忆已达' + m2.character[cid].length + '条。请将旧记忆合并为3-5条阶段摘要。格式：[MEMORY_COMPRESS character ' + cid + '] 摘要1 | 摘要2 | 摘要3 [/MEMORY_COMPRESS]\n';
       }
     });
   }
-  // Copy memories: >25 → compress
-  if (m2.copy) {
-    Object.keys(m2.copy).forEach(function(cp) {
-      if ((m2.copy[cp]||[]).length > 25) {
-        compressReq += '### 记忆压缩请求\n副本「' + cp + '」的记忆已达' + m2.copy[cp].length + '条，超过25条上限。请在本次回复末尾压缩旧记忆：格式：[MEMORY_COMPRESS copy ' + cp + '] 摘要1 | 摘要2 | 摘要3 [/MEMORY_COMPRESS]\n';
-      }
-    });
+  // Global memories: >100 → compress
+  if ((m2.global || []).length > 100) {
+    compressReq += '### 记忆压缩请求\n全局记忆已达' + m2.global.length + '条。请将importance<0.8且超过30天的旧记忆合并为阶段摘要。格式：[MEMORY_COMPRESS global] 摘要1 | 摘要2 [/MEMORY_COMPRESS]\n';
+  }
+  // Forum memories: >50 → compress
+  if ((m2.forum || []).length > 50) {
+    compressReq += '### 记忆压缩请求\n论坛记忆已达' + m2.forum.length + '条。请合并为摘要。格式：[MEMORY_COMPRESS forum] 摘要 [/MEMORY_COMPRESS]\n';
   }
 
   // Build world rules from active preset
@@ -3363,7 +3372,7 @@ var AI = {
             if (ch.isNPC && (ch.simpleMemories||[]).length >= 5) ch.simpleMemories.shift();
             if (ch.isNPC) { ch.simpleMemories = ch.simpleMemories || []; ch.simpleMemories.push({ summary: memContent.slice(0,50), time: Date.now() }); }
           }
-          if (memImp >= 0.7) Store.addCoreMemory(memContent, ['事件'], memImp);
+          if (memImp >= 0.7) Store.addGlobalMemory(memContent, ['事件'], memImp);
           break;
         }
         case 'memory_compress': {
@@ -5124,30 +5133,40 @@ var App = {
     var f = this._memFilter;
     var items = [];
     var plot = Store.activePlotMeta();
-    var typeLabels = { core:'核心', general:'全局', raw:'对话', plot:'副本', summary:'摘要', starred:'收藏' };
+    var typeLabels = { global:'全局', character:'角色', npc:'NPC', copy:'副本', forum:'论坛', raw:'对话', plot:'节点', summary:'摘要', starred:'收藏' };
 
-    // Core memories (importance ≥ 0.7)
-    var coreList = Store._db.memories.core || [];
-    if (f === 'all' || f === 'core') {
-      coreList.forEach(function(m) {
-        items.push({ type:'core', content:m.summary || m.content || '', ts:m.time, source:'核心', importance:m.importance, _tags:m.tags, _copy:m.relatedCopy });
+    // Global memories
+    var globalList = Store._db.memories.global || [];
+    if (f === 'all' || f === 'global') {
+      globalList.forEach(function(m) {
+        items.push({ type:'global', content:m.summary || m.content || '', ts:m.time, source:'全局', importance:m.importance, _tags:m.tags, _copy:m.relatedCopy });
       });
     }
-    // General memories (importance < 0.7)
-    var generalList = Store._db.memories.general || [];
-    if (f === 'all') {
-      generalList.forEach(function(m) {
-        items.push({ type:'general', content:m.summary || m.content || '', ts:m.time, source:'全局', importance:m.importance, _tags:m.tags, _copy:m.relatedCopy });
-      });
-    }
-    // Character memories (new structure)
+    // Character memories
     var charMems = Store._db.memories.character || {};
-    if (f === 'all' || f === 'core') {
+    if (f === 'all' || f === 'character') {
       Object.keys(charMems).forEach(function(cid) {
         var c = Store.character(cid);
         (charMems[cid]||[]).forEach(function(m) {
-          items.push({ type:'core', content:m.summary || m.content || '', ts:m.time, source:c?c.name:'角色', importance:m.importance, _tags:m.tags, _copy:m.relatedCopy });
+          items.push({ type:'character', content:m.summary || m.content || '', ts:m.time, source:c?c.name:'角色', importance:m.importance, _tags:m.tags, _copy:m.relatedCopy });
         });
+      });
+    }
+    // NPC memories
+    var npcMems = Store._db.memories.npc || {};
+    if (f === 'all' || f === 'npc') {
+      Object.keys(npcMems).forEach(function(nid) {
+        var nc = Store.character(nid);
+        (npcMems[nid]||[]).forEach(function(m) {
+          items.push({ type:'npc', content:m.summary || '', ts:m.time, source:nc?nc.name:'NPC' });
+        });
+      });
+    }
+    // Forum memories
+    var forumList = Store._db.memories.forum || [];
+    if (f === 'all' || f === 'forum') {
+      forumList.forEach(function(m) {
+        items.push({ type:'forum', content:m.summary || '', ts:m.time, source:'论坛' });
       });
     }
 
@@ -5880,7 +5899,7 @@ var App = {
     // Core memory — SAN change events
     var narr = null;
     for (var i = segs.length-1; i >= 0; i--) { if (segs[i].type === 'narrative') { narr = segs[i]; break; } }
-    if (narr && cmds.some(function(c) { return c.cmd === 'san'; })) { Store.addCoreMemory(narr.content.slice(0, 100), ['事件'], 0.8); }
+    if (narr && cmds.some(function(c) { return c.cmd === 'san'; })) { Store.addGlobalMemory(narr.content.slice(0, 100), ['事件'], 0.8); }
 
     // Auto-hook all markers to copy memory
     cmds.forEach(function(c) {

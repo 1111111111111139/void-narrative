@@ -3379,7 +3379,7 @@ var AI = {
           if (qs) { var q = qs.find(function(q) { return q.name === item.args[0] && q.status === 'active'; }); if (q) { q.status = 'done'; q.doneTime = Date.now(); } }
           break;
         }
-        case 'copy_end': Store._db.currentCopy.completed = true; Store.player().copiesCleared = (Store.player().copiesCleared||0) + 1; App._createSavePoint(); break;
+        case 'copy_end': Store._db.currentCopy.completionStatus = 'cleared'; Store._db.currentCopy.completed = true; delete Store._db.currentCopy.enterTime; Store.player().copiesCleared = (Store.player().copiesCleared||0) + 1; App._createSavePoint(); break;
         case 'char_join': {
           var joinName = item.args[0].trim();
           var joinDesc = (item.args[1] || '').trim();
@@ -4923,6 +4923,26 @@ var App = {
       }
       Store.save();
     }
+    // Auto-compress memories if needed
+    this._autoCompressMemories();
+  },
+
+  _autoCompressMemories: function() {
+    var m = Store._db.memories;
+    var didCompress = false;
+    // Character: >50 → keep last 30
+    Object.keys(m.character || {}).forEach(function(cid) {
+      if ((m.character[cid] || []).length > 50) { m.character[cid] = m.character[cid].slice(0, 30); didCompress = true; }
+    });
+    // Global: >100 → remove low-importance old ones
+    if ((m.global || []).length > 100) {
+      var cutoff = Date.now() - 2592000000; // 30 days
+      m.global = m.global.filter(function(x) { return (x.importance || 0) >= 0.8 || x.time > cutoff; }).slice(0, 80);
+      didCompress = true;
+    }
+    // Forum: >50 → keep last 30
+    if ((m.forum || []).length > 50) { m.forum = m.forum.slice(0, 30); didCompress = true; }
+    if (didCompress) Store.save();
   },
 
   _startTimeTick: function() {
@@ -4957,7 +4977,9 @@ var App = {
       var hours = totalHours % 24;
       var copy = Store._db.currentCopy;
       if (copy.completionStatus === 'active') {
-        vtEl.textContent = '副本内 · ' + copy.chapter;
+        if (!copy.enterTime) copy.enterTime = Date.now();
+        var elapsed = Math.floor((Date.now() - copy.enterTime) / 3600000);
+        vtEl.textContent = '副本内 ' + elapsed + '小时 · ' + copy.chapter;
         vtEl.style.color = copy.timeAnomaly ? 'var(--accent)' : '';
       } else {
         vtEl.textContent = '第' + Math.max(1, days) + '天 · 第' + hours + '小时';
@@ -6785,6 +6807,12 @@ var App = {
 
     var fp = Store._db.forumPosts;
     var playerId = (Store.player().voidId || '0000');
+
+    // 0. Clean will posts older than 24h
+    var willCutoff = now - 86400000;
+    if (fp.will) {
+      fp.will = fp.will.filter(function(p) { return (p.createdAt || 0) > willCutoff; });
+    }
 
     // 1. AI auto-generated posts (24h cycle)
     var lastAiPost = parseInt(Store._db.settings._lastAiForumPost || 0, 10);

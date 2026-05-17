@@ -3146,6 +3146,7 @@ function buildSystemPrompt() {
 // AI MODULE
 // ============================================================
 var AI = {
+  _lastJoinedCharId: null,
   call: async function(options) {
     var s = Store._db.settings.api;
     var baseUrl = (options && options.baseUrl) || s.url;
@@ -3315,7 +3316,13 @@ var AI = {
         }
         case 'item_add': {
           var parts = item.args[0].split(':');
-          Store.addItem({ name: parts[0].trim(), desc: (parts.slice(1).join(':') || '').trim() });
+          var itemName = parts[0].trim();
+          var itemDesc = (parts.slice(1).join(':') || '').trim();
+          Store.addItem({ name: itemName, desc: itemDesc });
+          if (AI._lastJoinedCharId) {
+            var jc = Store.character(AI._lastJoinedCharId);
+            if (jc) { jc.inventory = jc.inventory || []; jc.inventory.push({ name: itemName, desc: itemDesc, fromNarrative: true }); }
+          }
           break;
         }
         case 'item_remove': {
@@ -3366,7 +3373,7 @@ var AI = {
               var k = keys[Math.floor(Math.random() * keys.length)];
               if (attrs[k] < attrMax) { attrs[k]++; remaining--; }
             }
-            Store.addCharacter({
+            var newChar = Store.addCharacter({
               name: joinName, gender: '未知', affection: 0, relation: '中立', present: true,
               lastSummary: joinDesc.slice(0, 60), memories: [], tags: [],
               persona: isNPC ? '' : joinDesc, appearance: '', avatar: null,
@@ -3378,6 +3385,15 @@ var AI = {
               inventory: [],
               survivalDays: survivalDays
             });
+            AI._lastJoinedCharId = isNPC ? null : newChar.id;
+            // Pre-init memory partition
+            if (!isNPC) {
+              if (!Store._db.memories.character) Store._db.memories.character = {};
+              Store._db.memories.character[newChar.id] = Store._db.memories.character[newChar.id] || [];
+            } else {
+              if (!Store._db.memories.npc) Store._db.memories.npc = {};
+              Store._db.memories.npc[newChar.id] = Store._db.memories.npc[newChar.id] || [];
+            }
           } else {
             exists.present = true;
           }
@@ -6053,6 +6069,7 @@ var App = {
     // Parse commands → annotations
     var cmds = AI.parseCommands(responseText);
     AI.applyCommands(cmds);
+    AI._lastJoinedCharId = null;
     this._lastAnnotations = this._buildAnnotations(cmds);
 
     var segs = AI.parseResponse(responseText);

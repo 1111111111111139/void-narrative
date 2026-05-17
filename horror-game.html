@@ -2308,7 +2308,7 @@ var Store = {
     if (!this._db) {
       this._db = JSON.parse(JSON.stringify({
         version: 1,
-        player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: 1842, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false },
+        player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: 1842, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false, position: { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn', copyId: null } },
         currentCopy: { name: '404号公寓', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '一楼走廊', completionStatus:'active', terminalInterference:'轻度', mapRegions: JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS)) },
         inventory: [],
         skills: [],
@@ -2413,6 +2413,7 @@ var Store = {
     if (this._db.player.copiesCleared === undefined) this._db.player.copiesCleared = 0;
     if (this._db.player.killMark === undefined) this._db.player.killMark = false;
     if (!this._db.player.nextDeduction) this._db.player.nextDeduction = Date.now() + 86400000;
+    if (!this._db.player.position) this._db.player.position = { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn', copyId: null };
     // Random birth point on first init (only if location is default)
     if (this._db.currentCopy.location === '荒原·初始点' || this._db.currentCopy.location === '入口') {
       var roll = Math.random();
@@ -3103,6 +3104,15 @@ function buildSystemPrompt() {
   presetText += '已知区域之外是未生成的未知领域。轮回者向未知方向探索时，AI根据模块一底层规则自行生成新区域。越深入未知区域，理智值消耗越快（极限-5/h以上），空间逐渐扭曲，怪物更强更不可预测。可能发现全新的区域类型或前人从未见过的副本。\n';
   presetText += '空间捷径：某些不相关地点之间存在折叠通道。东墟某扇门可能直通南墟。捷径不稳定，随时间消失或变化。捷径情报在论坛价值不菲。\n';
   presetText += '有轮回者选择离开已知区域向未知探索——大多数没回来。极少数回来了，带回碎片化情报。\n';
+  presetText += '\n';
+  presetText += '## AI推进地图\n';
+  presetText += 'AI在以下情况自动生成新区域并写入地图：\n';
+  presetText += '1. 用户向未知区域探索超过2小时步行距离 → 生成新区域 → [MAP_NODE]标记\n';
+  presetText += '2. 捷径另一端为未知区域 → 生成目的地\n';
+  presetText += '3. 副本通关后可能揭示关联区域\n';
+  presetText += '4. 其他角色提供可靠位置情报\n';
+  presetText += '5. 论坛情报帖被验证真实\n';
+  presetText += '生成新区域时遵守底层生成规则。每次最多生成1个新区域。新区域坐标按实际距离自动计算。\n';
   presetText += '\n';
 
   // Inject global & local lore
@@ -4553,7 +4563,28 @@ var App = {
   },
   _openGoToPopup: function(nodeId, nodeName, info) {
     this._gotoNodeId = nodeId; this._gotoNodeName = nodeName;
-    document.getElementById('goto-node-name').textContent = nodeName;
+    // Estimate travel time
+    var estimate = '';
+    var pos = Store.player().position;
+    var regions = Store._db.currentCopy.mapRegions || [];
+    var curNode = null, targetNode = null;
+    regions.forEach(function(r) {
+      if (pos && r.id === pos.regionId) curNode = r;
+      (r.subNodes || []).forEach(function(s) {
+        if (pos && s.id === pos.subNodeId) { curNode = s; curNode._region = r; }
+        if (s.id === nodeId) { targetNode = s; targetNode._region = r; }
+      });
+      if (r.id === nodeId) targetNode = r;
+    });
+    if (curNode && targetNode) {
+      var dx = (targetNode.x - curNode.x) / 100;
+      var dy = (targetNode.y - curNode.y) / 100;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      var isXRegion = targetNode._region && curNode._region && targetNode._region.id !== curNode._region.id;
+      var hr = Math.max(1, Math.round(dist * 5));
+      estimate = isXRegion ? ('预计' + hr + '小时，跨区域') : ('预计' + Math.round(dist * 3) + '小时');
+    }
+    document.getElementById('goto-node-name').textContent = nodeName + (estimate ? ' (' + estimate + ')' : '');
     document.getElementById('goto-node-info').textContent = info || '';
     document.getElementById('goto-overlay').classList.add('open');
   },
@@ -4561,15 +4592,16 @@ var App = {
     document.getElementById('goto-overlay').classList.remove('open');
   },
   _confirmGoTo: function() {
-    // Check if in a copy
+    var p = Store.player();
     var copy = Store._db.currentCopy;
-    if (copy.completionStatus === 'active') {
-      Store.addMessage({ type:'system', content: '你正在副本「' + copy.name + '」中，需要先离开副本才能远行。' });
+    // Check if in a copy
+    if (p.position && p.position.copyId) {
+      Store.addMessage({ type:'system', content: '你正在副本中，需要先离开副本才能远行。' });
       this._closeGotoPopup(); this.renderMessages(); App.scrollToBottom(); return;
     }
     // Find target node
     var node = null;
-    var regions = Store._db.currentCopy.mapRegions || [];
+    var regions = copy.mapRegions || [];
     regions.forEach(function(r) {
       if (r.id === App._gotoNodeId) node = r;
       (r.subNodes || []).forEach(function(s) {
@@ -4578,78 +4610,102 @@ var App = {
     });
     if (!node) { this._closeGotoPopup(); return; }
 
-    var p = Store.player();
-    var oldLoc = copy.location || '荒原·初始点';
-    var newLoc = node.name;
-    var isSameRegion = node._region && oldLoc.indexOf(node._region.name) >= 0;
-
-    // Calculate time cost
-    var timeMins;
-    if (node._region && oldLoc.indexOf(node._region.name) < 0) {
-      // Cross-region: check if adjacent
-      var adj = false;
-      if (node._region.connections) {
-        regions.forEach(function(r) {
-          if (oldLoc.indexOf(r.name) >= 0 && node._region.connections.indexOf(r.id) >= 0) adj = true;
-        });
-      }
-      timeMins = adj ? (120 + Math.floor(Math.random() * 240)) : (360 + Math.floor(Math.random() * 1080)); // 2-6h : 6-24h
-    } else if (node.type === 'location' || node.type === 'dungeon') {
-      timeMins = 10 + Math.floor(Math.random() * 20); // 10-30min same region
-    } else {
-      timeMins = 120 + Math.floor(Math.random() * 240); // region click
+    // Target unexplored → block
+    if (node.state === 'unknown' && (!node._region || node._region.state === 'unknown')) {
+      Store.addMessage({ type:'system', content: '此区域尚未探索，需要徒步前往探索。AI将在下一轮叙事中描述你的探索过程。' });
+      this._closeGotoPopup(); this.renderMessages(); App.scrollToBottom();
+      this._retryText = '我向' + node.name + '方向探索前进。';
+      return;
     }
+
+    // Find current position node for distance calc
+    var curNode = null;
+    var pos = p.position || { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn' };
+    regions.forEach(function(r) {
+      if (r.id === pos.regionId) curNode = r;
+      (r.subNodes || []).forEach(function(s) {
+        if (s.id === pos.subNodeId) { curNode = s; curNode._region = r; }
+      });
+    });
+
+    var oldName = curNode ? curNode.name : (copy.location || '当前位置');
+    var newName = node.name;
+
+    // Calculate time from coordinate distance
+    var dx = (node.x - (curNode ? curNode.x : 50)) / 100;
+    var dy = (node.y - (curNode ? curNode.y : 50)) / 100;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    var isCrossRegion = node._region && curNode && curNode._region && node._region.id !== curNode._region.id;
+    var isAdjacent = isCrossRegion && curNode._region && curNode._region.connections && curNode._region.connections.indexOf(node._region.id) >= 0;
+    var timeMins;
+    if (!isCrossRegion) {
+      timeMins = Math.max(10, Math.round(dist * 300)); // 5h per full map span, min 10min
+    } else if (isAdjacent) {
+      timeMins = 120 + Math.floor(dist * 400);
+    } else {
+      timeMins = 360 + Math.floor(dist * 600); // cross-region: 6-24h+
+    }
+    timeMins = Math.min(timeMins, 4320); // cap at 3 days
+
+    // Cross-region extra SAN cost
+    var isSafe = (node.threatLevel === 'safe' || (node._region && node._region.threatLevel === 'safe'));
+    var hours = Math.ceil(timeMins / 60);
+    var sanCost = isSafe ? 0 : hours;
+    if (crossRegion && !isAdjacent) sanCost += Math.floor(hours / 6) * 2; // +2 per 6h for cross-region
+
+    // Monster encounter — threat level + tide + cross-region
+    var threat = node.threatLevel || (node._region && node._region.threatLevel) || 'safe';
+    var baseChance = { safe: 0.05, medium: 0.15, high: 0.30, fatal: 0.50 };
+    var encounterChance = (baseChance[threat] || 0.1);
+    if (copy.tideActive) encounterChance *= 2;
+    if (isCrossRegion && !isAdjacent) encounterChance += 0.2;
+    var monsterTriggered = Math.random() < encounterChance;
+
+    // Mid-journey event (cross-region only)
+    var midEvent = isCrossRegion && !isAdjacent && Math.random() < 0.4;
 
     // Apply time advancement
     p.nextDeduction = (p.nextDeduction || Date.now() + 86400000) - timeMins * 60000;
     if (!p.voidDays) p.voidDays = 0;
     p.voidDays += timeMins / 1440;
-    // Check if deduction triggered
     var deductionTriggered = Date.now() >= (p.nextDeduction || Date.now() + 86400000);
     if (deductionTriggered) {
       p.points = (p.points || 0) - 100;
       p.nextDeduction = (p.nextDeduction || Date.now()) + 86400000;
     }
 
-    // SAN cost (safe region = no cost, otherwise 1 per hour)
-    var isSafe = node.threatLevel === 'safe' || (node._region && node._region.threatLevel === 'safe');
-    if (!isSafe) {
-      var sanCost = Math.floor(timeMins / 60);
-      if (!copy.tideActive && !copy.stormActive) sanCost = Math.max(0, sanCost - 1);
-      p.san = Math.max(0, (p.san || 100) - sanCost);
-    }
+    // Apply SAN
+    p.san = Math.max(0, (p.san || 100) - sanCost);
 
-    // Monster encounter chance (based on threat level)
-    var threat = node.threatLevel || (node._region && node._region.threatLevel) || 'safe';
-    var encounterChance = { safe: 0.05, medium: 0.15, high: 0.30, fatal: 0.50 };
-    var monsterTriggered = Math.random() < (encounterChance[threat] || 0.1) || copy.tideActive;
+    // Update position
+    p.position = {
+      regionId: node._region ? node._region.id : node.id,
+      subNodeId: node._region ? node.id : (node.subNodes && node.subNodes[0] ? node.subNodes[0].id : node.id),
+      copyId: null
+    };
+    copy.location = newName;
 
-    // Update location
-    copy.location = newLoc;
     // Update node states
-    if (node.state === 'unknown') node.state = 'visited';
-    if (node._region && node._region.state === 'unknown') node._region.state = 'visited';
-    copy.mapRegions.forEach(function(r) { r.state = (r.id === (node._region ? node._region.id : node.id)) ? 'current' : (r.state === 'current' ? 'visited' : r.state); });
+    regions.forEach(function(r) { r.state = r.id === p.position.regionId ? 'current' : (r.state === 'current' ? 'visited' : r.state); });
     if (node._region) {
-      (node._region.subNodes || []).forEach(function(s) { s.state = s.id === node.id ? 'current' : (s.state === 'current' ? 'visited' : s.state); });
+      (node._region.subNodes || []).forEach(function(s) { s.state = s.id === p.position.subNodeId ? 'current' : (s.state === 'current' ? 'visited' : s.state); });
     }
-
     Store.save();
 
     // Build system message
-    var hours = Math.floor(timeMins / 60);
-    var mins = timeMins % 60;
-    var timeStr = hours > 0 ? (hours + '小时' + (mins > 0 ? mins + '分钟' : '')) : (mins + '分钟');
-    var msg = '你从 ' + oldLoc + ' 出发，前往 ' + newLoc + '。路程约 ' + timeStr + '。';
-    if (sanCost > 0) msg += '\\n理智值 -' + sanCost + '（路途消耗）。';
+    var timeStr = hours > 0 ? (hours + '小时') : (timeMins + '分钟');
+    var msg = '你从 ' + oldName + ' 出发前往 ' + newName + '。路程约 ' + timeStr + '。';
+    if (sanCost > 0) msg += '\\n理智值 -' + sanCost + '。';
     if (deductionTriggered) msg += '\\n积分自动扣除100，剩余' + (p.points||0) + '。';
+    if (isCrossRegion && !isAdjacent) msg += '\\n长途跋涉，途经多个区域。';
+    if (midEvent) msg += '\\n途中发生了意外事件。';
     if (monsterTriggered) msg += '\\n⚠ 途中遭遇了什么东西。';
-    msg += '\\n你已抵达 ' + newLoc + '。';
+    msg += '\\n你已抵达 ' + newName + '。';
     Store.addMessage({ type:'system', content: msg });
-    if (monsterTriggered) Store.addMessage({ type:'system', content: '请描述当前遭遇的怪物或异常。', meta: { travelMonster: true } });
+    if (monsterTriggered) Store.addMessage({ type:'system', content: '请描述遭遇的怪物或异常。', meta: { travelMonster: true } });
+    if (midEvent) Store.addMessage({ type:'system', content: '请描述途中的意外事件（遭遇角色/发现捷径/风暴/遗留营地/物资）。', meta: { travelEvent: true } });
 
     this._closeGotoPopup();
-    // Reset map to region level
     this._mapLevel = 'region'; this._mapRegionId = null;
     this.renderAll(); this.applySanEffect(); App.scrollToBottom();
     App._checkDeduction();

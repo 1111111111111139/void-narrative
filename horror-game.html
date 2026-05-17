@@ -4554,8 +4554,98 @@ var App = {
     document.getElementById('goto-overlay').classList.remove('open');
   },
   _confirmGoTo: function() {
-    Store.addMessage({ type:'system', content: '前往「' + this._gotoNodeName + '」——移动功能将在后续版本接入。' });
-    this._closeGotoPopup(); this.renderMessages(); App.scrollToBottom();
+    // Check if in a copy
+    var copy = Store._db.currentCopy;
+    if (copy.completionStatus === 'active') {
+      Store.addMessage({ type:'system', content: '你正在副本「' + copy.name + '」中，需要先离开副本才能远行。' });
+      this._closeGotoPopup(); this.renderMessages(); App.scrollToBottom(); return;
+    }
+    // Find target node
+    var node = null;
+    var regions = Store._db.currentCopy.mapRegions || [];
+    regions.forEach(function(r) {
+      if (r.id === App._gotoNodeId) node = r;
+      (r.subNodes || []).forEach(function(s) {
+        if (s.id === App._gotoNodeId) { node = s; node._region = r; }
+      });
+    });
+    if (!node) { this._closeGotoPopup(); return; }
+
+    var p = Store.player();
+    var oldLoc = copy.location || '荒原·初始点';
+    var newLoc = node.name;
+    var isSameRegion = node._region && oldLoc.indexOf(node._region.name) >= 0;
+
+    // Calculate time cost
+    var timeMins;
+    if (node._region && oldLoc.indexOf(node._region.name) < 0) {
+      // Cross-region: check if adjacent
+      var adj = false;
+      if (node._region.connections) {
+        regions.forEach(function(r) {
+          if (oldLoc.indexOf(r.name) >= 0 && node._region.connections.indexOf(r.id) >= 0) adj = true;
+        });
+      }
+      timeMins = adj ? (120 + Math.floor(Math.random() * 240)) : (360 + Math.floor(Math.random() * 1080)); // 2-6h : 6-24h
+    } else if (node.type === 'location' || node.type === 'dungeon') {
+      timeMins = 10 + Math.floor(Math.random() * 20); // 10-30min same region
+    } else {
+      timeMins = 120 + Math.floor(Math.random() * 240); // region click
+    }
+
+    // Apply time advancement
+    p.nextDeduction = (p.nextDeduction || Date.now() + 86400000) - timeMins * 60000;
+    if (!p.voidDays) p.voidDays = 0;
+    p.voidDays += timeMins / 1440;
+    // Check if deduction triggered
+    var deductionTriggered = Date.now() >= (p.nextDeduction || Date.now() + 86400000);
+    if (deductionTriggered) {
+      p.points = (p.points || 0) - 100;
+      p.nextDeduction = (p.nextDeduction || Date.now()) + 86400000;
+    }
+
+    // SAN cost (safe region = no cost, otherwise 1 per hour)
+    var isSafe = node.threatLevel === 'safe' || (node._region && node._region.threatLevel === 'safe');
+    if (!isSafe) {
+      var sanCost = Math.floor(timeMins / 60);
+      if (!copy.tideActive && !copy.stormActive) sanCost = Math.max(0, sanCost - 1);
+      p.san = Math.max(0, (p.san || 100) - sanCost);
+    }
+
+    // Monster encounter chance (based on threat level)
+    var threat = node.threatLevel || (node._region && node._region.threatLevel) || 'safe';
+    var encounterChance = { safe: 0.05, medium: 0.15, high: 0.30, fatal: 0.50 };
+    var monsterTriggered = Math.random() < (encounterChance[threat] || 0.1) || copy.tideActive;
+
+    // Update location
+    copy.location = newLoc;
+    // Update node states
+    if (node.state === 'unknown') node.state = 'visited';
+    if (node._region && node._region.state === 'unknown') node._region.state = 'visited';
+    copy.mapRegions.forEach(function(r) { r.state = (r.id === (node._region ? node._region.id : node.id)) ? 'current' : (r.state === 'current' ? 'visited' : r.state); });
+    if (node._region) {
+      (node._region.subNodes || []).forEach(function(s) { s.state = s.id === node.id ? 'current' : (s.state === 'current' ? 'visited' : s.state); });
+    }
+
+    Store.save();
+
+    // Build system message
+    var hours = Math.floor(timeMins / 60);
+    var mins = timeMins % 60;
+    var timeStr = hours > 0 ? (hours + '小时' + (mins > 0 ? mins + '分钟' : '')) : (mins + '分钟');
+    var msg = '你从 ' + oldLoc + ' 出发，前往 ' + newLoc + '。路程约 ' + timeStr + '。';
+    if (sanCost > 0) msg += '\\n理智值 -' + sanCost + '（路途消耗）。';
+    if (deductionTriggered) msg += '\\n积分自动扣除100，剩余' + (p.points||0) + '。';
+    if (monsterTriggered) msg += '\\n⚠ 途中遭遇了什么东西。';
+    msg += '\\n你已抵达 ' + newLoc + '。';
+    Store.addMessage({ type:'system', content: msg });
+    if (monsterTriggered) Store.addMessage({ type:'system', content: '请描述当前遭遇的怪物或异常。', meta: { travelMonster: true } });
+
+    this._closeGotoPopup();
+    // Reset map to region level
+    this._mapLevel = 'region'; this._mapRegionId = null;
+    this.renderAll(); this.applySanEffect(); App.scrollToBottom();
+    App._checkDeduction();
   },
   _getNodeStyle: function(n) {
     if (n.type === 'dungeon') {

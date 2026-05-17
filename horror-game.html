@@ -1086,8 +1086,12 @@ body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
                   <span class="loc-label">威胁</span>
                   <span class="loc-val" id="home-threat-val">--</span>
                 </div>
+                <div class="loc-row" id="home-void-time-row">
+                  <span class="loc-label">VOID时间</span>
+                  <span class="loc-val" id="home-void-time" style="font-family:var(--font-mono);font-size:10px">--</span>
+                </div>
                 <div class="loc-row" style="margin-top:auto;padding-top:6px">
-                  <span class="loc-label" id="home-points-label">生存积分</span>
+                  <span class="loc-label">生存积分</span>
                   <span class="loc-val" id="home-points-label-val">--</span>
                 </div>
               </div>
@@ -3714,6 +3718,7 @@ var App = {
   talkingToId: null,
   sanLevel: 0,
   _retryText: '',
+  _timeTimerId: null,
   combatState: { active: false, monsterName: '', monsterType: '', monsterStatus: '未受伤' },
   sanTimerId: null,
 
@@ -3744,6 +3749,7 @@ var App = {
     if (page === 'story' || page === 'terminal' || page === 'settings') {
       this.lastPage = page;
     }
+    if (page !== 'terminal') this._stopTimeTick();
     this.currentPage = page;
     this.selectedCharId = null;
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
@@ -4045,7 +4051,7 @@ var App = {
   // TERMINAL
   // ============================================================
   openTerminal: function() { this.navigateTo('terminal'); },
-  closeTerminal: function() { this.navigateTo('story'); },
+  closeTerminal: function() { this._stopTimeTick(); this.navigateTo('story'); },
   _openRulesPage: function() {
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
     document.getElementById('page-rules').classList.add('active');
@@ -4062,7 +4068,8 @@ var App = {
     document.querySelectorAll('.term-panel').forEach(function(p) { p.classList.remove('active'); });
     var panel = document.getElementById('term-panel-' + tab);
     if (panel) panel.classList.add('active');
-    if (tab === 'home') this.renderHome();
+    if (tab === 'home') { this.renderHome(); this._startTimeTick(); }
+    else { this._stopTimeTick(); }
     if (tab === 'forum') this.renderForum();
     if (tab === 'map') { this._mapLevel = 'region'; this._mapRegionId = null; this.renderMap(); }
     if (tab === 'attrs') this.renderAttributes();
@@ -4853,13 +4860,20 @@ var App = {
     }
   },
 
-  renderHome: function() {
-    this._checkDeduction();
+  _startTimeTick: function() {
+    if (this._timeTimerId) return;
+    var self = this;
+    this._timeTick();
+    this._timeTimerId = setInterval(function() { self._timeTick(); }, 1000);
+  },
+
+  _stopTimeTick: function() {
+    if (this._timeTimerId) { clearInterval(this._timeTimerId); this._timeTimerId = null; }
+  },
+
+  _timeTick: function() {
+    if (this.termTab !== 'home') { this._stopTimeTick(); return; }
     var p = Store.player();
-    // Points
-    var ptsEl = document.getElementById('home-points-val');
-    if (ptsEl) ptsEl.textContent = (p.points || 0).toLocaleString();
-    // Countdown — segmented display
     var remain = Math.max(0, (p.nextDeduction || Date.now() + 86400000) - Date.now());
     var h = Math.floor(remain / 3600000);
     var m = Math.floor((remain % 3600000) / 60000);
@@ -4870,6 +4884,29 @@ var App = {
     if (ttlH) ttlH.textContent = String(h).padStart(2,'0');
     if (ttlM) ttlM.textContent = String(m).padStart(2,'0');
     if (ttlS) { ttlS.textContent = String(s).padStart(2,'0'); ttlS.style.color = remain < 3600000 ? 'var(--accent)' : ''; }
+    // VOID world time
+    var vtEl = document.getElementById('home-void-time');
+    if (vtEl) {
+      var totalHours = Math.floor((p.voidDays || 1) * 24);
+      var days = Math.floor(totalHours / 24);
+      var hours = totalHours % 24;
+      var copy = Store._db.currentCopy;
+      if (copy.completionStatus === 'active') {
+        vtEl.textContent = '副本内 · ' + copy.chapter;
+        vtEl.style.color = copy.timeAnomaly ? 'var(--accent)' : '';
+      } else {
+        vtEl.textContent = '第' + Math.max(1, days) + '天 · 第' + hours + '小时';
+        vtEl.style.color = '';
+      }
+    }
+  },
+
+  renderHome: function() {
+    this._checkDeduction();
+    var p = Store.player();
+    // Points
+    var ptsEl = document.getElementById('home-points-val');
+    if (ptsEl) ptsEl.textContent = (p.points || 0).toLocaleString();
     // Rank
     var rankEl = document.getElementById('home-rank');
     if (rankEl) rankEl.textContent = '#' + ((p.rank || 0).toLocaleString());
@@ -4935,10 +4972,6 @@ var App = {
         }).join('');
       }
     }
-    // Days label
-    var p2 = Store.player();
-    var daysEl = document.getElementById('home-points-label');
-    if (daysEl && p2.voidDays) daysEl.textContent = '第' + Math.ceil(p2.voidDays || 1) + '天';
   },
 
   renderAttributes: function() {

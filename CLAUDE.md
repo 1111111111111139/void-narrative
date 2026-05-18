@@ -61,7 +61,7 @@ SPA with **3 bottom-tab views** + sub-pages + modals/panels:
 | `Store.masks()` / `Store.activeMask()` / `Store.addMask()` / `Store.setActiveMask()` | Player masks |
 | `Store.slots()` / `Store.saveToSlot()` / `Store.loadFromSlot()` | Save slots |
 | `Store.exportJSON()` / `Store.exportFile()` / `Store.importJSON()` / `Store.resetAll()` | Data portability |
-| `Store.apiCfg()` / `Store.memCfg()` / `Store.stateCfg()` | API config with `useMain` fallback |
+| `Store.apiCfg()` | API config accessor |
 
 ### Data Model (full `_db` structure)
 
@@ -104,15 +104,14 @@ _db {
   },
   forumPosts: { intel:[], party:[], trade:[], will:[], chat:[] },
   privateChats: { [charId]: { messages:[], hasUnread } },
-  settings: { api, memoryApi, stateApi, theme, fontSize, _lastAiForumPost },
+  settings: { api, theme, fontSize, _lastAiForumPost },
   config: { activePresetId, activePlotIdx, activeMaskId },
   worldPresets: [Preset],
   plots: [Plot],
   lores: [Lore],
   masks: [Mask],
   saveSlots: [Slot],
-  globalRules: [String],   // absolute prohibition rules
-  skills: []
+  globalRules: [String]   // absolute prohibition rules
 }
 ```
 
@@ -221,7 +220,7 @@ DEFAULT_WORLD_PRESET  — default world configuration (VOID rules, mechanics, fe
 DEFAULT_MAP_REGIONS   — 6-region dual-layer topology seed data
 Store                 — data layer (lines ~2200-2700)
   ├── init/migrations/save
-  ├── CRUD (messages/characters/inventory/items/skills)
+  ├── CRUD (messages/characters/inventory/items)
   ├── Memory (global/npc/copy/character/forum adders)
   ├── Lore library, Masks, Save slots
   ├── API config accessors (main/memory/state with useMain fallback)
@@ -260,15 +259,13 @@ App                   — main controller (lines ~3600-7100)
 
 ### API Integration
 
-Three independent OpenAI-compatible API configs:
+Single OpenAI-compatible API config:
 
 | Config | Key | Model | Purpose |
 |--------|-----|-------|---------|
-| Main | `settings.api` | `gpt-4o-mini` | Dialogue, character generation |
-| Memory | `settings.memoryApi` | (falls back to Main) | Diary, memory extraction |
-| State | `settings.stateApi` | (falls back to Main) | Reserved for rule adjudication |
+| Main | `settings.api` | `gpt-4o-mini` | All AI calls: dialogue, character generation, memory, state |
 
-`useMain: true` → falls back to Main API config. API base URL: `/chat/completions`.  
+API base URL: `/chat/completions`.  
 Streaming via SSE `ReadableStream`. Model list fetched from `/models`.
 
 ---

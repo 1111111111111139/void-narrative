@@ -32,8 +32,9 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   --glass:rgba(20,20,20,0.65);
   --surface:rgba(255,255,255,0.025);
   --surface-hover:rgba(255,255,255,0.05);
-  --bubble-npc:rgba(30,30,38,0.95);--bubble-user:rgba(35,35,42,0.95);
+  --bubble-npc:rgba(35,35,42,0.95);--bubble-user:rgba(30,30,38,0.95);
   --bubble-npc-text:#EAEAEA;--bubble-user-text:#C8CCD2;
+  --bubble-narrator:rgba(20,20,25,0.9);
   --font-serif:"Songti SC","STSong","SimSun",serif;
   --font-ui:-apple-system,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
   --font-mono:"SF Mono","Menlo","Consolas",monospace;
@@ -161,11 +162,11 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 
 /* NPC bubble — asymmetric 2-14-14-14 */
 .msg-character-bubble,.msg-npc-bubble{
-  background:var(--bubble-npc);border:0.5px solid rgba(255,255,255,0.08);
+  background:var(--bubble-npc);border:0.5px solid rgba(255,255,255,0.12);
   border-radius:2px 14px 14px 14px;padding:10px 14px;
   width:fit-content;max-width:100%;
 }
-.msg-character-bubble .msg-content,.msg-npc-bubble .msg-content{font-family:var(--font-serif);font-size:14px;line-height:1.6;color:var(--bubble-npc-text);text-align:left}
+.msg-character-bubble .msg-content,.msg-npc-bubble .msg-content{font-family:var(--font-serif);font-size:12px;line-height:1.55;color:var(--bubble-npc-text);text-align:left}
 
 /* User row — reverse, bubble 14-2-14-14 */
 .msg-user-row{display:flex;align-items:flex-start;gap:10px;width:100%;justify-content:flex-end}
@@ -175,18 +176,30 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   border-radius:14px 2px 14px 14px;padding:10px 14px;
   width:fit-content;max-width:100%;
 }
-.msg-user-bubble .msg-content{font-family:var(--font-serif);font-size:14px;line-height:1.6;color:var(--bubble-user-text);text-align:left}
+.msg-user-bubble .msg-content{font-family:var(--font-serif);font-size:12px;line-height:1.5;color:var(--bubble-user-text);text-align:left}
 .msg-user-row.pending .msg-user-bubble{opacity:.5}
 
 /* Action lines */
-.msg-action-line{font-family:var(--font-serif);font-size:11px;color:var(--text-2);font-style:italic;padding:2px 0;line-height:1.5}
+.msg-action-line{font-family:var(--font-serif);font-size:11px;color:#888;font-style:italic;padding:2px 0;line-height:1.5}
 .msg-character-col .msg-action-line,.msg-npc-col .msg-action-line{text-align:left}
 .msg-user-col .msg-action-line{text-align:right}
+
+/* Narrator wrapper — dashed border centered */
+.msg-narrator-wrapper{display:flex;justify-content:center;padding:4px 0}
+.msg-narrator-wrapper .msg-narrator-box{
+  font-family:var(--font-serif);font-size:12px;line-height:1.6;
+  color:var(--text);border:1px dashed rgba(255,255,255,0.15);
+  background:var(--bubble-narrator);
+  border-radius:10px;padding:10px 16px;max-width:90%;text-align:center;
+  letter-spacing:.02em;
+}
+.msg-action-inline{font-size:11px;color:#888;font-style:italic}
+.msg-narrator-wrapper .msg-narrator-box .msg-action-inline{font-size:11px;color:#888;font-style:italic}
 
 /* Telemetry tags (SAN/AFF/ITEM) */
 .msg-telemetry{display:flex;gap:5px;flex-wrap:wrap;margin-top:1px}
 .msg-tag{
-  font-family:var(--font-mono);font-size:8px;padding:2px 7px;border-radius:5px;
+  font-family:var(--font-mono);font-size:9px;padding:2px 7px;border-radius:5px;
   letter-spacing:.06em;border:0.5px solid var(--divider);color:var(--text-3);
 }
 .msg-tag.san{color:var(--accent);border-color:var(--accent-dim);background:var(--accent-dim)}
@@ -532,16 +545,16 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 /* ---- SAN LEVEL 2: 恐惧 (40-59) ---- */
 #app.san-lv2{box-shadow:inset 0 0 120px rgba(142,42,42,0.18)}
 #app.san-lv2 .msg-content{animation:sanJitter2 5s infinite ease-in-out}
-#app.san-lv2 .msg-narrative .msg-content{text-shadow:1px 0 0 rgba(142,42,42,0.2)}
+#app.san-lv2 .msg-narrative .msg-content,#app.san-lv2 .msg-narrator-box{text-shadow:1px 0 0 rgba(142,42,42,0.2)}
 /* ---- SAN LEVEL 3: 崩溃边缘 (20-39) ---- */
 #app.san-lv3{box-shadow:inset 0 0 200px rgba(142,42,42,0.30)}
 #app.san-lv3 .msg-content{animation:sanJitter3 3s infinite ease-in-out}
-#app.san-lv3 .msg-narrative .msg-content{text-shadow:2px 0 0 rgba(142,42,42,0.3)}
+#app.san-lv3 .msg-narrative .msg-content,#app.san-lv3 .msg-narrator-box{text-shadow:2px 0 0 rgba(142,42,42,0.3)}
 #app.san-lv3 #page-terminal .term-content{filter:blur(0.5px)}
 /* ---- SAN LEVEL 4: 濒临同化 (1-19) ---- */
 #app.san-lv4{box-shadow:inset 0 0 280px rgba(142,42,42,0.45)}
 #app.san-lv4 .msg-content{animation:sanJitter3 1.5s infinite ease-in-out}
-#app.san-lv4 .msg-narrative .msg-content{text-shadow:3px 0 0 rgba(142,42,42,0.4)}
+#app.san-lv4 .msg-narrative .msg-content,#app.san-lv4 .msg-narrator-box{text-shadow:3px 0 0 rgba(142,42,42,0.4)}
 #app.san-lv4 #page-terminal{display:none}
 /* ---- SAN LEVEL 5: 同化 (0) ---- */
 #app.san-lv5{box-shadow:inset 0 0 400px rgba(142,42,42,0.65)}
@@ -892,6 +905,7 @@ body.light,body.light-theme{
   --surface-hover:rgba(0,0,0,.04);
   --bubble-npc:rgba(240,240,238,0.95);--bubble-user:rgba(230,230,225,0.95);
   --bubble-npc-text:#1A1A1A;--bubble-user-text:#1A1A1A;
+  --bubble-narrator:rgba(245,245,242,0.9);
   transition:background .2s,color .2s;
 }
 body.light-theme .dock,
@@ -900,12 +914,22 @@ body.light-theme .dock-input-area,
 body.light .dock-input-area{border-color:rgba(0,0,0,.05)}
 body.light-theme .msg-npc-bubble,
 body.light .msg-npc-bubble{border-color:rgba(0,0,0,0.12)}
-body.light-theme .msg-player-bubble,
-body.light .msg-player-bubble{border-color:rgba(0,0,0,0.1)}
+body.light-theme .msg-user-bubble,
+body.light .msg-user-bubble{border-color:rgba(0,0,0,0.1)}
+body.light-theme .msg-narrator-wrapper .msg-narrator-box,
+body.light .msg-narrator-wrapper .msg-narrator-box{border-color:rgba(0,0,0,0.12);color:#1A1A1A}
+body.light-theme .msg-action-line,
+body.light .msg-action-line{color:#666}
+body.light-theme .msg-action-inline,
+body.light .msg-action-inline{color:#666}
+body.light-theme .msg-narrator-wrapper .msg-narrator-box .msg-action-inline,
+body.light .msg-narrator-wrapper .msg-narrator-box .msg-action-inline{color:#666}
 body.light-theme .dock,
 body.light .dock{background:rgba(248,248,246,0.82)}
 body.light-theme .msg-narrative .msg-content,
-body.light .msg-narrative .msg-content{border-color:rgba(0,0,0,0.1)}
+body.light .msg-narrative .msg-content,
+body.light-theme .msg-narrator-box,
+body.light .msg-narrator-box{border-color:rgba(0,0,0,0.12)}
 body.light-theme .center-modal-box,
 body.light .center-modal-box{background:rgba(248,248,246,0.97);border-color:rgba(0,0,0,0.08)}
 body.light-theme .user-panel,
@@ -1412,6 +1436,10 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
         <label class="form-label">外观描述</label>
         <textarea class="form-textarea" id="ce-appearance" rows="2" placeholder="AI叙事时参考的外貌特征（选填）"></textarea>
       </div>
+      <div class="form-group">
+        <label class="form-label">预设位置（选填）</label>
+        <input class="form-input" id="ce-position" type="text" placeholder="如：东墟·旧公寓；留空则AI安排出场">
+      </div>
       <!-- 高级设定（折叠） -->
       <div class="collapse-section">
         <div class="collapse-header" onclick="App._toggleCollapse('ce-advanced')">
@@ -1825,7 +1853,7 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">理智值</div><div style="font-size:11px;color:#888;line-height:1.7">范围0-100。归零时同化。<br>下降：恐怖场景、违反副本规则、战斗、击杀角色。<br>恢复：安全区休息、使用药物、通关副本。<br>低理智值时感知不可靠。终端可能受干扰。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">副本</div><div style="font-size:11px;color:#888;line-height:1.7">每个副本是一处规则怪谈。规则不被告知。<br>通过观察环境、NPC行为、情报推断规则。<br>解决核心执念通关。完美通关获得额外奖励。<br>进入副本后终端部分功能受干扰。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">角色</div><div style="font-size:11px;color:#888;line-height:1.7">其他轮回者。与你是同类。<br>可组队、交易、通讯。<br>击杀角色继承全部积分，但理智值暴跌70%起。<br>击杀标记永久存在。<br>好感度影响角色对你的态度。</div></div>
-      <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">NPC</div><div style="font-size:11px;color:#888;line-height:1.7">执念投影、被同化者、原住民。<br>不理解情感。不适用好感度。<br>击杀不掉积分，理智值消耗极少。<br>被同化者曾是角色，残存模糊记忆。</div></div>
+      <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">NPC</div><div style="font-size:11px;color:#888;line-height:1.7">执念投影、被同化者、原住民。<br>不是友善的存在。比怪物多了残存意识和记忆碎片。<br>遇到NPC不代表安全——下一秒可能攻击你。<br>击杀不掉积分，理智值消耗极少。<br>被同化者曾是角色，残存模糊记忆。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">终端</div><div style="font-size:11px;color:#888;line-height:1.7">前臂半透明显示屏。仅自己可见。<br>无自我意识。沉默记录一切。<br>功能：论坛、地图、通讯录、属性强化。<br>副本内受干扰程度取决于副本难度。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">属性</div><div style="font-size:11px;color:#888;line-height:1.7">力量、敏捷、感知、意志。<br>初始全1，最高10。<br>每500积分强化1点。<br>事件成功率由相关属性决定。<br>AI自动判定，无需手动操作。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.06em;margin-bottom:6px">死亡</div><div style="font-size:11px;color:#888;line-height:1.7">同化：理智值归零。变成副本或怪物。<br>抹杀：积分为负。存在感完全消失。<br>死亡后可回溯到上一个存档点一次。<br>回溯保留所有数据，回到存档时的状态。<br>也可选择完全重新开始。</div></div>
@@ -2167,18 +2195,10 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 // ============================================================
 var DEMO = {
   messages: [
-    { type:'system', content:'终端已连接' },
-    { type:'narrative', content:'你睁开眼睛。这是一条走廊，墙纸剥落，露出下面发黑的水泥。空气里有一股潮湿的霉味，还有别的什么——甜的，像花腐烂的味道。走廊很长，两端都隐没在黑暗里，只有头顶一根灯管在闪。' },
-    { type:'npc', content:'「别过去。」\n声音从你身后传来——很轻，像怕被什么东西听见。', characterName:'林晚' },
-    { type:'player', content:'我转过身，想看清是谁在说话。' },
-    { type:'narrative', content:'一个女人靠在门框上。她的脸一半在光里，一半在阴影中。你看不清她的表情，但她攥着门框的手指节节发白。灯管又闪了一下。她的影子没有动。' },
-    { type:'npc', content:'「进来。」\n她把门推开一条缝，眼睛没看你，而是越过你的肩膀，盯着走廊深处。「快进来，它快过来了。」', characterName:'林晚' }
+    { type:'system', content:'终端已连接' }
   ],
   characters: [
-    { id:'c1', name:'Terminal', affection:0, relation:'中立', present:true, isNPC:true, npcType:'native', lastSummary:'沉默的终端界面。只显示数据，不回应任何问题。', memories:[], simpleMemories:[], persona:'VOID终端界面。不是角色，不是AI。是锚点投射到意识中的交互界面。沉默地显示数据、记录一切、等待指令。不提供建议，不发表意见，不回应情感需求。' },
-    { id:'c2', name:'林医生', affection:30, relation:'友好', present:true, isNPC:false, lastSummary:'她警告你"不该来这一层"。白大褂口袋里露出一截注射器。', memories:[
-      { text:'林医生自称在这栋建筑里待了"很久"。她拒绝说具体时间。', time:Date.now()-1800000 }
-    ], persona:'中年女医生，疲惫但镇定。知道很多但选择性地透露。习惯性推眼镜框。' }
+    { id:'c1', name:'Terminal', affection:0, relation:'中立', present:true, isNPC:true, npcType:'native', lastSummary:'沉默的终端界面。只显示数据，不回应任何问题。', memories:[], simpleMemories:[], persona:'VOID终端界面。不是角色，不是AI。是锚点投射到意识中的交互界面。沉默地显示数据、记录一切、等待指令。不提供建议，不发表意见，不回应情感需求。' }
   ],
   forumPosts: {
     intel: [
@@ -2303,6 +2323,161 @@ var DEFAULT_WORLD_PRESET = {
 };
 
 // ============================================================
+// INITIAL CONTENT GENERATORS
+// ============================================================
+var CHAR_TEMPLATES = [
+  { name:'沉默的旅人', gender:'男', persona:'沉默寡言，很少主动说话。眼神警惕，手从不离开武器。似乎经历过什么，不肯谈。', tags:['警惕','沉默'] },
+  { name:'年轻拾荒者', gender:'女', persona:'二十出头，衣服破旧但眼睛很亮。在废墟里翻找有用的东西。好奇但小心。', tags:['好奇','生存者'] },
+  { name:'疲惫的探索者', gender:'男', persona:'眼窝深陷，好几轮没好好休息。只想找到离开这里的路。不太相信别人，但也不会主动惹事。', tags:['疲惫','中立'] },
+  { name:'受伤的猎人', gender:'女', persona:'左臂缠着绷带，血迹已干。以猎杀怪物为生，经验丰富。话不多，做事干脆。', tags:['猎人','受伤'] },
+  { name:'多疑的哨兵', gender:'男', persona:'一直保持警戒状态。对任何新面孔都保持距离。直觉很准，在这一带生存了足够久。', tags:['多疑','哨兵'] },
+  { name:'冷漠的佣兵', gender:'女', persona:'用积分换命。不带感情，不交朋友。但履约有信——雇佣她的钱从不白花。', tags:['佣兵','冷漠'] },
+  { name:'神经质的幸存者', gender:'男', persona:'SAN值不太稳定。说话时频繁看四周。但关于哪些地方危险、哪些东西不能碰，他比任何人都清楚。', tags:['神经质','知情者'] },
+  { name:'傲慢的竞争者', gender:'女', persona:'觉得自己的命比大多数轮回者值钱。自负但确实有实力。不轻易合作，合作时也不放松警惕。', tags:['傲慢','竞争者'] }
+];
+
+var NPC_ASSIMILATED_TEMPLATES = [
+  { name:'残影', persona:'被同化者的残存意识碎片。偶尔重复生前的一句话，但大部分时间只是茫然地站着。眼神空洞但不完全空白——有一丝东西还在。记忆模糊且不稳定。不可预测——可能平静，可能突然攻击。' },
+  { name:'低语者', persona:'蹲在角落反复念叨同一个名字。当你走近时突然抬头，用不属于活人的方式盯着你。可能说出模糊的警告，也可能突然尖叫。不是友善的存在——只是比游荡者多了一丁点残存意识。' },
+  { name:'游荡者残骸', persona:'生前某个角色留下的最后残片。动作迟缓，似乎被某种力量牵引着向某个方向走。偶尔停下，像在等待什么。遇到活人时可能有短暂的反应，但下一秒就可能变成攻击。' }
+];
+
+var INIT_MESSAGES = {
+  safe: [
+    { type:'narrative', content:'荒原上的风很安静。远处有模糊的轮廓在移动，但太远了，看不清。天空没有颜色——不是灰，也不是白，是一种让人不舒服的"空"。你手腕上的终端亮了。' },
+    { type:'narrative', content:'你站在一片开阔地上。脚下是干裂的灰土，偶尔能辨认出混凝土碎块和生锈的钢筋。这曾经是什么地方——也许是座城市。现在什么都不是了。' },
+    { type:'narrative', content:'空气干燥，没有异味。远处的地平线上有微弱的闪光——可能是其他轮回者的灯光，也可能是别的什么。至少现在，你还有时间。' }
+  ],
+  medium: [
+    { type:'narrative', content:'东墟。废弃的楼房像折断的肋骨插在灰白色的土地上。有些窗户里还有亮光——不是灯光，是执念的残光。远处传来断断续续的敲击声，也许是什么东西在动。' },
+    { type:'narrative', content:'建筑的影子压得很低。空气里有铁锈和烧焦塑料的味道。墙上有喷漆的标记——其他轮回者留下的警告，或者求救。大多已经看不清了。' },
+    { type:'narrative', content:'你踩到什么——一个碎裂的终端屏幕。上面最后的文字是"[POINTS -100] [POINTS -100] [POINTS -100] [POINTS -100]"。翻过来时，屏幕碎成了粉末。' }
+  ],
+  high: [
+    { type:'narrative', content:'铁穹之下没有自然光。只有机械的低频嗡鸣——不是从外面传来的，是从建筑本身、从墙壁、从你脚下的每一寸铁板里渗出来的。空气又热又干，像被什么巨大的东西呼吸过。' },
+    { type:'narrative', content:'警报。不是你的终端在响——是这整个建筑。红光从走廊深处涌过来，一闪一闪，然后停了。沉默压下来，比警报更糟。有什么东西知道你来了。' },
+    { type:'narrative', content:'你跪在地上等待耳鸣过去。这次传送比以往更粗暴——后颈的金属片烧得厉害。睁开眼时，你已经在这里了。铁穹内部。没有指南针。没有"外面"。' }
+  ]
+};
+
+function generateInitialMessages(threatLevel) {
+  var msgs = [{ id:'m0', type:'system', content:'终端已连接', timestamp: Date.now(), meta: {} }];
+  var pool = INIT_MESSAGES[threatLevel] || INIT_MESSAGES.safe;
+  // Pick 1-2 narrative messages
+  var pick = pool[Math.floor(Math.random() * pool.length)];
+  msgs.push({ id:'m1', type: pick.type, content: pick.content, timestamp: Date.now()+1, meta: {} });
+  if (Math.random() < 0.5 && pool.length > 1) {
+    var second;
+    do { second = pool[Math.floor(Math.random() * pool.length)]; } while (second === pick);
+    msgs.push({ id:'m2', type: second.type, content: second.content, timestamp: Date.now()+2, meta: {} });
+  }
+  return msgs;
+}
+
+function generateInitialCharacters(threatLevel) {
+  var chars = [];
+  // Terminal always present
+  chars.push(JSON.parse(JSON.stringify(DEMO.characters[0])));
+
+  var usedNames = {};
+  var usedPersonas = {};
+
+  function pickUnique(templates) {
+    var tries = 0;
+    var t;
+    do { t = templates[Math.floor(Math.random() * templates.length)]; tries++; } while (usedNames[t.name] && tries < 20);
+    usedNames[t.name] = true;
+    return t;
+  }
+
+  var t = threatLevel || 'safe';
+
+  if (t === 'safe') {
+    // 0-1 other characters (50%), 0-1 assimilated NPC (30%)
+    if (Math.random() < 0.5) {
+      var tmpl = pickUnique(CHAR_TEMPLATES);
+      chars.push({
+        id: 'c' + Date.now(),
+        name: tmpl.name, gender: tmpl.gender, persona: tmpl.persona,
+        affection: Math.floor(Math.random() * 20) - 10,
+        relation: '中立', present: true, isNPC: false,
+        tags: tmpl.tags || [], memories: [], simpleMemories: [],
+        initiativeEnabled: Math.random() < 0.3,
+        contactEstablished: false, survivalDays: 1 + Math.floor(Math.random() * 10),
+        attributes: { strength: 1+Math.floor(Math.random()*3), agility: 1+Math.floor(Math.random()*3), insight: 1+Math.floor(Math.random()*3), calm: 1+Math.floor(Math.random()*3) }
+      });
+    }
+    if (Math.random() < 0.3) {
+      var nt = NPC_ASSIMILATED_TEMPLATES[Math.floor(Math.random() * NPC_ASSIMILATED_TEMPLATES.length)];
+      chars.push({
+        id: 'c' + (Date.now() + 1),
+        name: nt.name, gender: '未知', persona: nt.persona,
+        affection: 0, relation: '未知', present: false, isNPC: true, npcType: 'assimilated',
+        tags: ['被同化者','不可预测'], memories: [], simpleMemories: [],
+        survivalDays: 0
+      });
+    }
+  } else if (t === 'medium') {
+    // 1-2 other characters (always at least 1), 0-1 NPC (50%)
+    var count = 1 + Math.floor(Math.random() * 2);
+    for (var i = 0; i < count; i++) {
+      var tmpl = pickUnique(CHAR_TEMPLATES);
+      chars.push({
+        id: 'c' + (Date.now() + i),
+        name: tmpl.name, gender: tmpl.gender, persona: tmpl.persona,
+        affection: Math.floor(Math.random() * 30) - 10,
+        relation: Math.random() < 0.3 ? '警惕' : '中立', present: true, isNPC: false,
+        tags: tmpl.tags || [], memories: [], simpleMemories: [],
+        initiativeEnabled: Math.random() < 0.4,
+        contactEstablished: false, survivalDays: 3 + Math.floor(Math.random() * 15),
+        attributes: { strength: 2+Math.floor(Math.random()*3), agility: 2+Math.floor(Math.random()*3), insight: 2+Math.floor(Math.random()*3), calm: 2+Math.floor(Math.random()*3) }
+      });
+    }
+    if (Math.random() < 0.5) {
+      var nt = NPC_ASSIMILATED_TEMPLATES[Math.floor(Math.random() * NPC_ASSIMILATED_TEMPLATES.length)];
+      chars.push({
+        id: 'c' + (Date.now() + count),
+        name: nt.name, gender: '未知', persona: nt.persona,
+        affection: 0, relation: '未知', present: true, isNPC: true, npcType: 'assimilated',
+        tags: ['被同化者','不可预测'], memories: [], simpleMemories: [],
+        survivalDays: 0
+      });
+    }
+  } else {
+    // high/fatal: 1-2 characters (one possibly hostile 40%), 0-1 NPC (30%)
+    var count = 1 + Math.floor(Math.random() * 2);
+    for (var i = 0; i < count; i++) {
+      var tmpl = pickUnique(CHAR_TEMPLATES);
+      var aff = i === 0 && Math.random() < 0.4 ? -(20 + Math.floor(Math.random() * 40)) : (Math.floor(Math.random() * 30) - 10);
+      chars.push({
+        id: 'c' + (Date.now() + i),
+        name: tmpl.name, gender: tmpl.gender, persona: tmpl.persona,
+        affection: aff,
+        relation: aff < 0 ? '敌视' : (Math.random() < 0.5 ? '警惕' : '中立'),
+        present: true, isNPC: false,
+        tags: tmpl.tags || [], memories: [], simpleMemories: [],
+        initiativeEnabled: Math.random() < 0.4,
+        contactEstablished: false, survivalDays: 5 + Math.floor(Math.random() * 30),
+        san: 40 + Math.floor(Math.random() * 40),
+        attributes: { strength: 3+Math.floor(Math.random()*4), agility: 3+Math.floor(Math.random()*4), insight: 3+Math.floor(Math.random()*4), calm: 3+Math.floor(Math.random()*4) }
+      });
+    }
+    if (Math.random() < 0.3) {
+      var nt = NPC_ASSIMILATED_TEMPLATES[Math.floor(Math.random() * NPC_ASSIMILATED_TEMPLATES.length)];
+      chars.push({
+        id: 'c' + (Date.now() + count),
+        name: nt.name, gender: '未知', persona: nt.persona,
+        affection: 0, relation: '未知', present: false, isNPC: true, npcType: 'assimilated',
+        tags: ['被同化者','不可预测'], memories: [], simpleMemories: [],
+        survivalDays: 0
+      });
+    }
+  }
+
+  return chars;
+}
+
+// ============================================================
 // DATA LAYER
 // ============================================================
 var LS_KEY = 'VOID_V1';
@@ -2314,28 +2489,58 @@ var Store = {
     var raw = opts.forceNew ? null : localStorage.getItem(LS_KEY);
     if (raw) { try { this._db = JSON.parse(raw); } catch(e) { this._db = null; } }
     if (!this._db) {
-      this._db = JSON.parse(JSON.stringify({
+      // Select spawn point by threat level
+      var spawnRoll = Math.random();
+      var spawnRegion, spawnSubNode, spawnLocation, copyName, copyThreat;
+      if (spawnRoll < 0.80) {
+        // 安全区域 80%
+        spawnRegion = 'wasteland_east';
+        spawnSubNode = 'wasteland_spawn';
+        spawnLocation = '荒原·初始点';
+        copyName = '404号公寓';
+        copyThreat = 'safe';
+      } else if (spawnRoll < 0.95) {
+        // 低威胁区域 15%
+        spawnRegion = 'east_ruins';
+        spawnSubNode = 'east_apt';
+        spawnLocation = '东墟·旧公寓';
+        copyName = '镜面怪谈';
+        copyThreat = 'medium';
+      } else {
+        // 危险区域 5%
+        spawnRegion = 'iron_dome';
+        spawnSubNode = 'iron_factory';
+        spawnLocation = '铁穹·锈蚀工厂';
+        copyName = '铁穹深处';
+        copyThreat = 'high';
+      }
+      // Update mapRegions: set spawn subNode to 'current', wasteland_spawn to 'visited'
+      var initMapRegions = JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS));
+      initMapRegions.forEach(function(r) {
+        r.subNodes.forEach(function(sn) {
+          if (sn.id === spawnSubNode) sn.state = 'current';
+          else if (sn.state === 'current') sn.state = 'visited';
+        });
+        if (r.id === spawnRegion) r.state = 'current';
+        else if (r.state === 'current') r.state = 'visited';
+      });
+
+      var initMessages = generateInitialMessages(copyThreat);
+      var initChars = generateInitialCharacters(copyThreat);
+
+      this._db = {
         version: 1,
-        player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: 1842, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false, position: { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn', copyId: null } },
-        currentCopy: { name: '404号公寓', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '一楼走廊', completionStatus:'active', terminalInterference:'轻度', mapRegions: JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS)) },
+        player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: 1842, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false, position: { regionId: spawnRegion, subNodeId: spawnSubNode, copyId: null } },
+        currentCopy: { name: copyName, type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: spawnLocation, completionStatus:'active', terminalInterference:'轻度', mapRegions: initMapRegions },
         inventory: [],
-        messages: [
-          { id:'m0', type:'system', content:'终端已连接', timestamp: Date.now(), meta: {} },
-          { id:'m1', type:'narrative', content:'你在一张冰凉的金属床上醒来。后颈隐隐作痛，像被什么东西咬过。天花板是一片均匀的灰白色，没有灯，但整个房间都在发光。', timestamp: Date.now()+1, meta: {} },
-          { id:'m2', type:'npc', content:'检测到新个体。编号 VOID-7734。\n生命体征稳定。', characterName:'Terminal', characterId:'c1', timestamp: Date.now()+2, meta: {} },
-          { id:'m3', type:'player', content:'（抬手摸后颈）\n我检查后颈的伤口', timestamp: Date.now()+3, meta: {}, pending:false },
-          { id:'m4', type:'npc', content:'（推了推眼镜框）\n那是神经接口。别抠。', characterName:'林医生', characterId:'c2', timestamp: Date.now()+4, meta: {} },
-          { id:'m5', type:'player', content:'（坐起来）\n这是什么地方？', timestamp: Date.now()+5, meta: {}, pending:false },
-          { id:'m6', type:'narrative', content:'她没回答。只是划了一下手里的平板。你后颈的金属片突然发烫——不是热，是一种从骨头里传出来的嗡鸣。', timestamp: Date.now()+6, meta: {} },
-          { id:'m7', type:'player', content:'你在干什么？', timestamp: Date.now()+7, meta: {targetCharName:'林医生'}, pending:true }
-        ],
-        characters: JSON.parse(JSON.stringify(DEMO.characters)),
+        messages: initMessages,
+        characters: initChars,
         memories: { global: [], npc: {}, copy: {}, character: {}, forum: [] },
         forumPosts: { intel:[], party:[], trade:[], will:[], chat:[] },
         settings: { api: { key: '', url: '', model: 'gpt-4o-mini' }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' },
         config: { activePresetId: 'default', activePlotIdx: 0 },
         worldPresets: [JSON.parse(JSON.stringify(DEFAULT_WORLD_PRESET))],
-        plots: [{ id: 'p1', globalId: 'default', name: '404号公寓', createdAt: Date.now(), updatedAt: Date.now() }],
+        plots: [{ id: 'p1', globalId: 'default', name: copyName, createdAt: Date.now(), updatedAt: Date.now() }],
         lores: [],
         masks: [{ id:'mask_default', name:'轮回者', gender:'男', identity:'死者', appearance:'', isDefault:true }],
         saveSlots: [],
@@ -2348,7 +2553,7 @@ var Store = {
           '禁止AI以自身身份说话（作为AI、我是语言模型等）',
           '禁止打破第四面墙（提及玩家现实身份、暗示VOID是游戏等）'
         ]
-      }));
+      };
       this.save();
     }
     // Migrations
@@ -2419,18 +2624,6 @@ var Store = {
     if (this._db.player.killMark === undefined) this._db.player.killMark = false;
     if (!this._db.player.nextDeduction) this._db.player.nextDeduction = Date.now() + 86400000;
     if (!this._db.player.position) this._db.player.position = { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn', copyId: null };
-    // Random birth point on first init (only if location is default)
-    if (this._db.currentCopy.location === '荒原·初始点' || this._db.currentCopy.location === '入口') {
-      var roll = Math.random();
-      if (roll < 0.80) {
-        this._db.currentCopy.location = '荒原·初始点';
-      } else if (roll < 0.95) {
-        this._db.currentCopy.location = Math.random() < 0.5 ? '荒原西段' : '东墟边缘';
-      } else {
-        var dangerSpots = ['边界地带边缘','铁穹外围','南墟·未知副本内部'];
-        this._db.currentCopy.location = dangerSpots[Math.floor(Math.random() * dangerSpots.length)];
-      }
-    }
     if (!this._db.currentCopy.mapRegions) this._db.currentCopy.mapRegions = JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS));
     if (!this._db.currentCopy.type) this._db.currentCopy.type = '恐怖';
     if (!this._db.currentCopy.difficulty) this._db.currentCopy.difficulty = 'C';
@@ -2438,7 +2631,7 @@ var Store = {
     if (!this._db.currentCopy.completionStatus) this._db.currentCopy.completionStatus = 'active';
     if (!this._db.currentCopy.terminalInterference) this._db.currentCopy.terminalInterference = '轻度';
     // Migrate existing characters to have isNPC field
-    (this._db.characters || []).forEach(function(c) { if (c.isNPC === undefined) c.isNPC = false; if (c.isNPC && !c.simpleMemories) c.simpleMemories = []; if (c.contactEstablished === undefined) c.contactEstablished = !c.isNPC; if (c.initiativeEnabled === undefined) c.initiativeEnabled = false; if (c.contactAccepted === undefined) c.contactAccepted = false; if (c.isOnline === undefined) c.isOnline = true; if (c.isAlive === undefined) c.isAlive = true; if (c.deathCause === undefined) c.deathCause = null; if (c.deathTime === undefined) c.deathTime = null; if (c.lastSeenLocation === undefined) c.lastSeenLocation = null; if (c.lastSeenTime === undefined) c.lastSeenTime = null; if (c.killCount === undefined) c.killCount = 0; if (c.hasKillMark === undefined) c.hasKillMark = false; if (c.san === undefined) c.san = 100; if (c.points === undefined) c.points = 100; if (c.attributes === undefined) c.attributes = { strength:1, agility:1, insight:1, calm:1 }; if (c.inventory === undefined) c.inventory = []; if (c.survivalDays === undefined) c.survivalDays = 0; });
+    (this._db.characters || []).forEach(function(c) { if (c.isNPC === undefined) c.isNPC = false; if (c.isNPC && !c.simpleMemories) c.simpleMemories = []; if (c.contactEstablished === undefined) c.contactEstablished = !c.isNPC; if (c.initiativeEnabled === undefined) c.initiativeEnabled = false; if (c.contactAccepted === undefined) c.contactAccepted = false; if (c.isOnline === undefined) c.isOnline = true; if (c.isAlive === undefined) c.isAlive = true; if (c.deathCause === undefined) c.deathCause = null; if (c.deathTime === undefined) c.deathTime = null; if (c.lastSeenLocation === undefined) c.lastSeenLocation = null; if (c.lastSeenTime === undefined) c.lastSeenTime = null; if (c.killCount === undefined) c.killCount = 0; if (c.hasKillMark === undefined) c.hasKillMark = false; if (c.san === undefined) c.san = 100; if (c.points === undefined) c.points = 100; if (c.attributes === undefined) c.attributes = { strength:1, agility:1, insight:1, calm:1 }; if (c.inventory === undefined) c.inventory = []; if (c.survivalDays === undefined) c.survivalDays = 0; if (c.isTemporary === undefined) c.isTemporary = false; if (c.isArchived === undefined) c.isArchived = false; if (c.lastInteraction === undefined) c.lastInteraction = null; if (c.isUserCreated === undefined) c.isUserCreated = false; });
     // Seed forum with demo data if all boards are empty
     var fp = this._db.forumPosts;
     var totalPosts = 0;
@@ -2574,7 +2767,24 @@ var Store = {
     data.attributes = data.attributes || { strength: 1, agility: 1, insight: 1, calm: 1 };
     data.inventory = data.inventory || [];
     data.survivalDays = data.survivalDays || 0;
+    data.isTemporary = data.isTemporary !== undefined ? data.isTemporary : false;
+    data.isArchived = data.isArchived !== undefined ? data.isArchived : false;
+    data.lastInteraction = data.lastInteraction || null;
+    data.isUserCreated = data.isUserCreated || false;
     if (data.isNPC) { data.simpleMemories = data.simpleMemories || []; data.affectionEnabled = false; data.memoryEnabled = false; }
+    // Character library limit: 30 formal (non-temp, non-archived, alive)
+    if (!data.isTemporary && !data.isArchived && data.isAlive !== false) {
+      var formalChars = this._db.characters.filter(function(c) { return !c.isTemporary && !c.isArchived && c.isAlive !== false; });
+      if (formalChars.length >= 30) {
+        var candidates = formalChars.filter(function(c) { return !c.isUserCreated; });
+        candidates.sort(function(a, b) { return (a.lastInteraction || 0) - (b.lastInteraction || 0); });
+        if (candidates.length > 0) {
+          candidates[0].isArchived = true;
+          if (!this._db.memories.global) this._db.memories.global = [];
+          this._db.memories.global.unshift({ id: 'gm_' + Date.now(), type: 'global', summary: '角色「' + candidates[0].name + '」已归档（角色库达30上限）', importance: 0.3, tags: [], time: Date.now() });
+        }
+      }
+    }
     this._db.characters.push(data); this.save(); return data;
   },
   addItem: function(item) {
@@ -2810,7 +3020,7 @@ function buildSystemPrompt() {
   var effIdentity = mask.identity || p.identity || '未知';
   var effGender = mask.gender || p.gender || '未知';
 
-  var activeChars = chars.filter(function(c) { return c.present; });
+  var activeChars = chars.filter(function(c) { return c.present && !c.isArchived; });
   var activeList = activeChars.length > 0
     ? activeChars.map(function(c) {
         var tier = '中立';
@@ -2941,12 +3151,19 @@ function buildSystemPrompt() {
   presetText += '1. 执念投影（projection，最常见）：副本中执念主人记忆的投影。有自我意识但活在执念循环中——重复死前最后一段时间的片段。有些隐约感知到不对劲，极少数完全清醒。行为按执念循环的固定模式。对用户的帮助/伤害有因果反馈——但这不属于好感度，是执念循环的一部分，不能违背"设定"来感谢或报复。记忆：固定记忆（循环中的"过去"）+ 互动记忆。击杀：SAN下降0到-5，不掉积分，极小概率掉落执念残留物，可能在副本重置后重新出现。\n';
   presetText += '2. 被同化者（assimilated）：曾是轮回者，被VOID同化后失去锚点和终端，变成副本一部分或游荡怪物。部分保留模糊意识碎片可简单交流。行为混乱不可预测——时而平静时而狂乱。可能对生前队友有模糊但扭曲的记忆，反复念叨生前的执念或某个名字。记忆：极度不完整且扭曲的残存片段。击杀：SAN下降-5到-10，不掉积分，极小概率掉落生前遗物，永久消失。\n';
   presetText += '3. 原住民（native，极其罕见）：VOID中自然产生的意识体。不是任何人的投影，是执念碎片聚合后诞生的独立人格。行为和动机完全自主，不受执念循环限制。自主但不一定理性，可能有独特的价值观和目的，对VOID的理解可能比轮回者更深。遇到一个是重大事件。记忆：完整——作为独立意识体的全部经历，可能包含对VOID的深层理解。击杀：SAN下降由AI判定，不掉积分，后果由AI根据该原住民在VOID中的角色决定，可能引发连锁事件。\n\n';
+  presetText += '### NPC警告\n';
+  presetText += 'NPC不是友善的存在。他们只是比怪物多了残存的记忆碎片和部分理智。遇到NPC并不代表安全——它可能下一秒就攻击你。\n';
+  presetText += '- NPC在安全区出现概率极低（仅执念投影偶尔出现在副本入口附近）；威胁越高区域NPC密度越高\n';
+  presetText += '- 被同化者保留模糊意识碎片，可能短暂交谈，但行为完全不可预测——可能平静对话中突然攻击\n';
+  presetText += '- 执念投影受循环限制，行为看似可预测，但循环可能包含暴力内容——不要假设无害\n';
+  presetText += '- 原住民最危险——完全自主且可能有完全不类人的价值观。它们可能帮你，也可能用你当诱饵\n';
+  presetText += '- 不要把NPC当NPC看。把它们当怪物看——只是碰巧还有一点残存意识\n\n';
   presetText += '### NPC对话规则\n';
   presetText += '严格按照角色卡设定输出对话。执念投影：对话受执念循环限制。被同化者：混乱、碎片化、可能突然中断。原住民：自主对话，可能透露VOID信息。NPC说话时出现头像+气泡（动作用斜体灰色放在气泡内、对话之前）；NPC不说话时动作用旁白渲染（虚线框居中）。只有说话才出气泡。对话格式：角色名独占一行，对话内容缩进两个空格，动作在前用斜体、对话在后。\n\n';
   presetText += '### NPC在场规则\n';
-  presetText += '在场NPC：用户可直接对话，输入中提及NPC名时自动切换对话模式。NPC可以自主行动，AI在旁白中描述。不在场NPC：用户不能直接对话。NPC之间可以互动，用户不在场时也会发生事情，后续返回时可能体现。进出场景由AI根据剧情判断，在旁白中自然描述。\n\n';
+  presetText += '在场NPC：用户可直接对话，输入中提及NPC名时自动切换对话模式。NPC可以自主行动，AI在旁白中描述——包括可能突然攻击或背叛。不在场NPC：用户不能直接对话。NPC之间可以互动，用户不在场时也会发生事情，后续返回时可能体现。进出场景由AI根据剧情判断，在旁白中自然描述。\n\n';
   presetText += '### 角色/NPC创建\n';
-	  presetText += '用户不可手动创建NPC。角色/NPC由AI在叙事中通过[CHAR_JOIN]标记引入。[CHAR_JOIN 名称 role]创建角色，[CHAR_JOIN 名称 npc]或默认创建NPC。[CHAR_JOIN 名称:描述 role/npc]附带描述。AI自动创建的NPC：好感度不适用、记忆模块默认关闭、性格标签从描述中提取、角色设定文本从描述提取、isNPC:true。\n\n';
+	  presetText += '用户不可手动创建NPC。角色/NPC由AI在叙事中通过[CHAR_JOIN]标记引入。[CHAR_JOIN 名称 role]创建角色（正式入库），[CHAR_JOIN 名称 npc]或默认创建NPC（临时标签，isTemporary:true，不在角色列表中显示）。[CHAR_JOIN 名称:描述 role/npc]附带描述。NPC临时标签规则：AI引入NPC时必须使用描述性标签（如"戴眼镜的医生""多疑的哨兵"）。临时NPC不正式入库、不在列表中显示。仅重要的NPC才正式创建。自报姓名→正式入库：当临时NPC自报姓名后，AI用[CHAR_UPDATE 临时标签名 name:真实姓名]将isTemporary变为false。离开清理：临时NPC离开场景([LEAVE])且未自报姓名→自动删除+全局记忆摘要。角色库上限30个正式角色（临时/归档/死亡不计）。超出时自动归档最久未互动的非手动角色。用户手动创建的角色不会被归档。\n\n';
 	  presetText += '#### 属性与存活时间挂钩\n';
 	  presetText += 'AI通过[CHAR_JOIN]引入新角色时，属性总和必须与存活时间成正比：\n';
 	  presetText += '- 存活<7天：属性总和4-8（新手，属性偏低）\n';
@@ -3355,7 +3572,15 @@ var AI = {
         }
         case 'scene_leave': {
           var lc = Store.characters().find(function(ch) { return ch.name === item.args[0].trim(); });
-          if (lc) { lc.present = false; Store.save(); }
+          if (lc) {
+            lc.present = false;
+            if (lc.isTemporary) {
+              Store.addGlobalMemory('在' + (Store._db.currentCopy.location||'未知地点') + '遇到了' + (lc.name||'无名者') + '，未深入交流', 0.3);
+              var lcIdx = Store._db.characters.indexOf(lc);
+              if (lcIdx >= 0) Store._db.characters.splice(lcIdx, 1);
+            }
+            Store.save();
+          }
           break;
         }
         case 'quest': {
@@ -3401,7 +3626,8 @@ var AI = {
               simpleMemories: isNPC ? [] : undefined,
               attributes: attrs,
               inventory: [],
-              survivalDays: survivalDays
+              survivalDays: survivalDays,
+              isTemporary: isNPC
             });
             AI._lastJoinedCharId = isNPC ? null : newChar.id;
             // Pre-init memory partition
@@ -3559,7 +3785,8 @@ var AI = {
           var cuName = item.args[0].trim();
           var cuField = item.args[1].trim();
           var cuVal = item.args[2].trim();
-          var cu = Store.characters().find(function(x) { return x.name === cuName && !x.isNPC; });
+          // Name updates can target NPCs (temp → formal conversion), other fields only non-NPCs
+          var cu = Store.characters().find(function(x) { return x.name === cuName && (cuField === 'name' || !x.isNPC); });
           if (cu) {
             if (cuField === 'san') cu.san = Math.max(0, Math.min(100, parseInt(cuVal) || cu.san));
             else if (cuField === 'points') cu.points = parseInt(cuVal) || cu.points;
@@ -3569,6 +3796,7 @@ var AI = {
             else if (cuField === 'injured') cu.injured = cuVal;
             else if (cuField === 'hasKillMark') cu.hasKillMark = cuVal === 'true';
             else if (cuField === 'killCount') cu.killCount = parseInt(cuVal) || cu.killCount;
+            else if (cuField === 'name') { cu.name = cuVal; cu.isTemporary = false; cu.lastInteraction = Date.now(); }
             Store.save();
           }
           break;
@@ -3643,13 +3871,42 @@ var AI = {
     } catch(e) { return { ok: false, error: e.message }; }
   },
 
-  generateForumReplies: async function(post) {
+  generateForumReplies: async function(post, isContinuation) {
     var s = Store._db.settings.api;
     if (!s.url || !s.key) return null;
+    if (post.locked) return null;
     var preset = Store.getActivePreset();
     var worldName = preset ? preset.name : 'VOID';
-    var sysPrompt = '你是VOID终端论坛的AI模拟器。为以下帖子生成2-4条来自其他VOID轮回者的回复。\n\n世界观：' + worldName + '\n\n规则：\n- 回复者使用VOID-XXXX格式的ID\n- 回复内容符合帖子主题和世界观氛围\n- 回复风格多样：有的谨慎、有的疯狂、有的提供线索、有的转移话题\n- 每条回复以"VOID-XXXX："开头\n- 情报帖回复应验证/补充/质疑情报\n- 组队帖回复应应征/询问详情\n- 交易帖回复应议价/询问品相\n- 遗言帖回复应表达共鸣或补充信息，语气沉痛\n- 杂谈帖回复应讨论/附和/分享类似经历\n- 如果帖子标注了"可疑"，回复应包含质疑或警告\n- 回复的立场多样：约30%友好（支持、补充）、50%中立（讨论、提问）、20%怀疑（质疑、警告）\n\n输出格式：\n[FORUM_REPLY]\nVOID-XXXX：回复内容\nVOID-YYYY：回复内容\n[/FORUM_REPLY]';
-    var userMsg = '帖子标题：' + (post.locked ? '[遗言]' : '') + post.title + '\n发帖人ID：' + (post.authorId || '匿名') + '\n板块：' + (post.board || '未知') + '\n时间：' + (post.time || '未知');
+    var playerId = (Store.player().voidId || '0000');
+
+    // Gather available NPC/character IDs for use as reply authors
+    var chars = Store.characters().filter(function(c) { return c.name && c.voidId; });
+    var charBriefs = chars.map(function(c) {
+      var aff = c.affection || 0;
+      var tone = aff > 60 ? '友好信任' : aff > 30 ? '友好' : aff > 0 ? '中立' : aff > -31 ? '冷淡' : '敌视';
+      return c.voidId + '(' + c.name + ',好感' + aff + ',' + tone + ')';
+    }).join('；');
+    if (!charBriefs) charBriefs = '无已知角色，使用VOID-XXXX格式临时ID';
+
+    var boardContext = {
+      intel: '情报验证帖——回复应验证情报真实性、补充细节、或质疑来源',
+      party: '组队招募帖——回复应应征、询问详情（难度/路线/要求）、或提供自身属性',
+      trade: '交易帖——回复应议价、询问品相/耐久/来源、或提出以物易物',
+      chat: '杂谈帖——自由讨论，回复可附和、分享类似经历、提出不同看法',
+      will: '遗言帖——不生成回复'
+    };
+    var boardGuide = boardContext[post.board] || boardContext.chat;
+
+    // Build existing reply context
+    var existingReplies = '';
+    if (post.replies && post.replies.length > 0) {
+      existingReplies = '\n已有回复：\n' + post.replies.slice(-6).map(function(r) {
+        return r.author + '：' + (r.content||'').slice(0,80);
+      }).join('\n');
+    }
+
+    var sysPrompt = '你是VOID终端论坛的AI模拟器。为帖子生成1-3条来自其他VOID轮回者的回复。\n\n世界观：' + worldName + '\n当前已知角色：' + charBriefs + '\n\n回复规则：\n- 回复者必须从上述"已知角色"中选择（使用对应VOID-XXXX格式ID），若没有合适角色则随机生成VOID-XXXX格式ID\n- 回复内容符合帖子主题和世界观氛围\n- ' + boardGuide + '\n- 回复风格多样：有的谨慎、有的疯狂、有的提供线索、有的转移话题\n- 好感度影响语气：友好→支持/补充/合作，中立→讨论/提问，冷淡/敌视→质疑/讽刺/警告\n- 如果帖子标注了"可疑"，回复应包含质疑或警告\n- ' + (isContinuation ? '这是新回复后的追加评论，内容应回应最新回复或继续讨论，避免重复已有观点' : '这是初始评论，为帖子贡献首批观点') + '\n- 回复的立场多样：约30%友好（支持、补充）、50%中立（讨论、提问）、20%怀疑（质疑、警告）\n\n输出格式：\n[FORUM_REPLY]\nVOID-XXXX：回复内容\nVOID-YYYY：回复内容\n[/FORUM_REPLY]';
+    var userMsg = '帖子标题：' + (post.locked ? '[遗言]' : '') + post.title + '\n发帖人ID：' + (post.authorId || '匿名') + '\n板块：' + (post.board || '未知') + '\n正文摘要：' + (post.content||'').slice(0,200) + existingReplies;
     try {
       var res = await fetch(s.url.replace(/\/+$/, '') + '/chat/completions', {
         method: 'POST',
@@ -3665,7 +3922,7 @@ var AI = {
       var replies = [];
       m[1].split('\n').forEach(function(line) {
         var kv = line.match(/^(VOID-\d+)[：:]\s*(.*)/);
-        if (kv) replies.push({ author: kv[1], content: kv[2].trim(), time: '刚刚' });
+        if (kv) replies.push({ author: kv[1], content: kv[2].trim(), time: Date.now() });
       });
       return replies.length > 0 ? replies : null;
     } catch(e) { return null; }
@@ -3741,7 +3998,7 @@ var App = {
     Store.init();
     this.applyTheme(Store._db.settings.theme || 'dark');
     this.bindEvents();
-    this._lastAnnotations = { user:[{cls:'msg-annot-san',text:'SAN -3'}], npc:{'林医生':[{cls:'',text:'好感 +2'}]} };
+    this._lastAnnotations = { user:[], npc:{} };
     this._checkDeduction();
     this.navigateTo('story');
     this.renderAll();
@@ -3816,8 +4073,10 @@ var App = {
   // AVATAR
   // ============================================================
   _avatarColors: ['#2A1A1A','#1A2A2A','#2A2A1A','#1A1A2A','#2A1A2A'],
+  _npcAvColors: { projection:'#2D1B4E', assimilated:'#4A1515', native:'#2A2A2A' },
 
-  getAvatarColor: function(name) {
+  getAvatarColor: function(name, npcType) {
+    if (npcType && this._npcAvColors[npcType]) return this._npcAvColors[npcType];
     if (!name) return this._avatarColors[0];
     var code = name.charCodeAt(0); return this._avatarColors[code % this._avatarColors.length];
   },
@@ -3902,14 +4161,14 @@ var App = {
   renderCharList: function() {
     var container = document.getElementById('char-card-list');
     var empty = document.getElementById('char-list-empty');
-    var chars = Store.characters();
+    var chars = Store.characters().filter(function(c) { return !c.isTemporary && !c.isArchived; });
     if (chars.length === 0) { container.innerHTML = ''; empty.style.display = 'block'; return; }
     empty.style.display = 'none';
     var self = this;
     container.innerHTML = chars.map(function(c) {
       var first = c.name ? c.name.charAt(0) : '?';
-      var avatarBg = self.getAvatarColor(c.name);
-      var avatarHTML = c.avatar
+      var avatarBg = self.getAvatarColor(c.name, c.isNPC ? c.npcType : null);
+      var avatarHTML = (c.avatar && !c.isNPC)
         ? '<img src="' + c.avatar + '">'
         : '<span class="char-list-avatar-text">' + App.escapeHtml(first) + '</span>';
       var autoBadge = c.isAutoCreated ? ' <span style="font-size:9px;color:var(--accent);font-family:var(--font-mono);border:1px solid var(--accent-dim);border-radius:3px;padding:1px 4px;margin-left:4px">AI生成</span>' : '';
@@ -3943,6 +4202,7 @@ var App = {
     document.getElementById('ce-name').value = c ? (c.name || '') : '';
     document.getElementById('ce-persona').value = c ? (c.persona || '') : '';
     document.getElementById('ce-appearance').value = c ? (c.appearance || '') : '';
+    document.getElementById('ce-position').value = c ? (c.position || '') : '';
     // Gender
     var gBtns = document.querySelectorAll('#ce-gender .toggle-btn');
     gBtns.forEach(function(b) { b.classList.toggle('active', b.textContent === (c && c.gender ? c.gender : '男')); });
@@ -3988,6 +4248,7 @@ var App = {
       speedUp: parseFloat((document.getElementById('ce-speed-up').value || '×1.0').replace('×','')) || 1,
       speedDown: parseFloat((document.getElementById('ce-speed-down').value || '×1.0').replace('×','')) || 1,
       appearance: document.getElementById('ce-appearance').value.trim(),
+      position: document.getElementById('ce-position').value.trim() || null,
       initiativeEnabled: document.getElementById('ce-initiative-toggle').checked,
       tags: this._getTagTexts('ce-tags'),
       taboos: []
@@ -3997,7 +4258,7 @@ var App = {
       var c = Store.character(this._charEditorId);
       if (c) { Object.keys(data).forEach(function(k) { if (data[k] !== undefined) c[k] = data[k]; }); }
     } else {
-      Store.addCharacter(Object.assign(data, { relation:'未知', present:true, lastSummary:'', memories:[] }));
+      Store.addCharacter(Object.assign(data, { relation:'未知', present:true, lastSummary:'', memories:[], isUserCreated: true, isAutoCreated: false }));
     }
     Store.save();
     this.updateAvatarDisplay('ce', name, this._ceAvatarData);
@@ -4291,41 +4552,61 @@ var App = {
       el.dataset.msgId = msg.id;
 
       if (msg.type === 'narrative') {
-        el.innerHTML = '<div class="msg-content">' + App.formatContent(msg.content) + '</div>';
+        el.className = 'msg msg-narrator-wrapper';
+        el.innerHTML = '<div class="msg-narrator-box">' + App.formatContent(msg.content) + '</div>';
       } else if (msg.type === 'npc') {
         var ch = Store.character(msg.characterId);
         var isCharacter = ch && !ch.isNPC;
-        var rowCls = isCharacter ? 'msg-character-row' : 'msg-npc-row';
-        var colCls = isCharacter ? 'msg-character-col' : 'msg-npc-col';
-        var bubbleCls = isCharacter ? 'msg-character-bubble' : 'msg-npc-bubble';
-        var avCls = isCharacter ? 'msg-character-avatar' : 'msg-npc-avatar';
-        el.className = 'msg ' + rowCls;
-        var avBg = self.getAvatarColor(msg.characterName||'?');
-        var first = (msg.characterName||'?').charAt(0);
-        var avHTML = '<div class="' + avCls + '" style="background:' + avBg + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><span class="msg-avatar-text">' + App.escapeHtml(first) + '</span></div>';
         var parsed = App.parseContent(msg.content);
-        var colHTML = '';
-        parsed.actions.forEach(function(a) {
-          colHTML += '<div class="msg-action-line">' + App.escapeHtml(a) + '</div>';
-        });
-        if (parsed.dialogue.length > 0) {
-          colHTML += '<div class="' + bubbleCls + '"><div class="msg-content">' + App.formatContent(parsed.dialogue.join('\n')) + '</div></div>';
-        }
-        if (ann && ann.npc && ann.npc[msg.characterName]) {
-          colHTML += '<div class="msg-telemetry">';
-          ann.npc[msg.characterName].forEach(function(a) {
-            colHTML += '<span class="msg-tag aff">' + App.escapeHtml(a.text) + '</span>';
+        // NPC without dialogue → render as narrator
+        if (parsed.dialogue.length === 0) {
+          el.className = 'msg msg-narrator-wrapper';
+          var narrContent = parsed.actions.length > 0 ? parsed.actions.join('\n') : msg.content;
+          el.innerHTML = '<div class="msg-narrator-box">' + App.formatContent(narrContent) + '</div>';
+        } else {
+          var rowCls = isCharacter ? 'msg-character-row' : 'msg-npc-row';
+          var colCls = isCharacter ? 'msg-character-col' : 'msg-npc-col';
+          var bubbleCls = isCharacter ? 'msg-character-bubble' : 'msg-npc-bubble';
+          var avCls = isCharacter ? 'msg-character-avatar' : 'msg-npc-avatar';
+          el.className = 'msg ' + rowCls;
+          var npcType = ch ? ch.npcType : null;
+          var avBg = self.getAvatarColor(msg.characterName||'?', isCharacter ? null : npcType);
+          var first = (msg.characterName||'?').charAt(0);
+          // Character avatar: use custom upload if available
+          var avHTML;
+          if (isCharacter && ch && ch.avatar) {
+            avHTML = '<div class="' + avCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="' + ch.avatar + '"></div>';
+          } else {
+            avHTML = '<div class="' + avCls + '" style="background:' + avBg + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><span class="msg-avatar-text">' + App.escapeHtml(first) + '</span></div>';
+          }
+          var colHTML = '';
+          parsed.actions.forEach(function(a) {
+            colHTML += '<div class="msg-action-line">' + App.escapeHtml(a) + '</div>';
           });
-          colHTML += '</div>';
+          colHTML += '<div class="' + bubbleCls + '"><div class="msg-content">' + App.formatContent(parsed.dialogue.join('\n')) + '</div></div>';
+          if (ann && ann.npc && ann.npc[msg.characterName]) {
+            colHTML += '<div class="msg-telemetry">';
+            ann.npc[msg.characterName].forEach(function(a) {
+              colHTML += '<span class="msg-tag aff">' + App.escapeHtml(a.text) + '</span>';
+            });
+            colHTML += '</div>';
+          }
+          el.innerHTML = avHTML + '<div class="' + colCls + '">' + colHTML + '</div>';
         }
-        el.innerHTML = avHTML + '<div class="' + colCls + '">' + colHTML + '</div>';
       } else if (msg.type === 'player') {
         el.className = 'msg msg-user-row';
         var mask = Store.activeMask() || {};
-        var pName = mask.name || Store.player().name || 'V';
+        var player = Store.player();
+        var pName = mask.name || player.name || 'V';
+        var pAvatar = mask.avatar || player.avatar || null;
         var pBg = self.getAvatarColor(pName);
         var pFirst = pName.charAt(0);
-        var avHTML = '<div class="msg-user-avatar" style="background:' + pBg + '" onclick="App.openUserPanel()"><span class="msg-avatar-text">' + App.escapeHtml(pFirst) + '</span></div>';
+        var avHTML;
+        if (pAvatar) {
+          avHTML = '<div class="msg-user-avatar" onclick="App.openUserPanel()"><img src="' + pAvatar + '"></div>';
+        } else {
+          avHTML = '<div class="msg-user-avatar" style="background:' + pBg + '" onclick="App.openUserPanel()"><span class="msg-avatar-text">' + App.escapeHtml(pFirst) + '</span></div>';
+        }
         var parsed = App.parseContent(msg.content);
         var colHTML = '';
         parsed.actions.forEach(function(a) {
@@ -4758,9 +5039,10 @@ var App = {
       if (p.suspicious) badges += '<span class="f-badge f-badge-suspect">⚠ 存疑</span>';
       if (p.price > 0) badges += '<span class="f-badge f-badge-cost">' + p.price + ' 积分</span>';
       if (!p.price && p.price === 0) badges += '<span class="f-badge" style="color:var(--text-3);background:rgba(255,255,255,.02)">免费</span>';
+      var replyCount = (p.replies && p.replies.length) ? p.replies.length : 0;
       var title = (p.locked ? '[遗言] ' : '') + App.escapeHtml(p.title);
       return '<div class="forum-post">' +
-        '<div class="forum-post-title">' + title + '</div>' +
+        '<div class="forum-post-title">' + title + (replyCount > 0 ? ' <span style="font-size:10px;color:var(--text-3);font-weight:400">' + replyCount + '条评论</span>' : '') + '</div>' +
         '<div class="forum-post-meta">ID:' + App.escapeHtml(p.authorId || '????') + ' · ' + (p.createdAt ? App._relativeTime(p.createdAt) : '') + ' · 浏览:' + (p.views||0) + '</div>' +
         (badges ? '<div class="forum-post-badges">' + badges + '</div>' : '') +
       '</div>';
@@ -4805,16 +5087,14 @@ var App = {
     // Action row
     var alreadyReported = post._reportedBy && post._reportedBy.indexOf(myId) >= 0;
     body.innerHTML += '<div style="display:flex;gap:8px;margin-top:10px">' +
-      (!post.locked ? '<button style="font-size:8px;color:#555;padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.04);cursor:pointer" id="forum-reply-toggle-btn">回复</button>' : '') +
       (!isMine ? '<button style="font-size:8px;color:#555;padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.04);cursor:pointer" id="forum-report-btn">' + (alreadyReported ? '已举报' : '举报') + '</button>' : '') +
       '</div>';
-    // Reply input
-    if (!post.locked) {
-      body.innerHTML += '<div id="forum-reply-area" style="display:none;margin-top:8px">' +
-        '<textarea id="forum-reply-text" style="width:100%;padding:8px 10px;border-radius:6px;background:rgba(255,255,255,0.04);color:var(--text);font-size:11px;border:0.5px solid var(--divider);resize:none;font-family:var(--font-ui);margin-bottom:6px" rows="2" placeholder="输入回复…" maxlength="500"></textarea>' +
+    // Reply input — visible for non-locked posts where user can see content
+    if (!post.locked && showContent) {
+      body.innerHTML += '<div id="forum-reply-area" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--divider)">' +
+        '<textarea id="forum-reply-text" style="width:100%;padding:8px 10px;border-radius:6px;background:rgba(255,255,255,0.04);color:var(--text);font-size:12px;border:0.5px solid var(--divider);resize:none;font-family:var(--font-ui);margin-bottom:6px;line-height:1.5" rows="2" placeholder="写下你的回复…" maxlength="500"></textarea>' +
         '<div style="display:flex;gap:6px;justify-content:flex-end">' +
-        '<button style="font-size:9px;padding:4px 10px;border-radius:4px;color:var(--text-2);background:var(--surface);cursor:pointer" id="forum-reply-cancel">取消</button>' +
-        '<button style="font-size:9px;padding:4px 10px;border-radius:4px;color:var(--bg);background:var(--text);cursor:pointer" id="forum-reply-send">发送</button>' +
+        '<button style="font-size:10px;padding:5px 12px;border-radius:5px;color:var(--bg);background:var(--text);cursor:pointer;font-weight:500" id="forum-reply-send">发送</button>' +
         '</div></div>';
     }
 
@@ -4831,7 +5111,6 @@ var App = {
       if (!post._paidBy) post._paidBy = [];
       post._paidBy.push(myId);
       Store.save();
-      // Re-render just the content area without re-fetching AI
       var bodyEl = document.getElementById('forum-post-body');
       var buyBtn2 = document.getElementById('forum-buy-btn');
       if (bodyEl && buyBtn2) {
@@ -4855,45 +5134,60 @@ var App = {
       self._openForumPost(post);
     });
 
-    // Reply toggle
-    var replyToggle = document.getElementById('forum-reply-toggle-btn');
-    if (replyToggle) replyToggle.addEventListener('click', function() {
-      var area = document.getElementById('forum-reply-area');
-      if (area) area.style.display = area.style.display === 'none' ? '' : 'none';
-    });
-    // Reply cancel
-    var replyCancel = document.getElementById('forum-reply-cancel');
-    if (replyCancel) replyCancel.addEventListener('click', function() {
-      document.getElementById('forum-reply-area').style.display = 'none';
-    });
-    // Reply send
+    // Reply send handler
     var replySend = document.getElementById('forum-reply-send');
-    if (replySend) replySend.addEventListener('click', function() {
+    if (replySend) replySend.addEventListener('click', async function() {
       var text = (document.getElementById('forum-reply-text') || {}).value || '';
       if (!text.trim()) return;
+      // Disable send button while processing
+      replySend.disabled = true; replySend.style.opacity = '0.5';
       if (!post.replies) post.replies = [];
-      post.replies.push({ author: 'VOID-' + myId, content: text.trim(), time: '刚刚' });
+      post.replies.push({ author: 'VOID-' + myId, content: text.trim(), time: Date.now() });
       Store.save();
-      document.getElementById('forum-reply-area').style.display = 'none';
-      self._openForumPost(post);
+      // Re-render reply list immediately
+      self._renderPostReplies(body, post);
+      document.getElementById('forum-reply-text').value = '';
+      // Trigger AI follow-up comments
+      if (!post.locked) {
+        var aiReplies = await AI.generateForumReplies(post, true);
+        if (aiReplies && aiReplies.length > 0) {
+          post.replies = post.replies.concat(aiReplies);
+          Store.save();
+          self._renderPostReplies(body, post);
+        }
+      }
+      replySend.disabled = false; replySend.style.opacity = '';
     });
 
-    // Replies
-    body.innerHTML += '<div style="text-align:center;color:var(--text-3);padding:20px 0;font-size:12px" id="forum-reply-loading">加载中…</div>';
-    var replies = post.replies && post.replies.length > 0 ? post.replies : null;
-    if (!replies && !post.locked) {
-      var result = await AI.generateForumReplies(post);
-      if (result) { post.replies = result; replies = result; Store.save(); }
+    // Load/display replies
+    body.innerHTML += '<div id="forum-replies-container"></div>';
+    var existingReplies = post.replies && post.replies.length > 0;
+    if (!existingReplies && !post.locked && showContent) {
+      body.querySelector('#forum-replies-container').innerHTML = '<div style="text-align:center;color:var(--text-3);padding:16px 0;font-size:12px">加载中…</div>';
+      var result = await AI.generateForumReplies(post, false);
+      if (result) { post.replies = result; Store.save(); }
     }
-    var loadEl = document.getElementById('forum-reply-loading');
-    if (loadEl) loadEl.remove();
-    if (replies && replies.length > 0) {
-      body.innerHTML += '<div style="font-size:10px;color:var(--text-3);font-family:var(--font-mono);margin-bottom:8px;padding-top:12px;border-top:1px solid var(--divider)">' + replies.length + ' 条回复</div>' +
-        replies.map(function(r) {
-          return '<div class="mem-entry"><div class="mem-entry-text">' + App.escapeHtml(r.content) + '</div>' +
-            '<div class="mem-entry-meta">' + App.escapeHtml(r.author) + ' · ' + (r.time || '') + '</div></div>';
-        }).join('');
+    var loadEl = body.querySelector('#forum-replies-container > div:only-child');
+    if (loadEl && loadEl.textContent === '加载中…') loadEl.remove();
+    self._renderPostReplies(body, post);
+  },
+
+  _renderPostReplies: function(body, post) {
+    var container = body.querySelector('#forum-replies-container');
+    if (!container) return;
+    var replies = post.replies || [];
+    if (replies.length === 0) {
+      container.innerHTML = '<div style="font-size:11px;color:var(--text-3);text-align:center;padding:16px 0;border-top:1px solid var(--divider);margin-top:10px">暂无回复</div>';
+      return;
     }
+    // Sort by time ascending
+    var sorted = replies.slice().sort(function(a, b) { return (a.time || 0) - (b.time || 0); });
+    container.innerHTML = '<div style="font-size:10px;color:var(--text-3);font-family:var(--font-mono);margin-bottom:8px;padding-top:12px;border-top:1px solid var(--divider)">' + sorted.length + ' 条回复</div>' +
+      sorted.map(function(r) {
+        var relTime = typeof r.time === 'number' ? App._relativeTime(r.time) : (r.time || '');
+        return '<div class="mem-entry" style="margin-bottom:6px"><div class="mem-entry-text" style="font-size:11px;line-height:1.5">' + App.escapeHtml(r.content) + '</div>' +
+          '<div class="mem-entry-meta">' + App.escapeHtml(r.author) + ' · ' + relTime + '</div></div>';
+      }).join('');
   },
 
   _checkDeduction: function() {
@@ -5108,7 +5402,7 @@ var App = {
   renderContacts: function() {
     var container = document.getElementById('term-contacts-list');
     if (!container) return;
-    var chars = Store.characters().filter(function(c) { return !c.isNPC && c.contactEstablished !== false; });
+    var chars = Store.characters().filter(function(c) { return !c.isNPC && !c.isArchived && c.contactEstablished !== false; });
     if (chars.length === 0) {
       container.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 16px;font-size:12px;line-height:1.8">暂无联系人<br><span style="font-size:10px">在副本中遇到其他角色后可请求添加通讯</span></div>';
       return;
@@ -5116,7 +5410,7 @@ var App = {
     var self = this;
     container.innerHTML = chars.map(function(c) {
       var first = c.name ? c.name.charAt(0) : '?';
-      var avBg = self.getAvatarColor(c.name);
+      var avBg = self.getAvatarColor(c.name, c.isNPC ? c.npcType : null);
       var chats = Store._db.privateChats || {};
       var hasUnread = chats[c.id] && chats[c.id].hasUnread;
       var online = c.present;
@@ -5193,14 +5487,22 @@ var App = {
     var msgs = (chats[this._pcCharId] && chats[this._pcCharId].messages) ? chats[this._pcCharId].messages : [];
     var c = Store.character(this._pcCharId);
     var cName = c ? (c.name||'角色') : '角色';
+    var isNPC = c ? c.isNPC : false;
+    var npcType = c ? c.npcType : null;
     var self = this;
     container.innerHTML = msgs.map(function(m) {
       if (m.role === 'user') {
-        return '<div style="display:flex;justify-content:flex-end"><div style="background:var(--bubble-user);border:1px solid rgba(255,255,255,0.08);border-radius:12px 12px 3px 12px;padding:6px 10px;max-width:75%;font-size:11px;color:var(--bubble-user-text)">' + App.escapeHtml(m.content) + '</div></div>';
+        return '<div style="display:flex;justify-content:flex-end"><div style="background:var(--bubble-user);border:1px solid rgba(255,255,255,0.08);border-radius:12px 12px 3px 12px;padding:8px 12px;max-width:75%;font-size:12px;line-height:1.5;color:var(--bubble-user-text)">' + App.escapeHtml(m.content) + '</div></div>';
       } else {
         var first = cName.charAt(0);
-        var bg = self.getAvatarColor(cName);
-        return '<div style="display:flex;align-items:flex-start;gap:6px"><div style="width:22px;height:22px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-family:var(--font-serif);font-size:10px;color:#EAEAEA">' + App.escapeHtml(first) + '</span></div><div style="background:var(--bubble-npc);border:1px solid rgba(255,255,255,0.1);border-radius:12px 12px 12px 3px;padding:6px 10px;max-width:75%;font-size:11px;color:var(--bubble-npc-text)">' + App.escapeHtml(m.content) + '</div></div>';
+        var bg = self.getAvatarColor(cName, isNPC ? npcType : null);
+        var avHTML;
+        if (!isNPC && c && c.avatar) {
+          avHTML = '<img src="' + c.avatar + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%) brightness(.9)">';
+        } else {
+          avHTML = '<span style="font-family:var(--font-serif);font-size:10px;color:#EAEAEA">' + App.escapeHtml(first) + '</span>';
+        }
+        return '<div style="display:flex;align-items:flex-start;gap:8px"><div style="width:24px;height:24px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">' + avHTML + '</div><div style="background:var(--bubble-npc);border:1px solid rgba(255,255,255,0.12);border-radius:12px 12px 12px 3px;padding:8px 12px;max-width:75%;font-size:12px;line-height:1.55;color:var(--bubble-npc-text)">' + App.escapeHtml(m.content) + '</div></div>';
       }
     }).join('');
     container.scrollTop = container.scrollHeight;
@@ -6581,11 +6883,11 @@ var App = {
     var mems = (c.simpleMemories || []).slice(-3);
     var copy = Store._db.currentCopy;
     var first = (c.name||'?').charAt(0);
-    var avBg = this.getAvatarColor(c.name||'?');
+    var avBg = this.getAvatarColor(c.name||'?', npcType);
 
     var html =
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
-        '<div class="msg-user-avatar" style="background:' + avBg + ';width:36px;height:36px"><span class="msg-avatar-text" style="font-size:14px">' + App.escapeHtml(first) + '</span></div>' +
+        '<div class="msg-npc-avatar" style="background:' + avBg + ';width:36px;height:36px"><span class="msg-avatar-text" style="font-size:14px">' + App.escapeHtml(first) + '</span></div>' +
         '<div><div style="font-size:14px;color:#EAEAEA">' + App.escapeHtml(c.name) + '</div>' +
         '<div style="font-size:10px;color:' + (npcTypeColors[npcType]||'#555') + '">' + (npcTypeLabels[npcType]||'NPC') + '</div></div>' +
       '</div>' +
@@ -6636,9 +6938,16 @@ var App = {
     var avBg = this.getAvatarColor(c.name||'?');
     var copy = Store._db.currentCopy;
 
+    var avHTML;
+    if (c.avatar) {
+      avHTML = '<div class="msg-character-avatar" style="width:36px;height:36px"><img src="' + c.avatar + '"></div>';
+    } else {
+      avHTML = '<div class="msg-character-avatar" style="background:' + avBg + ';width:36px;height:36px"><span class="msg-avatar-text" style="font-size:14px">' + App.escapeHtml(first) + '</span></div>';
+    }
+
     var html =
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
-        '<div class="msg-character-avatar" style="background:' + avBg + ';width:36px;height:36px"><span class="msg-avatar-text" style="font-size:14px">' + App.escapeHtml(first) + '</span></div>' +
+        avHTML +
         '<div><div style="font-size:14px;color:#EAEAEA">' + App.escapeHtml(c.name) + '</div>' +
         '<div style="font-size:10px;color:#555">ID:' + App.escapeHtml(c.voidId||'????') + ' · ' + App.escapeHtml(c.identity||'死者') + '</div></div>' +
       '</div>' +
@@ -6866,7 +7175,7 @@ var App = {
     var self = this;
     listEl.innerHTML = presentChars.map(function(c) {
       var first = c.name ? c.name.charAt(0) : '?';
-      var bg = self.getAvatarColor(c.name);
+      var bg = self.getAvatarColor(c.name, c.isNPC ? c.npcType : null);
       return '<div class="char-list-card" style="cursor:pointer" onclick="App._doGift(\'' + c.id + '\')">' +
         '<div class="char-list-avatar" style="background:' + bg + '"><span class="char-list-avatar-text">' + App.escapeHtml(first) + '</span></div>' +
         '<div class="char-list-info"><div class="char-list-name">' + App.escapeHtml(c.name) + '</div>' +
@@ -6982,7 +7291,7 @@ var App = {
           Store.player().points = (Store.player().points || 0) + p.price;
           // Auto comment from buyer
           if (!p.replies) p.replies = [];
-          p.replies.push({ author:'VOID-' + buyerId, content: this._randomBuyerComment(p.board), time: '刚刚' });
+          p.replies.push({ author:'VOID-' + buyerId, content: this._randomBuyerComment(p.board), time: Date.now() });
         }
         p._aiPurchaseDone = true;
         Store.addForumMemory('付费帖被' + buyCount + '人购买，收入' + (p.price * buyCount) + '积分');
@@ -7005,7 +7314,7 @@ var App = {
       var commentCount = 1 + Math.floor(Math.random() * 3);
       if (!p.replies) p.replies = [];
       for (var rc = 0; rc < commentCount; rc++) {
-        p.replies.push({ author:'VOID-' + this._randomVoidId(), content: this._randomForumComment(p.board), time: '刚刚' });
+        p.replies.push({ author:'VOID-' + this._randomVoidId(), content: this._randomForumComment(p.board), time: Date.now() });
       }
       p._aiCommentsDone = true;
       Store.addForumMemory('帖子收到' + commentCount + '条AI评论');

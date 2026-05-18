@@ -58,6 +58,9 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 }
 .toast{font-family:var(--font-mono);font-size:8px;color:var(--text-2);text-align:center;padding:8px 0;opacity:0;transition:opacity .3s}
 .toast.show{opacity:1}
+.val-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:9999;font-family:var(--font-mono);font-size:13px;color:var(--text);padding:10px 20px;border-radius:8px;background:var(--surface);border:1px solid var(--border);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;letter-spacing:.04em;backdrop-filter:blur(6px)}
+.val-toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+.val-toast.pts{color:#D4A574}.val-toast.sp{color:#7E9EC2}
 .page.active{display:flex}
 
 /* ============================================================
@@ -1951,17 +1954,7 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
       <span class="center-modal-title">API 配置</span>
       <button class="modal-close-btn" onclick="App.closeModal('modal-api')">×</button>
     </div>
-    <div class="forum-tabs" id="api-tab-strip" style="margin-bottom:16px">
-      <button class="forum-tab active" data-api-tab="main">主对话</button>
-      <button class="forum-tab" data-api-tab="memory">记忆总结</button>
-      <button class="forum-tab" data-api-tab="state">状态判定</button>
-    </div>
-    <div id="api-use-main-row" style="display:none;margin-bottom:14px">
-      <div class="toggle-row">
-        <span class="toggle-label">使用主 API 配置</span>
-        <label class="toggle"><input type="checkbox" id="api-use-main-toggle"><span class="toggle-slider"></span></label>
-      </div>
-    </div>
+<!-- 单 API 配置，无需 tab 切换 -->
     <div id="api-fields">
       <div class="form-group">
         <label class="form-label">接口 URL</label>
@@ -2326,7 +2319,6 @@ var Store = {
         player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: 1842, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false, position: { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn', copyId: null } },
         currentCopy: { name: '404号公寓', type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: '一楼走廊', completionStatus:'active', terminalInterference:'轻度', mapRegions: JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS)) },
         inventory: [],
-        skills: [],
         messages: [
           { id:'m0', type:'system', content:'终端已连接', timestamp: Date.now(), meta: {} },
           { id:'m1', type:'narrative', content:'你在一张冰凉的金属床上醒来。后颈隐隐作痛，像被什么东西咬过。天花板是一片均匀的灰白色，没有灯，但整个房间都在发光。', timestamp: Date.now()+1, meta: {} },
@@ -2340,7 +2332,7 @@ var Store = {
         characters: JSON.parse(JSON.stringify(DEMO.characters)),
         memories: { global: [], npc: {}, copy: {}, character: {}, forum: [] },
         forumPosts: { intel:[], party:[], trade:[], will:[], chat:[] },
-        settings: { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' },
+        settings: { api: { key: '', url: '', model: 'gpt-4o-mini' }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' },
         config: { activePresetId: 'default', activePlotIdx: 0 },
         worldPresets: [JSON.parse(JSON.stringify(DEFAULT_WORLD_PRESET))],
         plots: [{ id: 'p1', globalId: 'default', name: '404号公寓', createdAt: Date.now(), updatedAt: Date.now() }],
@@ -2418,10 +2410,8 @@ var Store = {
     }
     if (!this._db.forumPosts || !this._db.forumPosts.intel) this._db.forumPosts = { intel:[], party:[], trade:[], will:[], chat:[] };
     if (this._db.terminalMessages) { this._db.forumPosts = this._db.terminalMessages; delete this._db.terminalMessages; }
-    if (!this._db.settings) this._db.settings = { api: { key: '', url: '', model: 'gpt-4o-mini' }, memoryApi: { key: '', url: '', model: '', useMain: true }, stateApi: { key: '', url: '', model: '', useMain: true }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' };
+    if (!this._db.settings) this._db.settings = { api: { key: '', url: '', model: 'gpt-4o-mini' }, theme: 'dark', fontSize: 'medium', termNickname: '', termCommPerm: 'all' };
     if (!this._db.settings.termCommPerm) this._db.settings.termCommPerm = 'all';
-    if (!this._db.settings.memoryApi) this._db.settings.memoryApi = { key: '', url: '', model: '', useMain: true };
-    if (!this._db.settings.stateApi) this._db.settings.stateApi = { key: '', url: '', model: '', useMain: true };
     if (!this._db.player.attributes) this._db.player.attributes = { strength:1, agility:1, insight:1, calm:1 };
     if (!this._db.player.voidId) this._db.player.voidId = (1000 + Math.floor(Math.random() * 9000)).toString();
     if (this._db.player.killCount === undefined) this._db.player.killCount = 0;
@@ -2511,7 +2501,6 @@ var Store = {
     return c ? (c.memories || []) : [];
   },
   inventory: function() { return this._db.inventory; },
-  skills: function() { return this._db.skills; },
   globalMemories: function() {
     return this._db.memories.global || [];
   },
@@ -2601,9 +2590,6 @@ var Store = {
     this._db.inventory.push(item); this.save(); return item;
   },
   removeItem: function(id) { this._db.inventory = this._db.inventory.filter(function(i) { return i.id !== id; }); this.save(); },
-  addSkill: function(skill) {
-    skill.id = 's' + Date.now(); this._db.skills.push(skill); this.save(); return skill;
-  },
   exportJSON: function() { return JSON.stringify(this._db, null, 2); },
   exportFile: function() {
     var blob = new Blob([this.exportJSON()], { type: 'application/json' });
@@ -2695,20 +2681,8 @@ var Store = {
     this.save();
   },
 
-  // API config accessors
+  // API config accessor
   apiCfg: function() { var s = this._db.settings; return s ? s.api : { key:'', url:'', model:'gpt-4o-mini' }; },
-  memCfg: function() {
-    var s = this._db.settings;
-    if (!s || !s.memoryApi) return { key:'', url:'', model:'', useMain:true };
-    var m = s.memoryApi;
-    return m.useMain ? Object.assign({}, s.api, { useMain:true }) : m;
-  },
-  stateCfg: function() {
-    var s = this._db.settings;
-    if (!s || !s.stateApi) return { key:'', url:'', model:'', useMain:true };
-    var st = s.stateApi;
-    return st.useMain ? Object.assign({}, s.api, { useMain:true }) : st;
-  },
 
   // World presets
   getActivePreset: function() {
@@ -3030,7 +3004,7 @@ function buildSystemPrompt() {
   presetText += '### 特殊遭遇\n';
   presetText += '被同化的认识角色：AI描述残存的熟悉特征。对用户理智值打击远高于普通怪物（-15到-25）。但被同化者可能在被击杀前说出关键情报或遗言。精英怪物"清醒者"：极少数保留完整意识，知道自己曾是角色、知道VOID本质、选择变成怪物而非继续轮回——遇到是重大事件，可能获得深层情报，也可能极其危险。\n\n';
   presetText += '### AI权限\n';
-  presetText += 'AI可以：在叙事中引入怪物遭遇、根据区域和副本生成怪物类型、描述怪物外观/行为/攻击方式、判定战斗结果和掉落、让怪物守护重要地点或线索。AI不可以：随意生成精英怪物（需符合区域威胁等级）、让清道夫无故攻击正常推进剧情角色、让怪物行为与VOID世界观矛盾。引入怪物时使用[MONSTER 类型:名称]标记告知系统。\n';
+  presetText += 'AI可以：在叙事中引入怪物遭遇、根据区域和副本生成怪物类型、描述怪物外观/行为/攻击方式、判定战斗结果和掉落、让怪物守护重要地点或线索。AI不可以：随意生成精英怪物（需符合区域威胁等级）、让清道夫无故攻击正常推进剧情角色、让怪物行为与VOID世界观矛盾。引入怪物时使用[MONSTER 类型:名称]标记告知系统（仅标记遭遇，不计数）。怪物被确认击杀时使用[MONSTER_KILL 类型:名称]标记（计数+1）。\n';
   presetText += '\n### 怪物数值\n怪物与角色使用同一套属性系统（力量/敏捷/感知/意志，范围1-10）。\n';
   presetText += '游荡者（普通）：力量1-3 敏捷1-2 感知1 意志1。最弱，生前低级角色。\n';
   presetText += '游荡者（危险）：力量3-5 敏捷2-4 感知2 意志2。生前可能是中高级角色。\n';
@@ -3168,7 +3142,7 @@ function buildSystemPrompt() {
   topHeader += '第五级（最低）：论坛AI发帖 > 后台角色行动模拟 > AI模拟购买\n';
   topHeader += '  论坛生成和购买模拟为背景系统，不直接影响主线叙事。后台角色行动仅在重逢时自然体现变化。\n\n';
 
-  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。荒原初始点→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、荒原→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + compressReq;
+  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。荒原初始点→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、荒原→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + compressReq;
 }
 
 // ============================================================
@@ -3294,6 +3268,8 @@ var AI = {
     var cmds = [];
     var pats = [
       { re: /\[SAN ([+\-]\d+)\]/g, cmd: 'san' },
+      { re: /\[POINTS ([+\-]\d+)\]/g, cmd: 'points' },
+      { re: /\[SURVIVAL ([+\-]\d+)\]/g, cmd: 'survival' },
       { re: /\[AFFECTION (.+?) ([+\-]\d+)\]/g, cmd: 'affection' },
       { re: /\[ITEM \+([^\]]+)\]/g, cmd: 'item_add' },
       { re: /\[ITEM \-([^\]]+)\]/g, cmd: 'item_remove' },
@@ -3306,6 +3282,7 @@ var AI = {
       { re: /\[FORUM_POST (\S+):([^\]]+)\]/g, cmd: 'forum_post' },
       { re: /\[MAP_NODE ([^\]:]+):([^\]:]+):([^\]:]+):([^\]]+)\]/g, cmd: 'map_node' },
       { re: /\[MONSTER (\S+):([^\]]+)\]/g, cmd: 'monster' },
+      { re: /\[MONSTER_KILL ([^\]:]+):([^\]]+)\]/g, cmd: 'monster_kill' },
       { re: /\[TIDE_START\]/g, cmd: 'tide_start' },
       { re: /\[TIDE_END\]/g, cmd: 'tide_end' },
       { re: /\[STORM_START\]/g, cmd: 'storm_start' },
@@ -3331,6 +3308,18 @@ var AI = {
     cmds.forEach(function(item) {
       switch (item.cmd) {
         case 'san': p.san = Math.max(0, Math.min(p.maxSan, p.san + parseInt(item.args[0]))); break;
+        case 'points': {
+          var delta = parseInt(item.args[0]);
+          p.points = Math.max(0, (p.points || 0) + delta);
+          App._showValueToast((delta >= 0 ? '+' : '') + delta + ' 积分', 'pts');
+          break;
+        }
+        case 'survival': {
+          var svDelta = parseInt(item.args[0]);
+          p.survivalPoints = Math.max(0, (p.survivalPoints || 0) + svDelta);
+          App._showValueToast((svDelta >= 0 ? '+' : '') + svDelta + ' 生存点', 'sp');
+          break;
+        }
         case 'affection': {
           var c = Store.characters().find(function(ch) { return ch.name === item.args[0].trim(); });
           if (c) {
@@ -3470,13 +3459,14 @@ var AI = {
           break;
         }
         case 'monster': {
-          // Monster encounter tracking
+          App._startCombat(item.args[1].trim(), item.args[0].trim());
+          break;
+        }
+        case 'monster_kill': {
           var p2 = Store.player();
           if (!p2.monsterKills) p2.monsterKills = {};
-          var mType = item.args[0].trim();
-          var mName = item.args[1].trim();
-          p2.monsterKills[mType] = (p2.monsterKills[mType] || 0) + 1;
-          App._startCombat(mName, mType);
+          var kType = item.args[0].trim();
+          p2.monsterKills[kType] = (p2.monsterKills[kType] || 0) + 1;
           break;
         }
         case 'tide_start': Store._db.currentCopy.tideActive = true; break;
@@ -3592,11 +3582,11 @@ var AI = {
     try {
     // Strip marker lines
     var clean = text
-      .replace(/^\[SAN [+\-]\d+\]\s*$/gm, '').replace(/^\[AFFECTION .+? [+\-]\d+\]\s*$/gm, '')
+      .replace(/^\[SAN [+\-]\d+\]\s*$/gm, '').replace(/^\[POINTS [+\-]\d+\]\s*$/gm, '').replace(/^\[SURVIVAL [+\-]\d+\]\s*$/gm, '').replace(/^\[AFFECTION .+? [+\-]\d+\]\s*$/gm, '')
       .replace(/^\[ITEM \+[^\]]+\]\s*$/gm, '').replace(/^\[ITEM \-[^\]]+\]\s*$/gm, '')
       .replace(/^\[QUEST [^\]]+\]\s*$/gm, '').replace(/^\[QUEST_DONE [^\]]+\]\s*$/gm, '')
       .replace(/^\[SCENE [^\]]+\]\s*$/gm, '').replace(/^\[LEAVE [^\]]+\]\s*$/gm, '')
-      .replace(/^\[CHAR_JOIN [^\]]+\]\s*$/gm, '').replace(/^\[FORUM_POST [^\]]+\]\s*$/gm, '').replace(/^\[MAP_NODE [^\]]+\]\s*$/gm, '').replace(/^\[MONSTER [^\]]+\]\s*$/gm, '').replace(/^\[TIDE_(START|END)\]\s*$/gm, '').replace(/^\[STORM_(START|END)\]\s*$/gm, '').replace(/^\[TIME \+\d+[mhd]\]\s*$/gm, '').replace(/^\[MSG [^\]]+\]\s*$/gm, '').replace(/^\[CONTACT_REQ [^\]]+\]\s*$/gm, '').replace(/^\[CHAR_UPDATE [^\]]+\]\s*$/gm, '').replace(/^\[MEMORY .+?\]\s*$/gm, '').replace(/^\[MEMORY_COMPRESS[\s\S]*?\/MEMORY_COMPRESS\]\s*$/gm, '').replace(/^\[COPY_END\]\s*$/gm, '')
+      .replace(/^\[CHAR_JOIN [^\]]+\]\s*$/gm, '').replace(/^\[FORUM_POST [^\]]+\]\s*$/gm, '').replace(/^\[MAP_NODE [^\]]+\]\s*$/gm, '').replace(/^\[MONSTER [^\]]+\]\s*$/gm, '').replace(/^\[MONSTER_KILL [^\]]+\]\s*$/gm, '').replace(/^\[TIDE_(START|END)\]\s*$/gm, '').replace(/^\[STORM_(START|END)\]\s*$/gm, '').replace(/^\[TIME \+\d+[mhd]\]\s*$/gm, '').replace(/^\[MSG [^\]]+\]\s*$/gm, '').replace(/^\[CONTACT_REQ [^\]]+\]\s*$/gm, '').replace(/^\[CHAR_UPDATE [^\]]+\]\s*$/gm, '').replace(/^\[MEMORY .+?\]\s*$/gm, '').replace(/^\[MEMORY_COMPRESS[\s\S]*?\/MEMORY_COMPRESS\]\s*$/gm, '').replace(/^\[COPY_END\]\s*$/gm, '')
       .replace(/\n{3,}/g, '\n\n').trim();
 
     // Parse by lines: detect "角色名\n  对话" pattern
@@ -5229,10 +5219,72 @@ var App = {
     Store.save(); this._renderPrivateChat();
 
     // Build AI prompt for private chat
-    var sysPrompt = '你是 ' + (c.name||'角色') + '，VOID中的轮回者。' + (c.persona||'') + '\n';
-    sysPrompt += '这是与用户 VOID-' + (Store.player().voidId||'0000') + ' 的私人终端通讯。';
-    sysPrompt += '用该角色的语气和风格回复。简短自然，像即时通讯。不要旁白，不要标记，纯对话。';
-    sysPrompt += '用户好感度：' + (c.affection||0) + '。根据好感度调整语气。\n';
+    var player = Store.player();
+    var copy = Store._db.currentCopy || {};
+
+    var sysPrompt = '你是 ' + (c.name||'角色') + '，VOID中的轮回者。\n';
+    sysPrompt += '\n## 角色设定\n';
+    if (c.gender) sysPrompt += '性别：' + c.gender + '\n';
+    sysPrompt += '关系：' + (c.relation||'未知') + '\n';
+    sysPrompt += '好感度：' + (c.affection||0) + '/100（根据好感度调整语气）\n';
+    if (c.persona) sysPrompt += '性格：' + c.persona + '\n';
+    if (c.appearance) sysPrompt += '外貌：' + c.appearance + '\n';
+    if (c.tags && c.tags.length) sysPrompt += '标签：' + c.tags.join('、') + '\n';
+    if (c.lastSummary) sysPrompt += '最近互动摘要：' + c.lastSummary + '\n';
+    if (c.survivalDays !== undefined) sysPrompt += '已存活：' + c.survivalDays + '天\n';
+
+    // Memories
+    var memLines = [];
+    // Direct character memories
+    if (c.memories && c.memories.length) {
+      c.memories.slice(-5).forEach(function(m) {
+        memLines.push((m.text||m.summary||'').slice(0, 80));
+      });
+    }
+    // simpleMemories (for NPCs)
+    if (c.simpleMemories && c.simpleMemories.length) {
+      c.simpleMemories.slice(-5).forEach(function(m) {
+        memLines.push((m.summary||m.text||'').slice(0, 80));
+      });
+    }
+    // System-tracked char memories
+    var storedMems = Store.charMemories(this._pcCharId);
+    if (storedMems.length) {
+      storedMems.slice(-5).forEach(function(m) {
+        memLines.push((m.summary||m.text||'').slice(0, 80));
+      });
+    }
+    // Deduplicate and inject
+    var seen = {};
+    var uniqueMems = [];
+    memLines.forEach(function(line) {
+      var k = line.slice(0, 30);
+      if (!seen[k]) { seen[k] = true; uniqueMems.push(line); }
+    });
+    if (uniqueMems.length > 0) {
+      sysPrompt += '\n## 相关记忆\n';
+      uniqueMems.slice(-8).forEach(function(line) {
+        sysPrompt += '- ' + line + '\n';
+      });
+    }
+
+    // Conversation partner
+    sysPrompt += '\n## 通讯对象\n';
+    sysPrompt += '与你通讯的是 VOID-' + (player.voidId||'0000') + '，当前位于' + (copy.location||'未知') + '。\n';
+    sysPrompt += 'TA的SAN值：' + (player.san||0) + '/100，生存点：' + (player.survivalPoints||0) + '。\n';
+    if (player.statusEffects && player.statusEffects.length) {
+      sysPrompt += '当前状态效果：' + player.statusEffects.join('；') + '\n';
+    }
+
+    // Current copy context
+    if (copy.name) {
+      sysPrompt += '\n## 当前副本\n';
+      sysPrompt += '名称：' + copy.name + '\n';
+      if (copy.core) sysPrompt += '核心执念：' + copy.core + '\n';
+      if (copy.rules && copy.rules !== '尚未发现') sysPrompt += '已知规则：' + copy.rules + '\n';
+    }
+
+    sysPrompt += '\n用该角色的语气和风格回复。简短自然，像即时通讯。不要旁白，不要标记，纯对话。';
 
     var msgHistory = chats[this._pcCharId].messages.slice(-10);
     var apiMsgs = [{ role:'system', content: sysPrompt }];
@@ -5241,24 +5293,64 @@ var App = {
     });
 
     var s = Store._db.settings.api;
+    // Add placeholder bubble for streaming
+    chats[this._pcCharId].messages.push({ role:'character', content: '…', time: Date.now() });
+    var placeholderIdx = chats[this._pcCharId].messages.length - 1;
+    Store.save(); this._renderPrivateChat();
+
     try {
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
       var res = await fetch(s.url.replace(/\/+$/, '') + '/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + s.key },
-        body: JSON.stringify({ model: s.model || 'gpt-4o-mini', messages: apiMsgs, temperature: 0.9, max_tokens: 256 })
+        body: JSON.stringify({ model: s.model || 'gpt-4o-mini', messages: apiMsgs, temperature: 0.9, max_tokens: 384, stream: true }),
+        signal: controller.signal
       });
-      if (res.ok) {
-        var data = await res.json();
-        var reply = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
-        if (reply) {
-          chats[this._pcCharId].messages.push({ role:'character', content: reply.trim(), time: Date.now() });
+      clearTimeout(timeoutId);
+      if (!res.ok) {
+        var et = await res.text();
+        chats[this._pcCharId].messages[placeholderIdx].content = '[HTTP ' + res.status + ']';
+      } else {
+        var reader = res.body.getReader();
+        var decoder = new TextDecoder();
+        var fullText = '';
+        var buf = '';
+        while (true) {
+          var result = await reader.read();
+          if (result.done) break;
+          buf += decoder.decode(result.value, { stream: true });
+          var lines = buf.split('\n');
+          buf = lines.pop() || '';
+          for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim();
+            if (!line || !line.startsWith('data:')) continue;
+            var dataStr = line.slice(5).trim();
+            if (dataStr === '[DONE]') continue;
+            try {
+              var data = JSON.parse(dataStr);
+              var delta = data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content;
+              if (delta) {
+                fullText += delta;
+                chats[this._pcCharId].messages[placeholderIdx].content = fullText;
+                this._renderPrivateChat();
+              }
+            } catch(e) {}
+          }
+        }
+        if (!fullText) {
+          chats[this._pcCharId].messages[placeholderIdx].content = '[无回复]';
+        } else {
+          chats[this._pcCharId].messages[placeholderIdx].content = fullText.trim();
           // Parse [AFFECTION] in reply
-          var affMatch = reply.match(/\[AFFECTION .+? ([+\-]\d+)\]/);
+          var affMatch = fullText.match(/\[AFFECTION .+? ([+\-]\d+)\]/);
           if (affMatch && c) { c.affection = Math.max(-100, Math.min(100, (c.affection||0) + parseInt(affMatch[1]))); }
-          Store.save(); this._renderPrivateChat();
         }
       }
-    } catch(e) {}
+    } catch(e) {
+      chats[this._pcCharId].messages[placeholderIdx].content = e.name === 'AbortError' ? '[超时]' : '[网络错误]';
+    }
+    Store.save(); this._renderPrivateChat();
     this._aiBusy = false;
   },
 
@@ -5423,6 +5515,15 @@ var App = {
     var container = document.getElementById('save-slot-list');
     if (!container) return;
     var slots = Store.slots();
+    // Update add button state (always, even with 0 slots)
+    var addBtn = document.getElementById('save-slot-add-btn');
+    if (addBtn) {
+      var atLimit = slots.length >= 10;
+      addBtn.disabled = atLimit;
+      addBtn.style.opacity = atLimit ? '0.4' : '';
+      addBtn.style.cursor = atLimit ? 'not-allowed' : '';
+      addBtn.textContent = atLimit ? '+ 已达存档上限（' + slots.length + '/10）' : '+ 新建槽位';
+    }
     if (!slots.length) { container.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:30px 0;font-size:12px">暂无槽位，点击下方按钮新建</div>'; return; }
     var self = this;
     container.innerHTML = slots.map(function(s, i) {
@@ -5441,7 +5542,15 @@ var App = {
     container.querySelectorAll('[data-action="save"]').forEach(function(btn) {
       btn.addEventListener('click', function(e) { e.stopPropagation();
         var idx = parseInt(btn.dataset.slotIdx);
-        if (confirm('保存当前数据到「' + (Store.slots()[idx].name || '存档') + '」？')) {
+        var slot = Store.slots()[idx];
+        var msg;
+        if (slot && slot.data) {
+          var t = new Date(slot.timestamp).toLocaleString('zh-CN');
+          msg = '「' + (slot.name || '存档') + '」已有存档（保存于 ' + t + '），覆盖后旧数据将丢失，确认覆盖？';
+        } else {
+          msg = '保存当前数据到「' + (slot.name || '存档') + '」？';
+        }
+        if (confirm(msg)) {
           Store.saveToSlot(idx); self.renderSaveSlots();
         }
       });
@@ -6382,6 +6491,16 @@ var App = {
     requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; });
   },
 
+  _showValueToast: function(text, type) {
+    var el = document.getElementById('val-toast');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'val-toast show ' + (type || '');
+    var self = this;
+    clearTimeout(this._valToastTimer);
+    this._valToastTimer = setTimeout(function() { el.classList.remove('show'); }, 1500);
+  },
+
   _onStoryScroll: function() {
     var c = document.getElementById('story-messages');
     if (!c) return;
@@ -7128,14 +7247,6 @@ var App = {
       item.addEventListener('click', function() { self.ctxAction(item.dataset.action); });
     });
 
-    // API config: tab switch
-    document.getElementById('api-tab-strip').addEventListener('click', function(e) {
-      var btn = e.target.closest('.forum-tab'); if (!btn) return;
-      self._switchApiTab(btn.dataset.apiTab);
-    });
-    // Use main toggle
-    var apiUseMainToggle = document.getElementById('api-use-main-toggle');
-    if (apiUseMainToggle) apiUseMainToggle.addEventListener('change', function() { self._saveApiForm(); self._loadApiForm(); });
     // Input changes
     var apiUrl = document.getElementById('api-url-input');
     var apiKey = document.getElementById('api-key-input');
@@ -7164,16 +7275,14 @@ var App = {
     document.getElementById('api-test-btn').addEventListener('click', async function() {
       self._saveApiForm();
       var btn = document.getElementById('api-test-btn');
-      var s = Store._db.settings;
-      var cfg = self._apiTab === 'memory' ? s.memoryApi : (self._apiTab === 'state' ? s.stateApi : s.api);
-      var testCfg = (self._apiTab !== 'main' && cfg.useMain !== false) ? s.api : cfg;
-      if (!testCfg.url || !testCfg.key) { alert('请先填写URL和Key'); return; }
+      var cfg = Store._db.settings.api;
+      if (!cfg.url || !cfg.key) { alert('请先填写URL和Key'); return; }
       btn.textContent = '测试中…'; btn.disabled = true;
       try {
-        var res = await fetch(testCfg.url.replace(/\/+$/, '') + '/chat/completions', {
+        var res = await fetch(cfg.url.replace(/\/+$/, '') + '/chat/completions', {
           method: 'POST',
-          headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + testCfg.key },
-          body: JSON.stringify({ model: testCfg.model || 'gpt-4o-mini', messages: [{ role:'user', content:'回复：连接成功' }], max_tokens: 20 })
+          headers: { 'Content-Type':'application/json', 'Authorization':'Bearer ' + cfg.key },
+          body: JSON.stringify({ model: cfg.model || 'gpt-4o-mini', messages: [{ role:'user', content:'回复：连接成功' }], max_tokens: 20 })
         });
         if (!res.ok) { var et = await res.text(); alert('失败：HTTP ' + res.status + ': ' + et.slice(0,200)); }
         else { var d = await res.json(); alert('连接成功！' + ((d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'(空)')); }
@@ -7206,6 +7315,7 @@ var App = {
     // Save slots: add button
     var slotAddBtn = document.getElementById('save-slot-add-btn');
     if (slotAddBtn) slotAddBtn.addEventListener('click', function() {
+      if (Store.slots().length >= 10) { alert('已达存档上限（10个），请删除旧槽位后再新建。'); return; }
       var name = prompt('槽位名称：', '存档 ' + (Store.slots().length + 1));
       if (name && name.trim()) { Store.createSlot(name.trim()); self.renderSaveSlots(); }
     });
@@ -7325,44 +7435,22 @@ var App = {
     if (toast) { toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 1500); }
   },
 
-  _apiTab: 'main',
   _openApiModal: function() {
-    this._apiTab = 'main';
-    document.querySelectorAll('#api-tab-strip .forum-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.apiTab === 'main'); });
     this._loadApiForm();
     document.getElementById('modal-api').classList.add('open');
   },
   _loadApiForm: function() {
-    var s = Store._db.settings;
-    var cfg;
-    if (this._apiTab === 'memory') cfg = s.memoryApi;
-    else if (this._apiTab === 'state') cfg = s.stateApi;
-    else cfg = s.api;
-    var isMain = this._apiTab === 'main';
-    document.getElementById('api-use-main-row').style.display = isMain ? 'none' : '';
-    if (!isMain) document.getElementById('api-use-main-toggle').checked = cfg.useMain !== false;
-    document.getElementById('api-fields').style.display = (!isMain && cfg.useMain !== false) ? 'none' : '';
+    var cfg = Store._db.settings.api;
     document.getElementById('api-url-input').value = cfg.url || '';
     document.getElementById('api-key-input').value = cfg.key || '';
     document.getElementById('api-model-select').value = cfg.model || '';
   },
   _saveApiForm: function() {
-    var s = Store._db.settings;
-    var cfg;
-    if (this._apiTab === 'memory') cfg = s.memoryApi;
-    else if (this._apiTab === 'state') cfg = s.stateApi;
-    else cfg = s.api;
+    var cfg = Store._db.settings.api;
     cfg.url = document.getElementById('api-url-input').value;
     cfg.key = document.getElementById('api-key-input').value;
     cfg.model = document.getElementById('api-model-select').value;
-    if (this._apiTab !== 'main') cfg.useMain = document.getElementById('api-use-main-toggle').checked;
     Store.save();
-  },
-  _switchApiTab: function(tab) {
-    this._saveApiForm();
-    this._apiTab = tab;
-    document.querySelectorAll('#api-tab-strip .forum-tab').forEach(function(t) { t.classList.toggle('active', t.dataset.apiTab === tab); });
-    this._loadApiForm();
   },
 
   // Mask management
@@ -7490,5 +7578,6 @@ var App = {
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() { App.init(); });
 </script>
+<div class="val-toast" id="val-toast"></div>
 </body>
 </html>

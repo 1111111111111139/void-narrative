@@ -32,8 +32,8 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   --glass:rgba(20,20,20,0.65);
   --surface:rgba(255,255,255,0.025);
   --surface-hover:rgba(255,255,255,0.05);
-  --bubble-npc:rgba(35,35,42,0.95);--bubble-user:rgba(30,30,38,0.95);
-  --bubble-npc-text:#EAEAEA;--bubble-user-text:#C8CCD2;
+  --bubble-npc:rgba(45,45,52,0.98);--bubble-user:rgba(40,40,48,0.98);
+  --bubble-npc-text:#F5F5F5;--bubble-user-text:#E0E0E0;
   --bubble-narrator:rgba(20,20,25,0.9);
   --font-serif:"Songti SC","STSong","SimSun",serif;
   --font-ui:-apple-system,"SF Pro Text","PingFang SC","Microsoft YaHei",sans-serif;
@@ -155,6 +155,9 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 .msg-user-avatar:active,.msg-character-avatar:active,.msg-npc-avatar:active{opacity:.7}
 .msg-user-avatar img,.msg-character-avatar img,.msg-npc-avatar img{width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%) brightness(.9)}
 .msg-avatar-text{font-family:var(--font-serif);font-size:14px;color:var(--text);line-height:1}
+.avatar-projection{background-color:#3A2A3A}
+.avatar-assimilated{background-color:#5A2A2A}
+.avatar-native{background-color:#2A2A2A}
 
 /* NPC/Character row */
 .msg-character-row,.msg-npc-row{display:flex;align-items:flex-start;gap:10px;width:100%}
@@ -195,6 +198,7 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 }
 .msg-action-inline{font-size:11px;color:#888;font-style:italic}
 .msg-narrator-wrapper .msg-narrator-box .msg-action-inline{font-size:11px;color:#888;font-style:italic}
+.action-text{font-style:italic;opacity:0.8;color:#AAA}
 
 /* Telemetry tags (SAN/AFF/ITEM) */
 .msg-telemetry{display:flex;gap:5px;flex-wrap:wrap;margin-top:1px}
@@ -240,18 +244,38 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 #copy-bar-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:copyDotPulse 2s infinite}
 @keyframes copyDotPulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ---- Combat hint bar (top of story page) ---- */
+/* ---- Combat alert strip (top of story page) ---- */
 #combat-bar{
-  display:none;align-items:center;gap:10px;
-  padding:8px 16px;margin:0 16px 4px;
-  background:rgba(20,20,20,0.9);border-left:2px solid var(--accent);border-bottom:1px solid var(--accent-dim);
-  flex-shrink:0;border-radius:4px;
+  display:none;align-items:center;gap:8px;
+  padding:7px 16px;margin:0 16px 4px;
+  background:rgba(30,8,8,0.92);border-left:2px solid var(--accent);border-bottom:1px solid var(--accent-dim);
+  flex-shrink:0;border-radius:4px;cursor:pointer;
+  animation:cb-pulse 3s ease-in-out infinite;
 }
 #combat-bar.active{display:flex}
-#combat-bar .cb-name{font-size:10px;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#combat-bar .cb-status{font-size:10px;color:var(--text-2);white-space:nowrap}
-#combat-bar .cb-btn{font-size:8px;padding:4px 8px;border-radius:4px;background:rgba(255,255,255,0.04);color:var(--text-2);cursor:pointer;white-space:nowrap;border:1px solid rgba(255,255,255,0.06)}
-#combat-bar .cb-btn:active{color:var(--text)}
+#combat-bar:active{opacity:.8}
+@keyframes cb-pulse{0%,100%{border-left-color:var(--accent)}50%{border-left-color:rgba(142,42,42,0.4)}}
+#combat-bar .cb-alert-icon{font-size:13px;color:var(--accent)}
+#combat-bar .cb-alert-label{font-size:11px;color:var(--text);font-weight:500}
+#combat-bar .cb-alert-hint{font-size:9px;color:var(--text-3);margin-left:auto}
+
+/* ---- Combat modal ---- */
+.cm-enemy-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.cm-enemy-icon{width:44px;height:44px;border-radius:12px;background:rgba(142,42,42,0.15);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--accent);flex-shrink:0;font-family:var(--font-serif)}
+.cm-enemy-info{flex:1;min-width:0}
+.cm-enemy-name{font-size:15px;color:var(--text);font-weight:600;margin-bottom:2px}
+.cm-enemy-type{font-size:10px;color:var(--text-3)}
+.cm-san-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:12px}
+.cm-san-label{font-size:11px;color:var(--text-2)}
+.cm-san-val{font-size:18px;font-weight:600;color:var(--text);font-family:var(--font-mono)}
+.cm-threat-hint{font-size:11px;color:var(--text-2);line-height:1.5;margin-bottom:16px;font-style:italic}
+.cm-actions{display:flex;gap:10px;margin-bottom:12px}
+.cm-btn{flex:1;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+.cm-btn:active{transform:scale(0.97)}
+.cm-btn-attack{background:var(--accent);color:#fff}
+.cm-btn-flee{background:rgba(255,255,255,0.06);color:var(--text-2);border:1px solid var(--divider)}
+.cm-btn-flee:active{color:var(--text);background:rgba(255,255,255,0.1)}
+.cm-result{font-size:11px;color:var(--text-2);line-height:1.5;min-height:20px;text-align:center}
 
 /* ---- Copy detail panel (top slide-down) ---- */
 .copy-panel-overlay{
@@ -372,6 +396,8 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 .ttl-display{font-family:var(--font-mono);color:var(--accent);display:flex;align-items:baseline}
 .ttl-digit{font-size:15px;font-weight:500;letter-spacing:1px}
 .ttl-colon{font-size:13px;margin:0 1px;opacity:.7}
+.ttl-urgent .ttl-digit,.ttl-urgent .ttl-colon{animation:ttl-blink 1s step-end infinite}
+@keyframes ttl-blink{0%,100%{opacity:1}50%{opacity:0.25}}
 .ttl-bar-wrap{width:100%;height:2px;background:var(--accent-dim);border-radius:1px;overflow:hidden;margin-top:4px}
 .ttl-bar-fill{height:100%;background:var(--accent);transition:width 1s linear}
 
@@ -1058,11 +1084,10 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 
   <!-- Story page -->
   <div id="page-story" class="page active">
-    <div id="combat-bar">
-      <span class="cb-name" id="cb-name"></span>
-      <span class="cb-status" id="cb-status">未受伤</span>
-      <button class="cb-btn" id="cb-item-btn" onclick="App.openUserPanel()">使用道具</button>
-      <button class="cb-btn" id="cb-flee-btn" onclick="App._fleeCombat()">逃跑</button>
+    <div id="combat-bar" onclick="App._openCombatModal()">
+      <span class="cb-alert-icon">&#9888;</span>
+      <span class="cb-alert-label">威胁感知</span>
+      <span class="cb-alert-hint">点击处理</span>
     </div>
     <div id="copy-info-bar" onclick="App._openCopyPanel()">
       <span id="copy-bar-name">--</span>
@@ -2133,6 +2158,37 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 </div>
 
 <!-- ============================================================
+     CENTER MODAL: 战斗弹窗
+     ============================================================ -->
+<div class="center-modal-overlay" id="modal-combat" onclick="App._closeCombatModal()">
+  <div class="center-modal-box" id="modal-combat-box" onclick="event.stopPropagation()">
+    <div class="center-modal-header">
+      <span class="center-modal-title" id="combat-modal-title">遭遇威胁</span>
+      <button class="modal-close-btn" onclick="App._closeCombatModal()">×</button>
+    </div>
+    <div id="combat-modal-body">
+      <div class="cm-enemy-row">
+        <div class="cm-enemy-icon" id="cm-enemy-icon">?</div>
+        <div class="cm-enemy-info">
+          <div class="cm-enemy-name" id="cm-enemy-name">--</div>
+          <div class="cm-enemy-type" id="cm-enemy-type">--</div>
+        </div>
+      </div>
+      <div class="cm-san-row">
+        <span class="cm-san-label">当前理智值</span>
+        <span class="cm-san-val" id="cm-san-val">--</span>
+      </div>
+      <div class="cm-threat-hint" id="cm-threat-hint">--</div>
+      <div class="cm-actions">
+        <button class="cm-btn cm-btn-attack" id="cm-btn-attack">攻击</button>
+        <button class="cm-btn cm-btn-flee" id="cm-btn-flee">逃跑</button>
+      </div>
+      <div class="cm-result" id="cm-result"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
      CENTER MODAL: 面具管理
      ============================================================ -->
 <div class="center-modal-overlay" id="modal-masks">
@@ -2810,7 +2866,18 @@ var Store = {
     try { var d = JSON.parse(json); if (d.version === undefined) throw new Error('bad'); this._db = d; this.save(); return true; }
     catch(e) { return false; }
   },
-  resetAll: function() { localStorage.removeItem(LS_KEY); location.reload(); },
+  resetAll: function() {
+    var apiCfg = null, globalRules = null;
+    if (this._db) {
+      apiCfg = this._db.settings && this._db.settings.api ? JSON.parse(JSON.stringify(this._db.settings.api)) : null;
+      globalRules = this._db.globalRules ? this._db.globalRules.slice() : null;
+    }
+    this.init({ forceNew: true });
+    if (apiCfg) this._db.settings.api = apiCfg;
+    if (globalRules) this._db.globalRules = globalRules;
+    this.save();
+    location.reload();
+  },
 
   // Lore library
   lores: function(type) {
@@ -3359,7 +3426,7 @@ function buildSystemPrompt() {
   topHeader += '第五级（最低）：论坛AI发帖 > 后台角色行动模拟 > AI模拟购买\n';
   topHeader += '  论坛生成和购买模拟为背景系统，不直接影响主线叙事。后台角色行动仅在重逢时自然体现变化。\n\n';
 
-  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。荒原初始点→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、荒原→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + compressReq;
+  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n**行动暗示规则**：每次回复末尾，如果用户刚进入新场景、刚苏醒、或刚到达新地点且没有明确行动目标，AI在旁白结尾自然附带1-2个简短的行动暗示。暗示用（ ）包裹在旁白正文中，格式如"（铁门似乎没有锁死。床底下可能有什么东西。）"。暗示不是强制选项，用户可完全忽略。如果用户已有明确行动方向，不添加暗示。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。荒原初始点→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、荒原→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + compressReq;
 }
 
 // ============================================================
@@ -3991,7 +4058,7 @@ var App = {
   sanLevel: 0,
   _retryText: '',
   _timeTimerId: null,
-  combatState: { active: false, monsterName: '', monsterType: '', monsterStatus: '未受伤' },
+  combatState: { active: false, combatHandled: false, monsterName: '', monsterType: '', monsterStatus: '未受伤' },
   sanTimerId: null,
 
   init: function() {
@@ -4020,7 +4087,7 @@ var App = {
     if (page === 'story' || page === 'terminal' || page === 'settings') {
       this.lastPage = page;
     }
-    if (page !== 'terminal') this._stopTimeTick();
+    if (page !== 'terminal') { this._stopTimeTick(); } else if (this.termTab === 'home') { this.renderHome(); this._startTimeTick(); }
     this.currentPage = page;
     this.selectedCharId = null;
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
@@ -4573,11 +4640,12 @@ var App = {
           var avBg = self.getAvatarColor(msg.characterName||'?', isCharacter ? null : npcType);
           var first = (msg.characterName||'?').charAt(0);
           // Character avatar: use custom upload if available
+          var npcTypeCls = (!isCharacter && npcType) ? ' avatar-' + npcType : '';
           var avHTML;
           if (isCharacter && ch && ch.avatar) {
-            avHTML = '<div class="' + avCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="' + ch.avatar + '"></div>';
+            avHTML = '<div class="' + avCls + npcTypeCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="' + ch.avatar + '"></div>';
           } else {
-            avHTML = '<div class="' + avCls + '" style="background:' + avBg + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><span class="msg-avatar-text">' + App.escapeHtml(first) + '</span></div>';
+            avHTML = '<div class="' + avCls + npcTypeCls + '" style="background:' + avBg + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><span class="msg-avatar-text">' + App.escapeHtml(first) + '</span></div>';
           }
           var colHTML = '';
           parsed.actions.forEach(function(a) {
@@ -4890,11 +4958,14 @@ var App = {
     });
     if (!node) { this._closeGotoPopup(); return; }
 
-    // Target unexplored → block
+    // Target unexplored → trigger AI exploration
     if (node.state === 'unknown' && (!node._region || node._region.state === 'unknown')) {
-      Store.addMessage({ type:'system', content: '此区域尚未探索，需要徒步前往探索。AI将在下一轮叙事中描述你的探索过程。' });
-      this._closeGotoPopup(); this.renderMessages(); App.scrollToBottom();
+      Store.addMessage({ type:'system', content: '前往' + node.name + '方向，探索未知区域。' });
+      this._closeGotoPopup();
       this._retryText = '我向' + node.name + '方向探索前进。';
+      this.navigateTo('story');
+      var self = this;
+      setTimeout(function() { self._retryAI(); }, 300);
       return;
     }
 
@@ -4987,8 +5058,14 @@ var App = {
 
     this._closeGotoPopup();
     this._mapLevel = 'region'; this._mapRegionId = null;
-    this.renderAll(); this.applySanEffect(); App.scrollToBottom();
+    this.applySanEffect();
     App._checkDeduction();
+    Store.save();
+    // Navigate to story then trigger AI narration
+    this._retryText = '（继续前行）';
+    this.navigateTo('story');
+    var self = this;
+    setTimeout(function() { self._retryAI(); }, 300);
   },
   _getNodeStyle: function(n) {
     if (n.type === 'dungeon') {
@@ -5107,7 +5184,13 @@ var App = {
       if (pts < post.price) { alert('积分不足。需要 ' + post.price + ' 积分，当前 ' + pts + '。'); return; }
       if (!confirm('支付 ' + post.price + ' 积分查看此帖？')) return;
       Store.player().points -= post.price;
+      // Credit points to post author
+      var author = Store.characters().find(function(c) { return c.voidId === post.authorId; });
+      if (author && post.authorId !== myId) {
+        author.points = (author.points || 0) + post.price;
+      }
       post.purchases = (post.purchases || 0) + 1;
+      post.views = (post.views || 0) + 1;
       if (!post._paidBy) post._paidBy = [];
       post._paidBy.push(myId);
       Store.save();
@@ -5160,7 +5243,7 @@ var App = {
     });
 
     // Load/display replies
-    body.innerHTML += '<div id="forum-replies-container"></div>';
+    body.insertAdjacentHTML('beforeend', '<div id="forum-replies-container"></div>');
     var existingReplies = post.replies && post.replies.length > 0;
     if (!existingReplies && !post.locked && showContent) {
       body.querySelector('#forum-replies-container').innerHTML = '<div style="text-align:center;color:var(--text-3);padding:16px 0;font-size:12px">加载中…</div>';
@@ -5231,6 +5314,7 @@ var App = {
 
   _startTimeTick: function() {
     if (this._timeTimerId) return;
+    this._lastVoidTimeText = null;
     var self = this;
     this._timeTick();
     this._timeTimerId = setInterval(function() { self._timeTick(); }, 1000);
@@ -5238,12 +5322,16 @@ var App = {
 
   _stopTimeTick: function() {
     if (this._timeTimerId) { clearInterval(this._timeTimerId); this._timeTimerId = null; }
+    this._lastVoidTimeText = null;
   },
 
   _timeTick: function() {
     if (this.termTab !== 'home') { this._stopTimeTick(); return; }
     var p = Store.player();
-    var remain = Math.max(0, (p.nextDeduction || Date.now() + 86400000) - Date.now());
+    var now = Date.now();
+    var remain = Math.max(0, (p.nextDeduction || now + 86400000) - now);
+    var wrap = document.getElementById('home-countdown-wrap');
+    var urgent = remain < 3600000;
     var h = Math.floor(remain / 3600000);
     var m = Math.floor((remain % 3600000) / 60000);
     var s = Math.floor((remain % 60000) / 1000);
@@ -5252,22 +5340,28 @@ var App = {
     var ttlS = document.getElementById('ttl-s');
     if (ttlH) ttlH.textContent = String(h).padStart(2,'0');
     if (ttlM) ttlM.textContent = String(m).padStart(2,'0');
-    if (ttlS) { ttlS.textContent = String(s).padStart(2,'0'); ttlS.style.color = remain < 3600000 ? 'var(--accent)' : ''; }
-    // VOID world time
+    if (ttlS) ttlS.textContent = String(s).padStart(2,'0');
+    if (wrap) wrap.classList.toggle('ttl-urgent', urgent);
+    // VOID world time (cache text, only update DOM on change)
     var vtEl = document.getElementById('home-void-time');
     if (vtEl) {
+      var newText;
       var totalHours = Math.floor((p.voidDays || 1) * 24);
       var days = Math.floor(totalHours / 24);
       var hours = totalHours % 24;
       var copy = Store._db.currentCopy;
       if (copy.completionStatus === 'active') {
-        if (!copy.enterTime) copy.enterTime = Date.now();
-        var elapsed = Math.floor((Date.now() - copy.enterTime) / 3600000);
-        vtEl.textContent = '副本内 ' + elapsed + '小时 · ' + copy.chapter;
-        vtEl.style.color = copy.timeAnomaly ? 'var(--accent)' : '';
+        if (!copy.enterTime) copy.enterTime = now;
+        var elapsedMs = now - copy.enterTime;
+        var elapsedH = Math.floor(elapsedMs / 3600000);
+        var elapsedM = Math.floor((elapsedMs % 3600000) / 60000);
+        newText = '副本内 ' + elapsedH + '小时 ' + elapsedM + '分';
       } else {
-        vtEl.textContent = '第' + Math.max(1, days) + '天 · 第' + hours + '小时';
-        vtEl.style.color = '';
+        newText = '第' + Math.max(1, days) + '天 · 第' + hours + '小时';
+      }
+      if (newText !== this._lastVoidTimeText) {
+        vtEl.textContent = newText;
+        this._lastVoidTimeText = newText;
       }
     }
   },
@@ -5418,7 +5512,7 @@ var App = {
       var affLabel = aff > 60 ? '信任' : aff > 30 ? '友好' : aff > 0 ? '中立' : aff > -31 ? '冷淡' : '敌视';
       return '<div class="entity-item">' +
         '<div class="e-summary" onclick="App._openPrivateChat(\'' + c.id + '\')">' +
-          '<div class="e-avatar ' + (online ? 'online' : 'offline') + '" style="background:' + avBg + '">' +
+          '<div class="e-avatar ' + (online ? 'online' : 'offline') + (c.isNPC && c.npcType ? ' avatar-' + c.npcType : '') + '" style="background:' + avBg + '">' +
             '<span style="font-family:var(--font-serif);font-size:14px;color:#EAEAEA">' + App.escapeHtml(first) + '</span>' +
           '</div>' +
           '<div class="e-info">' +
@@ -6627,7 +6721,9 @@ var App = {
 
   _retryAI: function() {
     if (this._aiBusy || !this._retryText) return;
+    if (this.currentPage !== 'story') this.navigateTo('story');
     var input = document.getElementById('input-msg');
+    if (input.disabled) return;
     input.value = this._retryText;
     this.sendMessage();
     setTimeout(function() { App.triggerAI(); }, 100);
@@ -6682,7 +6778,9 @@ var App = {
     // Handle errors
     if (!response || response.error) {
       var errMsg = response ? response.msg : '连接失败';
-      Store.addMessage({ type:'system', content: errMsg + '。', meta: { isError: true, retryText: this._retryText } });
+      var rt = this._retryText;
+      this._retryText = '';
+      Store.addMessage({ type:'system', content: errMsg + '。', meta: { isError: true, retryText: rt } });
       this._aiBusy = false; this.renderMessages(); return;
     }
     var responseText = response.text || response;
@@ -6741,9 +6839,24 @@ var App = {
     });
     Store.save();
 
-    // Combat state: end if no monster in this response
-    if (!cmds.some(function(c) { return c.cmd === 'monster'; })) {
+    // Combat state logic
+    var hasMonsterMarker = cmds.some(function(c) { return c.cmd === 'monster'; });
+    if (this.combatState.active && !this.combatState.combatHandled) {
+      // Unhandled combat: AI deducts SAN each response
+      var threatCost = { '极高':10, '高':7, '中':4, '低':2 };
+      var cost = threatCost[this.combatState.threatLevel] || 4;
+      cost = Math.floor(cost * (0.7 + Math.random() * 0.6)); // ±30% variance
+      var p3 = Store.player();
+      p3.san = Math.max(1, (p3.san || 100) - cost);
+      Store.addMessage({ type:'system', content: '你犹豫不决，' + this.combatState.monsterName + '的压迫感侵蚀着你的理智... 理智值 -' + cost });
+      Store.save();
+    }
+    if (this.combatState.active && this.combatState.combatHandled) {
+      // Handled: combat ends after this response
       this._endCombat();
+    } else if (!hasMonsterMarker && !this.combatState.active) {
+      // No monster and no active combat: ensure bar is hidden
+      document.getElementById('combat-bar').classList.remove('active');
     }
 
     // Blink copy hint if new scene or quest
@@ -6887,7 +7000,7 @@ var App = {
 
     var html =
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
-        '<div class="msg-npc-avatar" style="background:' + avBg + ';width:36px;height:36px"><span class="msg-avatar-text" style="font-size:14px">' + App.escapeHtml(first) + '</span></div>' +
+        '<div class="msg-npc-avatar avatar-' + npcType + '" style="background:' + avBg + ';width:36px;height:36px"><span class="msg-avatar-text" style="font-size:14px">' + App.escapeHtml(first) + '</span></div>' +
         '<div><div style="font-size:14px;color:#EAEAEA">' + App.escapeHtml(c.name) + '</div>' +
         '<div style="font-size:10px;color:' + (npcTypeColors[npcType]||'#555') + '">' + (npcTypeLabels[npcType]||'NPC') + '</div></div>' +
       '</div>' +
@@ -7058,33 +7171,102 @@ var App = {
     setTimeout(function() { overlay.classList.remove('open','closing'); }, 250);
   },
 
-  // Combat bar
+  // === Combat System ===
+
   _startCombat: function(name, type) {
     this.combatState.active = true;
+    this.combatState.combatHandled = false;
     this.combatState.monsterName = name;
     this.combatState.monsterType = type;
     this.combatState.monsterStatus = '未受伤';
     this._updateCombatBar();
+    this._openCombatModal();
   },
 
   _endCombat: function() {
     this.combatState.active = false;
+    this.combatState.combatHandled = false;
     document.getElementById('combat-bar').classList.remove('active');
+    document.getElementById('modal-combat').classList.remove('open');
   },
 
   _updateCombatBar: function() {
     var bar = document.getElementById('combat-bar');
     if (!this.combatState.active) { bar.classList.remove('active'); return; }
     bar.classList.add('active');
-    document.getElementById('cb-name').textContent = this.combatState.monsterName + ' · ' + this.combatState.monsterType;
-    // SAN < 40: status may be inaccurate
-    var san = Store.player().san || 100;
-    document.getElementById('cb-status').textContent = (san < 40 ? '感知不可靠 · ' : '') + this.combatState.monsterStatus;
   },
 
-  _fleeCombat: function() {
+  // === Combat Modal ===
+
+  _openCombatModal: function() {
+    if (!this.combatState.active) return;
+    var san = Store.player().san || 100;
+    var cs = this.combatState;
+    var threats = { '执念残留': '高', '扭曲者': '高', '游荡者': '中', '残影': '低', '未知存在': '极高', '深渊生物': '极高' };
+    cs.threatLevel = threats[cs.monsterType] || '中';
+
+    document.getElementById('combat-modal-title').textContent = '遭遇威胁';
+    document.getElementById('cm-enemy-name').textContent = cs.monsterName;
+    document.getElementById('cm-enemy-type').textContent = cs.monsterType + ' · 威胁：' + (cs.threatLevel || '未知');
+    document.getElementById('cm-enemy-icon').textContent = cs.monsterName.charAt(0);
+    document.getElementById('cm-san-val').textContent = san;
+    document.getElementById('cm-san-val').style.color = san < 40 ? 'var(--accent)' : 'var(--text)';
+    document.getElementById('cm-threat-hint').textContent = 'SAN' + (san < 40 ? '偏低，感知可能不可靠。' : '稳定，判断较准确。') + ' 一击定胜负，请选择行动。';
+    document.getElementById('cm-result').textContent = '';
+    document.getElementById('cm-btn-attack').disabled = false;
+    document.getElementById('cm-btn-flee').disabled = false;
+    document.getElementById('modal-combat').classList.add('open');
+  },
+
+  _closeCombatModal: function() {
+    document.getElementById('modal-combat').classList.remove('open');
+  },
+
+  _combatAttack: function() {
+    if (!this.combatState.active || this.combatState.combatHandled) return;
+    this.combatState.combatHandled = true;
+    var cs = this.combatState;
+    document.getElementById('cm-btn-attack').disabled = true;
+    document.getElementById('cm-btn-flee').disabled = true;
+    document.getElementById('cm-result').textContent = '交由AI判定…';
+
+    var san = Store.player().san || 100;
+    Store.addMessage({ type:'system', content: '[遭遇战] 目标：' + cs.monsterName + '（' + cs.monsterType + '）。威胁：' + (cs.threatLevel||'中') + '。当前SAN：' + san + '。请根据数值判定攻击结果。成功→[SAN -1~-5][POINTS +10~+30]。失败→[SAN -5~-15]。' });
+
+    var self = this;
+    this._closeCombatModal();
+    document.getElementById('combat-bar').classList.remove('active');
+
     var input = document.getElementById('input-msg');
-    if (input) { input.value = '我逃跑'; input.focus(); }
+    if (input) { input.value = '我向' + cs.monsterName + '发起攻击'; }
+    this.sendMessage();
+    setTimeout(function() { self.triggerAI(); }, 100);
+  },
+
+  _combatFlee: function() {
+    if (!this.combatState.active || this.combatState.combatHandled) return;
+    this.combatState.combatHandled = true;
+    var cs = this.combatState;
+    document.getElementById('cm-btn-attack').disabled = true;
+    document.getElementById('cm-btn-flee').disabled = true;
+    document.getElementById('cm-result').textContent = '交由AI判定…';
+
+    var san = Store.player().san || 100;
+    Store.addMessage({ type:'system', content: '[遭遇战] 逃跑。目标：' + cs.monsterName + '（' + cs.monsterType + '）。威胁：' + (cs.threatLevel||'中') + '。当前SAN：' + san + '。请根据SAN判定逃跑结果。成功→[SAN -1~-3]。失败→[SAN -4~-15]。' });
+
+    var self = this;
+    this._closeCombatModal();
+    document.getElementById('combat-bar').classList.remove('active');
+
+    var input = document.getElementById('input-msg');
+    if (input) { input.value = '我试图从' + cs.monsterName + '面前逃跑'; }
+    this.sendMessage();
+    setTimeout(function() { self.triggerAI(); }, 100);
+  },
+
+  // Legacy flee — delegates to AI-driven combat flee
+  _fleeCombat: function() {
+    this._combatFlee();
   },
 
   renderUserPanel: function() {
@@ -7364,7 +7546,21 @@ var App = {
     return div.innerHTML;
   },
   formatContent: function(text) {
-    return this.escapeHtml(text).replace(/\n/g, '<br>');
+    var self = this;
+    var lines = text.split('\n');
+    var result = lines.map(function(line) {
+      var html = '';
+      var re = /([（(][^）)]*[）)])/g;
+      var lastIdx = 0, m;
+      while ((m = re.exec(line)) !== null) {
+        if (m.index > lastIdx) html += self.escapeHtml(line.slice(lastIdx, m.index));
+        html += '<span class="action-text">' + self.escapeHtml(m[1]) + '</span>';
+        lastIdx = m.index + m[1].length;
+      }
+      if (lastIdx < line.length) html += self.escapeHtml(line.slice(lastIdx));
+      return html || self.escapeHtml(line);
+    });
+    return result.join('<br>');
   },
 
   parseContent: function(text) {
@@ -7860,6 +8056,12 @@ var App = {
     };
     reader.readAsText(file);
     event.target.value = '';
+
+    // Combat modal buttons
+    var cmAttackBtn = document.getElementById('cm-btn-attack');
+    var cmFleeBtn = document.getElementById('cm-btn-flee');
+    if (cmAttackBtn) cmAttackBtn.addEventListener('click', function() { self._combatAttack(); });
+    if (cmFleeBtn) cmFleeBtn.addEventListener('click', function() { self._combatFlee(); });
   },
 
   resetAll: function() {

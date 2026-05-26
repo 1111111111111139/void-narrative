@@ -394,55 +394,86 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 }
 .glass-card-flush{padding:0;overflow:hidden}
 
-/* Terminal — Home: Bento grid */
-.bento-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
-.bento-card{
-  background:var(--surface);border-radius:14px;padding:16px;
-  border:0.5px solid var(--divider);
-  display:flex;flex-direction:column;position:relative;overflow:hidden;
-}
-.bento-full{grid-column:span 2}
-.bento-title{
-  font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.1em;
-  text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:5px;
-}
-.bento-title::before{content:'';width:3px;height:3px;background:var(--accent);border-radius:50%;opacity:.7}
-.hero-points-val{font-family:var(--font-mono);font-size:42px;font-weight:200;letter-spacing:-1px;line-height:1}
-.hero-meta-row{display:flex;margin-top:12px;padding-top:12px;border-top:0.5px solid var(--divider);gap:24px}
-.hero-meta-item{flex:1}
-.hero-meta-val{font-family:var(--font-mono);font-size:13px;color:var(--text)}
-.hero-meta-label{font-size:8px;color:var(--text-3);letter-spacing:.08em;margin-top:2px;text-transform:uppercase}
+/* Terminal — Home: Vitals Monitor */
+#term-panel-home{display:flex;flex-direction:column;gap:10px}
 
-/* Countdown */
-.ttl-display{font-family:var(--font-mono);color:var(--accent);display:flex;align-items:baseline}
-.ttl-digit{font-size:15px;font-weight:500;letter-spacing:1px}
-.ttl-colon{font-size:13px;margin:0 1px;opacity:.7}
-.ttl-urgent .ttl-digit,.ttl-urgent .ttl-colon{animation:ttl-blink 1s step-end infinite}
-@keyframes ttl-blink{0%,100%{opacity:1}50%{opacity:0.25}}
-.ttl-bar-wrap{width:100%;height:2px;background:var(--accent-dim);border-radius:1px;overflow:hidden;margin-top:4px}
-.ttl-bar-fill{height:100%;background:var(--accent);transition:width 1s linear}
+/* 1. Countdown */
+.ttl-section{padding:18px 4px 8px;text-align:center;position:relative}
+.ttl-label{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;color:var(--text-3);text-transform:uppercase;margin-bottom:6px}
+.ttl-digits{font-family:var(--font-mono);font-size:52px;font-weight:100;letter-spacing:6px;color:var(--accent-bright);line-height:1;text-shadow:0 0 30px rgba(142,42,42,.5),0 0 60px rgba(142,42,42,.2);transition:text-shadow .3s ease}
+.ttl-digits.ttl-urgent{animation:ttl-blink .8s step-end infinite}
+@keyframes ttl-blink{0%,100%{opacity:1}50%{opacity:.2}}
+.ttl-sub{font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--text-2);margin-top:4px}
 
-/* SAN card */
-.san-big{font-family:var(--font-mono);font-size:28px;font-weight:200;margin-top:4px}
-.san-sub{font-size:9px;color:var(--text-3);font-family:var(--font-mono);margin-top:2px;text-transform:uppercase}
-.eq-container{display:flex;align-items:flex-end;justify-content:space-between;height:28px;margin-top:auto;padding-top:10px}
-.eq-bar{width:12%;background:var(--accent);border-radius:1px;opacity:.7;animation:eqBounce 1.2s infinite ease-in-out alternate;box-shadow:0 0 6px var(--accent-dim)}
-.eq-bar:nth-child(1){animation-delay:.1s}.eq-bar:nth-child(2){animation-delay:.4s}.eq-bar:nth-child(3){animation-delay:.2s}.eq-bar:nth-child(4){animation-delay:.6s}.eq-bar:nth-child(5){animation-delay:.3s}.eq-bar:nth-child(6){animation-delay:.5s}
-@keyframes eqBounce{0%{height:15%}100%{height:100%}}
+/* 2. Points + Rank */
+.stats-row{display:flex;gap:8px}
+.stat-cell{flex:1;background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius);padding:14px 16px;text-align:center;position:relative;overflow:hidden}
+.stat-cell-value{font-family:var(--font-mono);font-size:24px;font-weight:200;color:var(--text);letter-spacing:1px;line-height:1;position:relative;z-index:1}
+.stat-cell-value.accent{color:var(--accent-bright)}
+.stat-cell-label{font-family:var(--font-mono);font-size:7px;letter-spacing:.12em;color:var(--text-3);text-transform:uppercase;margin-top:6px;position:relative;z-index:1}
 
-/* Location rows */
-.loc-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--divider)}
-.loc-row:last-child{border-bottom:none;padding-bottom:0}
-.loc-label{font-size:11px;color:var(--text-2)}
-.loc-val{font-size:12px;color:var(--text);text-align:right}
-.threat-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-right:5px;animation:threatPulse 1.5s infinite}
-@keyframes threatPulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* 3. SAN Spectrum */
+.san-section{background:radial-gradient(ellipse at 50% 0%,rgba(142,42,42,.06) 0%,transparent 60%),var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius-lg);padding:20px 20px 16px;position:relative;overflow:hidden}
+.san-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.san-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;color:var(--text-3);text-transform:uppercase;display:block}
+.san-label-sub{font-family:var(--font-mono);font-size:7px;letter-spacing:.1em;color:var(--accent-bright);opacity:.5;margin-top:3px}
+.san-current{text-align:right}
+.san-value-large{font-family:var(--font-mono);font-size:48px;font-weight:100;letter-spacing:2px;color:var(--text);line-height:1;text-shadow:0 0 20px rgba(142,42,42,.35);transition:color .5s ease,text-shadow .5s ease}
+.san-value-large.low{color:var(--accent-bright);text-shadow:0 0 30px rgba(180,50,50,.6)}
+.san-max{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.04em}
 
-/* Nearby list */
-.nearby-list{display:flex;flex-direction:column;margin-top:6px}
-.nearby-item{display:flex;justify-content:space-between;padding:7px 0;font-size:11px;color:var(--text);border-bottom:0.5px solid var(--divider)}
-.nearby-item:last-child{border-bottom:none}
-.nearby-type{color:var(--text-3);font-family:var(--font-mono);font-size:9px}
+/* Spectrum bars */
+.spectrum-row{display:flex;align-items:flex-end;gap:5px;height:52px;margin-bottom:14px;padding:0 2px}
+.spectrum-bar{flex:1;border-radius:2px;background:var(--accent);transition:height .5s cubic-bezier(.4,0,.2,1),background .5s ease,box-shadow .5s ease;box-shadow:0 0 6px rgba(142,42,42,.3);position:relative}
+.spectrum-bar.low{background:var(--accent-bright);box-shadow:0 0 10px rgba(180,50,50,.5)}
+.spectrum-bar:nth-child(1){animation:bar-wave 2.5s ease-in-out infinite 0s}
+.spectrum-bar:nth-child(2){animation:bar-wave 2.5s ease-in-out infinite .15s}
+.spectrum-bar:nth-child(3){animation:bar-wave 2.5s ease-in-out infinite .3s}
+.spectrum-bar:nth-child(4){animation:bar-wave 2.5s ease-in-out infinite .45s}
+.spectrum-bar:nth-child(5){animation:bar-wave 2.5s ease-in-out infinite .6s}
+.spectrum-bar:nth-child(6){animation:bar-wave 2.5s ease-in-out infinite .45s}
+.spectrum-bar:nth-child(7){animation:bar-wave 2.5s ease-in-out infinite .3s}
+.spectrum-bar:nth-child(8){animation:bar-wave 2.5s ease-in-out infinite .15s}
+.spectrum-bar:nth-child(9){animation:bar-wave 2.5s ease-in-out infinite 0s}
+@keyframes bar-wave{0%,100%{transform:scaleY(.6);opacity:.6}50%{transform:scaleY(1);opacity:1}}
+.spectrum-bar.critical:nth-child(1){animation:bar-wave-critical 1.2s ease-in-out infinite 0s}
+.spectrum-bar.critical:nth-child(2){animation:bar-wave-critical 1.2s ease-in-out infinite .08s}
+.spectrum-bar.critical:nth-child(3){animation:bar-wave-critical 1.2s ease-in-out infinite .16s}
+.spectrum-bar.critical:nth-child(4){animation:bar-wave-critical 1.2s ease-in-out infinite .24s}
+.spectrum-bar.critical:nth-child(5){animation:bar-wave-critical 1.2s ease-in-out infinite .32s}
+.spectrum-bar.critical:nth-child(6){animation:bar-wave-critical 1.2s ease-in-out infinite .24s}
+.spectrum-bar.critical:nth-child(7){animation:bar-wave-critical 1.2s ease-in-out infinite .16s}
+.spectrum-bar.critical:nth-child(8){animation:bar-wave-critical 1.2s ease-in-out infinite .08s}
+.spectrum-bar.critical:nth-child(9){animation:bar-wave-critical 1.2s ease-in-out infinite 0s}
+@keyframes bar-wave-critical{0%,100%{transform:scaleY(.3);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* SAN footer */
+.san-footer{display:flex;justify-content:space-between;align-items:center}
+.san-status-tag{font-family:var(--font-mono);font-size:9px;padding:4px 12px;border-radius:10px;letter-spacing:.08em;transition:all .4s ease}
+.san-status-tag.stable{color:var(--text-3);background:rgba(255,255,255,.03)}
+.san-status-tag.tense{color:#B89070;background:rgba(184,144,112,.1)}
+.san-status-tag.fear{color:var(--accent-bright);background:var(--accent-dim)}
+.san-status-tag.critical{color:#EAEAEA;background:rgba(142,42,42,.35);animation:tag-pulse 1.5s ease-in-out infinite}
+@keyframes tag-pulse{0%,100%{box-shadow:0 0 6px rgba(142,42,42,.2)}50%{box-shadow:0 0 18px rgba(142,42,42,.5)}}
+.san-trend-group{display:flex;align-items:center;gap:8px}
+.san-trend{font-family:var(--font-mono);font-size:8px;color:var(--text-3);letter-spacing:.06em}
+.san-trend.down{color:var(--accent-bright)}
+.san-arrow{font-family:var(--font-mono);font-size:11px;color:var(--text-3);transition:color .4s ease}
+.san-arrow.down{color:var(--accent-bright);animation:arrow-bob 1s ease-in-out infinite}
+@keyframes arrow-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+
+/* 4. Location / Threat / Time */
+.data-list{background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius-lg);overflow:hidden}
+.data-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:0.5px solid var(--divider)}
+.data-row:last-child{border-bottom:none}
+.data-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;color:var(--text-2);text-transform:uppercase}
+.data-value{font-size:12px;color:var(--text);text-align:right;letter-spacing:.03em}
+.data-value.mono{font-family:var(--font-mono);font-size:10px}
+.threat-indicator{display:inline-flex;align-items:center;gap:6px}
+.threat-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4A6A4A;box-shadow:0 0 6px rgba(74,106,74,.4)}
+.threat-dot.warning{background:#B89040;box-shadow:0 0 8px rgba(184,144,64,.5)}
+.threat-dot.danger{background:var(--accent-bright);box-shadow:0 0 10px rgba(180,50,50,.6);animation:threat-pulse 1.5s ease-in-out infinite}
+@keyframes threat-pulse{0%,100%{box-shadow:0 0 6px rgba(180,50,50,.3)}50%{box-shadow:0 0 16px rgba(180,50,50,.7)}}
 
 /* Shared pill tabs (used by memory filter, lore filter, API tabs) */
 .forum-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
@@ -1147,59 +1178,76 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
       </div>
       <div class="term-content" id="term-content">
 
-        <!-- Home panel — Bento grid -->
+        <!-- Home panel — Vitals Monitor -->
         <div class="term-panel active" id="term-panel-home">
-          <div class="bento-grid">
-            <div class="bento-card bento-full">
-              <div class="bento-title">生存积分</div>
-              <div class="hero-points-val" id="home-points-val">--</div>
-              <div class="hero-meta-row">
-                <div class="hero-meta-item">
-                  <div class="ttl-display" id="home-countdown-wrap">
-                    <span class="ttl-digit" id="ttl-h">00</span><span class="ttl-colon">:</span><span class="ttl-digit" id="ttl-m">00</span><span class="ttl-colon">:</span><span class="ttl-digit" id="ttl-s">00</span>
-                  </div>
-                  <div class="hero-meta-label">扣除倒计时</div>
-                </div>
-                <div class="hero-meta-item" style="text-align:right">
-                  <div class="hero-meta-val" id="home-rank">--</div>
-                  <div class="hero-meta-label">排名</div>
-                </div>
+
+          <!-- 1. Countdown -->
+          <div class="ttl-section">
+            <div class="ttl-label">扣除倒计时</div>
+            <div class="ttl-digits" id="home-countdown-wrap">
+              <span id="ttl-h">00</span>:<span id="ttl-m">00</span>:<span id="ttl-s">00</span>
+            </div>
+            <div class="ttl-sub">SURVIVAL COUNTDOWN</div>
+          </div>
+
+          <!-- 2. Points + Rank -->
+          <div class="stats-row">
+            <div class="stat-cell">
+              <div class="stat-cell-value accent" id="home-points-val">--</div>
+              <div class="stat-cell-label">生存积分</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-cell-value" id="home-rank">--</div>
+              <div class="stat-cell-label">当前排名</div>
+            </div>
+          </div>
+
+          <!-- 3. SAN Spectrum -->
+          <div class="san-section" id="home-san-card">
+            <div class="san-header">
+              <div class="san-label-group">
+                <span class="san-label">意识稳定度</span>
+                <span class="san-label-sub">NEURAL MONITOR</span>
+              </div>
+              <div class="san-current">
+                <span class="san-value-large" id="term-san-val">100</span>
+                <span class="san-max"> /100</span>
               </div>
             </div>
-
-            <div class="bento-card" id="home-san-card">
-              <div class="bento-title">理智值</div>
-              <div class="san-big" id="term-san-val">100</div>
-              <div class="san-sub" id="term-san-sub">清醒</div>
-              <div class="eq-container" id="term-eq"></div>
+            <div class="spectrum-row" id="spectrum-row">
+              <div class="spectrum-bar" style="height:70%"></div>
+              <div class="spectrum-bar" style="height:85%"></div>
+              <div class="spectrum-bar" style="height:55%"></div>
+              <div class="spectrum-bar" style="height:90%"></div>
+              <div class="spectrum-bar" style="height:40%"></div>
+              <div class="spectrum-bar" style="height:90%"></div>
+              <div class="spectrum-bar" style="height:55%"></div>
+              <div class="spectrum-bar" style="height:85%"></div>
+              <div class="spectrum-bar" style="height:70%"></div>
             </div>
-
-            <div class="bento-card">
-              <div class="bento-title">当前位置</div>
-              <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
-                <div class="loc-row">
-                  <span class="loc-label">坐标</span>
-                  <span class="loc-val" id="home-location-val">--</span>
-                </div>
-                <div class="loc-row">
-                  <span class="loc-label">威胁</span>
-                  <span class="loc-val" id="home-threat-val">--</span>
-                </div>
-                <div class="loc-row" id="home-void-time-row">
-                  <span class="loc-label">VOID时间</span>
-                  <span class="loc-val" id="home-void-time" style="font-family:var(--font-mono);font-size:10px">--</span>
-                </div>
-                <div class="loc-row" style="margin-top:auto;padding-top:6px">
-                  <span class="loc-label">生存积分</span>
-                  <span class="loc-val" id="home-points-label-val">--</span>
-                </div>
+            <div class="san-footer">
+              <span class="san-status-tag stable" id="san-status-tag">清醒</span>
+              <div class="san-trend-group">
+                <span class="san-trend" id="san-trend">稳定</span>
+                <span class="san-arrow" id="san-arrow">→</span>
               </div>
             </div>
           </div>
 
-          <div class="glass-card" style="padding-bottom:10px">
-            <div class="bento-title" style="margin-bottom:4px">附近</div>
-            <div id="home-nearby-list" style="font-size:11px;color:var(--text-3);padding:4px 0">--</div>
+          <!-- 4. Location / Threat / Time -->
+          <div class="data-list">
+            <div class="data-row">
+              <span class="data-label">当前位置</span>
+              <span class="data-value" id="home-location-val">--</span>
+            </div>
+            <div class="data-row">
+              <span class="data-label">威胁等级</span>
+              <span class="data-value threat-indicator" id="home-threat-val">--</span>
+            </div>
+            <div class="data-row" id="home-void-time-row">
+              <span class="data-label">VOID 时间</span>
+              <span class="data-value mono" id="home-void-time">--</span>
+            </div>
           </div>
         </div>
 
@@ -5426,31 +5474,39 @@ var App = {
     // Rank
     var rankEl = document.getElementById('home-rank');
     if (rankEl) rankEl.textContent = (p.rank != null) ? '#' + p.rank.toLocaleString() : '--';
-    // Points label on location card
-    var ptsLblEl = document.getElementById('home-points-label-val');
-    if (ptsLblEl) ptsLblEl.textContent = (p.points || 0).toLocaleString();
-    // SAN
-    var sanVal = document.getElementById('term-san-val');
-    if (sanVal) sanVal.textContent = (p.san || 0);
-    var sanSub = document.getElementById('term-san-sub');
+    // SAN spectrum monitor
     var san = p.san || 0;
-    var sanLevel;
-    if (san >= 80) sanLevel = '清醒';
-    else if (san >= 60) sanLevel = '紧张';
-    else if (san >= 40) sanLevel = '恐惧';
-    else if (san >= 20) sanLevel = '崩溃边缘';
-    else if (san > 0) sanLevel = '濒临同化';
-    else sanLevel = '已同化';
-    if (sanSub) { sanSub.textContent = sanLevel; sanSub.style.color = san <= 39 ? 'var(--accent)' : ''; }
-    // EQ bars
-    var eqEl = document.getElementById('term-eq');
-    if (eqEl) {
-      var bars = [];
-      for (var bi = 0; bi < 6; bi++) {
-        var hPct = Math.max(8, (san / 100) * (40 + Math.sin(bi * 1.2) * 20 + Math.random() * 15));
-        bars.push('<div class="eq-bar" style="height:' + hPct + '%"></div>');
-      }
-      eqEl.innerHTML = bars.join('');
+    var sanVal = document.getElementById('term-san-val');
+    if (sanVal) {
+      sanVal.textContent = san;
+      sanVal.className = 'san-value-large' + (san <= 39 ? ' low' : '');
+    }
+    var sanLevel, tagCls, trendText, arrowText, arrowCls;
+    if (san >= 80)      { sanLevel = '清醒'; tagCls = 'stable'; trendText = '稳定'; arrowText = '→'; arrowCls = ''; }
+    else if (san >= 60) { sanLevel = '紧张'; tagCls = 'tense'; trendText = '波动'; arrowText = '↘'; arrowCls = ''; }
+    else if (san >= 40) { sanLevel = '恐惧'; tagCls = 'fear'; trendText = '下降'; arrowText = '↓'; arrowCls = 'down'; }
+    else if (san >= 20) { sanLevel = '崩溃边缘'; tagCls = 'critical'; trendText = '急速下降'; arrowText = '↓↓'; arrowCls = 'down'; }
+    else if (san > 0)   { sanLevel = '濒临同化'; tagCls = 'critical'; trendText = '即将归零'; arrowText = '↓↓'; arrowCls = 'down'; }
+    else                { sanLevel = '已同化'; tagCls = 'critical'; trendText = '归零'; arrowText = '✕'; arrowCls = 'down'; }
+    var tagEl = document.getElementById('san-status-tag');
+    if (tagEl) { tagEl.textContent = sanLevel; tagEl.className = 'san-status-tag ' + tagCls; }
+    var trendEl = document.getElementById('san-trend');
+    if (trendEl) { trendEl.textContent = trendText; trendEl.className = 'san-trend' + (arrowCls === 'down' ? ' down' : ''); }
+    var arrowEl = document.getElementById('san-arrow');
+    if (arrowEl) { arrowEl.textContent = arrowText; arrowEl.className = 'san-arrow' + (arrowCls ? ' ' + arrowCls : ''); }
+    // Spectrum bars
+    var spectrumRow = document.getElementById('spectrum-row');
+    if (spectrumRow) {
+      var bars = spectrumRow.querySelectorAll('.spectrum-bar');
+      var barCls = san <= 39 ? 'spectrum-bar low critical' : san <= 59 ? 'spectrum-bar low' : 'spectrum-bar';
+      var chaos = san <= 19 ? 0.4 : san <= 39 ? 0.6 : san <= 59 ? 0.8 : 1.0;
+      bars.forEach(function(bar, i) {
+        var base = (san / 100) * 90;
+        var jitter = Math.sin(i * 1.3 + Date.now() * 0.001) * 25 * (1 - chaos);
+        var h = Math.max(8, Math.min(95, base + jitter));
+        bar.style.height = h + '%';
+        bar.className = barCls;
+      });
     }
     // Location & threat
     var locEl = document.getElementById('home-location-val');
@@ -5470,23 +5526,6 @@ var App = {
       if (copy.tideActive) extra.push('潮汐期');
       if (copy.stormActive) extra.push('风暴');
       threatEl.innerHTML = (extra.length > 0 ? '<span class="threat-dot"></span>' : '') + threat + (extra.length > 0 ? ' · ' + extra.join(' · ') : '');
-    }
-    // Nearby dungeons
-    var nearbyContainer = document.getElementById('home-nearby-list');
-    if (nearbyContainer) {
-      var allDungeons = [];
-      (Store._db.currentCopy.mapRegions || []).forEach(function(r) {
-        (r.subNodes || []).forEach(function(s) {
-          if (s.type === 'dungeon' && s.state !== 'visited' && s.dungeonState !== 'cleared') allDungeons.push({ name: s.name, type: s.dungeonState || 'unknown' });
-        });
-      });
-      if (allDungeons.length === 0) {
-        nearbyContainer.innerHTML = '<span style="color:var(--text-3)">附近暂未发现入口</span>';
-      } else {
-        nearbyContainer.innerHTML = allDungeons.map(function(n) {
-          return '<div class="nearby-item"><span>' + App.escapeHtml(n.name) + '</span><span class="nearby-type">' + App.escapeHtml(n.type || '') + '</span></div>';
-        }).join('');
-      }
     }
   },
 
@@ -6506,11 +6545,27 @@ var App = {
     var san = Store.player().san;
     var pct = Math.round((san / 100) * 100);
     var termVal = document.getElementById('term-san-val');
-    if (termVal) termVal.textContent = san;
+    if (termVal) {
+      termVal.textContent = san;
+      termVal.className = 'san-value-large' + (san <= 39 ? ' low' : '');
+    }
     var meVal = document.getElementById('me-san-val');
     if (meVal) meVal.textContent = san + ' / 100';
     var meFill = document.getElementById('me-san-fill');
     if (meFill) meFill.style.width = pct + '%';
+    // Refresh spectrum bars if visible
+    var spectrumRow = document.getElementById('spectrum-row');
+    if (spectrumRow) {
+      var bars = spectrumRow.querySelectorAll('.spectrum-bar');
+      var barCls = san <= 39 ? 'spectrum-bar low critical' : san <= 59 ? 'spectrum-bar low' : 'spectrum-bar';
+      var chaos = san <= 19 ? 0.4 : san <= 39 ? 0.6 : san <= 59 ? 0.8 : 1.0;
+      bars.forEach(function(bar, i) {
+        var base = (san / 100) * 90;
+        var jitter = Math.sin(i * 1.3 + Date.now() * 0.001) * 25 * (1 - chaos);
+        bar.style.height = Math.max(8, Math.min(95, base + jitter)) + '%';
+        bar.className = barCls;
+      });
+    }
   },
 
   openCharMemories: function(charId, charName) {

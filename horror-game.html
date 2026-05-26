@@ -504,30 +504,71 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 .forum-tab{padding:6px 12px;border-radius:12px;font-size:11px;font-family:var(--font-mono);color:var(--text-2);background:var(--surface);transition:all .15s;letter-spacing:.04em;white-space:nowrap;border:none;cursor:pointer}
 .forum-tab.active{color:var(--text);background:rgba(255,255,255,.08)}
 
-/* Terminal — Forum: filter chips */
-.forum-filter-scroll{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
-.forum-filter-scroll::-webkit-scrollbar{display:none}
-.filter-chip{
-  padding:5px 12px;border-radius:12px;font-size:10px;font-family:var(--font-mono);
-  color:var(--text-2);background:var(--surface);border:0.5px solid var(--divider);
-  white-space:nowrap;cursor:pointer;transition:all .15s;
-}
-.filter-chip.active{color:var(--text);background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
-.forum-list{display:flex;flex-direction:column}
-.forum-post{
-  padding:12px 16px;border-bottom:0.5px solid var(--divider);cursor:pointer;
-  transition:background .15s;display:flex;flex-direction:column;gap:4px;
-}
-.forum-post:first-child{border-radius:14px 14px 0 0}
-.forum-post:last-child{border-radius:0 0 14px 14px;border-bottom:none}
-.forum-post:active{background:var(--surface-hover)}
-.forum-post-title{font-size:13px;color:var(--text);line-height:1.45}
-.forum-post-meta{font-size:9px;color:var(--text-3);font-family:var(--font-mono);display:flex;justify-content:space-between;align-items:center}
-.forum-post-badges{display:flex;gap:6px;margin-top:2px}
-.f-badge{font-size:8px;padding:2px 6px;border-radius:3px;font-family:var(--font-mono);letter-spacing:.04em}
-.f-badge-locked{color:var(--accent);background:var(--accent-dim)}
-.f-badge-suspect{color:#8E7A2A;background:rgba(142,122,42,.15)}
-.f-badge-cost{color:var(--text-3);background:rgba(255,255,255,.04)}
+/* Terminal — Forum: reference design */
+#term-panel-forum.active{display:flex;flex-direction:column;gap:6px;padding:0}
+/* Filter scroll */
+.filter-scroll{display:flex;gap:6px;padding:4px 0 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filter-scroll::-webkit-scrollbar{display:none}
+.filter-chip{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;padding:7px 16px;border-radius:16px;color:var(--text-3);background:transparent;border:0.5px solid var(--divider);white-space:nowrap;cursor:pointer;transition:all .25s;flex-shrink:0}
+.filter-chip:hover{color:var(--text-2);border-color:var(--divider-strong)}
+.filter-chip.active{color:var(--accent-bright);border-color:rgba(142,42,42,.35);background:var(--accent-dim)}
+/* Post cards */
+.post-list{display:flex;flex-direction:column;gap:6px}
+.post-card{background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.post-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(142,42,42,.03) 50%,transparent 100%);transform:translateX(-100%);transition:transform .5s ease;pointer-events:none}
+.post-card:hover::before{transform:translateX(100%)}
+.post-card:active{background:var(--surface-alt)}
+.post-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.post-title{font-size:13px;color:var(--text);letter-spacing:.02em;line-height:1.4;flex:1;margin-right:10px}
+.post-badge{font-family:var(--font-mono);font-size:8px;padding:2px 8px;border-radius:8px;letter-spacing:.06em;flex-shrink:0}
+.post-badge.intel{color:#4A90D9;background:rgba(74,144,217,.1)}
+.post-badge.team{color:#4A9A6A;background:rgba(74,154,106,.1)}
+.post-badge.trade{color:#B89040;background:rgba(184,144,64,.1)}
+.post-badge.will{color:var(--accent-bright);background:var(--accent-dim)}
+.post-badge.misc,.post-badge.chat{color:#8E7A9A;background:rgba(142,122,154,.12)}
+.post-meta{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.04em}
+.post-meta .meta-author{color:var(--text-2)}
+.post-meta .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--text-3);opacity:.4}
+.post-meta .meta-points{color:var(--accent-bright);margin-left:auto}
+/* Locked / suspect status badges */
+.post-status{font-family:var(--font-mono);font-size:8px;padding:2px 6px;border-radius:3px;letter-spacing:.04em;display:inline-block;margin-right:4px}
+.post-status.locked{color:var(--accent);background:var(--accent-dim)}
+.post-status.suspect{color:#8E7A2A;background:rgba(142,122,42,.15)}
+.post-status.cost{color:var(--text-3);background:rgba(255,255,255,.04)}
+/* FAB button */
+.fab-container{position:sticky;bottom:16px;display:flex;justify-content:center;padding:12px 0;z-index:5}
+.fab-btn{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;padding:12px 32px;border-radius:24px;background:var(--accent);color:#EAEAEA;border:none;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(142,42,42,.3)}
+.fab-btn:hover{background:var(--accent-bright);box-shadow:0 6px 28px rgba(180,64,64,.45);transform:translateY(-1px)}
+.fab-btn:active{transform:translateY(0);box-shadow:0 2px 12px rgba(142,42,42,.25)}
+/* Forum post creation modal */
+#forum-post-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+#forum-post-overlay.open{display:flex}
+body.light #forum-post-overlay{background:rgba(0,0,0,.35)}
+#forum-post-sheet{width:90%;max-width:380px;background:var(--bg);border:0.5px solid var(--divider-strong);border-radius:var(--radius-lg);padding:24px 20px 20px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+/* Modal shared elements */
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-title{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:var(--text-2);text-transform:uppercase}
+.modal-close{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all .2s;background:transparent;border:none;font-size:16px}
+.modal-close:hover{color:var(--text);background:var(--surface-alt)}
+/* Modal form elements — scoped to forum sheet */
+#forum-post-sheet .form-group{margin-bottom:14px}
+#forum-post-sheet .form-label{display:block;font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;color:var(--text-3);text-transform:uppercase;margin-bottom:6px}
+#forum-post-sheet .chip-select{display:flex;gap:6px;flex-wrap:wrap}
+#forum-post-sheet .chip-option{font-family:var(--font-mono);font-size:9px;letter-spacing:.05em;padding:5px 12px;border-radius:12px;color:var(--text-3);background:transparent;border:0.5px solid var(--divider);cursor:pointer;transition:all .25s}
+#forum-post-sheet .chip-option:hover{color:var(--text-2);border-color:var(--divider-strong)}
+#forum-post-sheet .chip-option.selected{color:var(--accent-bright);border-color:rgba(142,42,42,.35);background:var(--accent-dim)}
+#forum-post-sheet .form-input{width:100%;padding:10px 12px;border-radius:var(--radius);background:var(--surface);border:0.5px solid var(--divider);color:var(--text);font-family:var(--font-mono);font-size:12px;letter-spacing:.03em;outline:none;transition:all .25s}
+#forum-post-sheet .form-input::placeholder{color:var(--text-3);opacity:.5}
+#forum-post-sheet .form-input:focus{border-color:rgba(142,42,42,.4);box-shadow:0 0 0 1px rgba(142,42,42,.1)}
+#forum-post-sheet .form-textarea{min-height:100px;resize:vertical;font-family:var(--font-mono);font-size:12px;line-height:1.6}
+#forum-post-sheet .points-row{display:flex;align-items:center;gap:8px}
+#forum-post-sheet .points-row .form-input{width:80px;text-align:center}
+#forum-post-sheet .points-hint{font-family:var(--font-mono);font-size:8px;color:var(--text-3);letter-spacing:.04em}
+#forum-post-sheet .modal-actions{display:flex;gap:8px;margin-top:20px}
+#forum-post-sheet .btn-cancel{flex:1;padding:10px 0;border-radius:var(--radius);font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;color:var(--text-3);background:transparent;border:0.5px solid var(--divider);cursor:pointer;transition:all .2s}
+#forum-post-sheet .btn-cancel:hover{color:var(--text-2);border-color:var(--divider-strong)}
+#forum-post-sheet .btn-publish{flex:1;padding:10px 0;border-radius:var(--radius);font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;color:#EAEAEA;background:var(--accent);border:none;cursor:pointer;transition:all .2s}
+#forum-post-sheet .btn-publish:hover{background:var(--accent-bright);box-shadow:0 0 16px rgba(142,42,42,.4)}
 
 /* Terminal — Map */
 .map-pips-card{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -562,16 +603,41 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 .topo-nodes{position:absolute;inset:0}
 
 /* Terminal — Attributes: pip bars */
-.attrs-id{display:flex;justify-content:space-between;padding:0 0 12px;border-bottom:0.5px solid var(--divider);margin-bottom:12px}
-.attrs-id-label{font-size:11px;color:var(--text-2)}.attrs-id-val{font-family:var(--font-mono);font-size:11px;color:var(--text)}
-.attrs-status{font-size:9px;color:var(--accent);font-family:var(--font-mono);padding:3px 8px;background:var(--accent-dim);border-radius:3px;display:inline-block;margin-bottom:14px}
-.attr-row{display:flex;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--divider);gap:10px}
-.attr-row:last-child{border-bottom:none}
-.attr-name{font-size:13px;color:var(--text);width:36px;flex-shrink:0}
-.attr-val{font-family:var(--font-mono);font-size:13px;color:var(--text);width:22px;text-align:center;flex-shrink:0}
-.attr-pips{flex:1;display:flex;gap:2px}
-.attr-pip{flex:1;height:3px;background:rgba(255,255,255,.06);border-radius:.5px}
-.attr-pip.fill{background:var(--text-2)}
+/* Terminal — Attributes: reference design */
+#term-panel-attrs.active{display:flex;flex-direction:column;gap:14px;padding:0}
+/* ID card */
+.id-card{display:flex;align-items:center;padding:16px 18px;background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius-lg);gap:12px}
+.id-info{flex:1;min-width:0}
+.id-label{font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;color:var(--text-3);text-transform:uppercase;margin-bottom:3px}
+.id-value{font-family:var(--font-mono);font-size:13px;letter-spacing:.06em;color:var(--text)}
+.id-status{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;padding:4px 12px;border-radius:10px;background:rgba(74,154,106,.1);color:#3A8A4A;border:0.5px solid rgba(74,154,106,.2);flex-shrink:0}
+.id-points{text-align:right;flex-shrink:0}
+.id-points-label{font-family:var(--font-mono);font-size:8px;letter-spacing:.08em;color:var(--text-3);text-transform:uppercase;margin-bottom:3px}
+.id-points-val{font-family:var(--font-mono);font-size:13px;letter-spacing:.04em;color:var(--accent-bright)}
+/* Attribute cards */
+.attr-card{background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius);padding:14px 16px;transition:all .25s;position:relative;overflow:hidden}
+.attr-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(142,42,42,.03) 50%,transparent 100%);transform:translateX(-100%);transition:transform .5s ease;pointer-events:none}
+.attr-card:hover::before{transform:translateX(100%)}
+.attr-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.attr-identity{display:flex;align-items:baseline;gap:8px}
+.attr-abbr{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--text-2);font-weight:600}
+.attr-name-cn{font-size:12px;color:var(--text);letter-spacing:.04em;font-weight:500}
+.attr-level{font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.05em}
+.attr-level span{color:var(--text);font-weight:600}
+/* Pip row */
+.pip-row{display:flex;gap:4px;margin-bottom:8px}
+.pip{flex:1;height:8px;border-radius:2px;background:rgba(255,255,255,.05);transition:background .3s ease}
+.pip.filled{background:var(--accent);box-shadow:0 0 4px rgba(142,42,42,.3)}
+/* Description */
+.attr-desc{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.03em;line-height:1.5;margin-bottom:10px}
+/* Footer */
+.attr-footer{display:flex;justify-content:space-between;align-items:center}
+.attr-cost{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.04em}
+.attr-btn{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;padding:6px 16px;border-radius:12px;cursor:pointer;transition:all .25s;border:none;background:var(--accent);color:#FFF;font-weight:600}
+.attr-btn:hover{background:var(--accent-bright);box-shadow:0 0 14px rgba(142,42,42,.4)}
+.attr-btn:active{transform:scale(.95)}
+.attr-btn:disabled{background:rgba(255,255,255,.04);color:var(--text-3);cursor:not-allowed;box-shadow:none;font-weight:400}
+.attr-btn:disabled:hover{background:rgba(255,255,255,.04);box-shadow:none}
 .attr-btn{
   padding:4px 10px;border-radius:4px;font-size:9px;font-family:var(--font-mono);
   color:var(--bg);background:var(--text);border:none;cursor:pointer;
@@ -581,9 +647,65 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 .attr-btn:disabled{opacity:.15;pointer-events:none}
 
 /* Terminal — Contacts: entity list */
-.entity-list{display:flex;flex-direction:column}
-.entity-item{border-bottom:0.5px solid var(--divider);transition:background .2s}
-.entity-item:last-child{border-bottom:none}
+/* Terminal — Contacts & Private Chat: reference design */
+#term-panel-contacts.active{display:flex;flex-direction:column;gap:6px;padding:0}
+/* Empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 30px;text-align:center}
+.empty-state.hidden{display:none}
+.empty-card{background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius-lg);padding:40px 28px;display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
+.standby-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px rgba(142,42,42,.5);animation:standby-pulse 2.5s ease-in-out infinite}
+@keyframes standby-pulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:1;transform:scale(1.6)}}
+.empty-title{font-family:var(--font-mono);font-size:12px;color:var(--text-2);letter-spacing:.06em}
+.empty-desc{font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.04em;line-height:1.6}
+/* Contact list */
+.contact-list{display:flex;flex-direction:column;gap:6px}
+.contact-card{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:0.5px solid var(--divider);border-radius:var(--radius);cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.contact-card::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(142,42,42,.03) 50%,transparent 100%);transform:translateX(-100%);transition:transform .5s ease;pointer-events:none}
+.contact-card:hover::before{transform:translateX(100%)}
+.contact-card:active{background:var(--surface-alt)}
+.contact-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-mono);font-size:14px;color:var(--text);background:var(--surface-alt);border:0.5px solid var(--divider-strong);position:relative}
+.status-dot{position:absolute;bottom:1px;right:1px;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--bg)}
+.status-dot.alive{background:var(--accent);box-shadow:0 0 6px rgba(142,42,42,.6);animation:dot-alive 2s ease-in-out infinite}
+.status-dot.dead{background:#3A3A3A;box-shadow:none;animation:none}
+.status-dot.lost{background:#B89040;box-shadow:0 0 6px rgba(184,144,64,.5);animation:dot-lost 1.2s ease-in-out infinite}
+@keyframes dot-alive{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes dot-lost{0%,100%{opacity:.4}50%{opacity:1}}
+.contact-info{flex:1;min-width:0}
+.contact-name{font-size:12px;color:var(--text);letter-spacing:.03em}
+.contact-relation{font-family:var(--font-mono);font-size:8px;color:var(--text-3);letter-spacing:.05em;margin-top:2px}
+.contact-affection{text-align:right;flex-shrink:0}
+.aff-label{font-family:var(--font-mono);font-size:7px;color:var(--text-3);letter-spacing:.05em;display:block}
+.aff-value{font-family:var(--font-mono);font-size:13px;color:var(--accent-bright);letter-spacing:.04em}
+/* Private chat */
+.chat-topbar{display:flex;align-items:center;padding:calc(10px + var(--sat)) 14px 8px;gap:10px;background:rgba(0,0,0,.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:0.5px solid var(--divider);flex-shrink:0}
+body.light .chat-topbar{background:rgba(242,240,236,.9)}
+.chat-back{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);flex-shrink:0;background:transparent;border:none}
+.chat-back:hover{color:var(--text-2)}
+.chat-partner-info{flex:1;min-width:0}
+.chat-partner-name{font-size:12px;color:var(--text);letter-spacing:.03em;display:flex;align-items:center;gap:6px}
+.chat-partner-name .status-dot-inline{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 4px rgba(142,42,42,.5);animation:dot-alive 2s ease-in-out infinite}
+.chat-partner-sub{font-family:var(--font-mono);font-size:8px;color:var(--text-3);letter-spacing:.04em;margin-top:2px}
+.chat-aff{text-align:right;flex-shrink:0}
+.chat-aff-label{font-family:var(--font-mono);font-size:7px;color:var(--text-3);letter-spacing:.05em}
+.chat-aff-val{font-family:var(--font-mono);font-size:11px;color:var(--accent-bright)}
+.secure-banner{display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 0;background:rgba(142,42,42,.04);border-bottom:0.5px solid var(--divider);flex-shrink:0}
+.secure-dot{width:3px;height:3px;border-radius:50%;background:var(--accent);opacity:.5;animation:dot-alive 2s ease-in-out infinite}
+.secure-text{font-family:var(--font-mono);font-size:7px;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase}
+.chat-messages{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 20px;display:flex;flex-direction:column;gap:12px}
+.msg-other-row{display:flex;align-items:flex-start;gap:8px;width:100%}
+.msg-other-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--font-mono);font-size:10px;color:var(--text-2);background:var(--surface-alt);border:0.5px solid var(--divider)}
+.msg-other-bubble{background:rgba(18,18,24,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid var(--divider);border-radius:2px 12px 12px 12px;padding:9px 13px;max-width:75%;font-size:12px;line-height:1.5;color:var(--text);letter-spacing:.02em}
+body.light .msg-other-bubble{background:rgba(242,240,236,.95)}
+.msg-self-row{display:flex;align-items:flex-start;gap:8px;width:100%;justify-content:flex-end}
+.msg-self-bubble{background:rgba(142,42,42,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:0.5px solid rgba(142,42,42,.12);border-radius:12px 2px 12px 12px;padding:9px 13px;max-width:75%;font-size:12px;line-height:1.5;color:var(--text);letter-spacing:.02em}
+body.light .msg-self-bubble{background:rgba(142,42,42,.04)}
+.chat-input-bar{display:flex;align-items:flex-end;padding:8px 12px 12px;gap:8px;background:rgba(0,0,0,.9);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:0.5px solid var(--divider);flex-shrink:0}
+body.light .chat-input-bar{background:rgba(242,240,236,.9)}
+.chat-input{flex:1;background:var(--surface);border:0.5px solid var(--divider);border-radius:18px;padding:8px 14px;font-family:var(--font-mono);font-size:11px;color:var(--text);outline:none;letter-spacing:.03em;resize:none;min-height:22px;max-height:70px;line-height:1.4}
+.chat-input::placeholder{color:var(--text-3);opacity:.5}
+.chat-send-btn{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#EAEAEA;border:none;cursor:pointer;transition:all .2s}
+.chat-send-btn:hover{background:var(--accent-bright);box-shadow:0 0 14px rgba(142,42,42,.4)}
+.chat-send-btn:active{transform:scale(.9)}
 .e-summary{display:flex;align-items:center;padding:10px 2px;cursor:pointer;gap:10px}
 .e-summary:active{opacity:.7}
 .e-avatar{
@@ -1279,17 +1401,17 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 
         <!-- Forum panel -->
         <div class="term-panel" id="term-panel-forum">
-          <div class="forum-filter-scroll" id="forum-tabs">
+          <div class="filter-scroll" id="forum-tabs">
             <button class="filter-chip active" data-board="intel">情报</button>
             <button class="filter-chip" data-board="party">组队</button>
             <button class="filter-chip" data-board="trade">交易</button>
             <button class="filter-chip" data-board="will">遗言</button>
             <button class="filter-chip" data-board="chat">杂谈</button>
           </div>
-          <div class="glass-card glass-card-flush">
-            <div class="forum-list" id="forum-list"></div>
+          <div class="post-list" id="forum-list"></div>
+          <div class="fab-container">
+            <button class="fab-btn" id="forum-new-post-btn">+ 发布帖子</button>
           </div>
-          <button class="btn-dashed" id="forum-new-post-btn" style="margin-top:8px">+ 发帖</button>
         </div>
 
         <!-- Map panel -->
@@ -1342,21 +1464,30 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 
         <!-- Attributes panel -->
         <div class="term-panel" id="term-panel-attrs">
-          <div class="glass-card">
-            <div class="attrs-id">
-              <span class="attrs-id-label">轮回者 ID</span>
-              <span class="attrs-id-val" id="term-attr-id">--</span>
+          <div class="id-card">
+            <div class="id-info">
+              <div class="id-label">轮回者 ID</div>
+              <div class="id-value" id="term-attr-id">--</div>
             </div>
-            <span class="attrs-status" id="term-attr-status">存活</span>
-            <div id="term-attr-rows"></div>
+            <span class="id-status" id="term-attr-status">存活</span>
+            <div class="id-points">
+              <div class="id-points-label">可用积分</div>
+              <div class="id-points-val" id="term-attr-points">--</div>
+            </div>
           </div>
+          <div id="term-attr-rows"></div>
         </div>
 
         <!-- Contacts panel -->
         <div class="term-panel" id="term-panel-contacts">
-          <div class="glass-card glass-card-flush" style="padding:0">
-            <div class="entity-list" id="term-contacts-list"></div>
+          <div class="empty-state hidden" id="contacts-empty">
+            <div class="empty-card">
+              <div class="standby-dot"></div>
+              <div class="empty-title">暂无联系人</div>
+              <div class="empty-desc">在副本中遇到其他角色后可请求添加通讯</div>
+            </div>
           </div>
+          <div class="contact-list" id="term-contacts-list"></div>
         </div>
 
       </div>
@@ -1986,17 +2117,35 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
   <!-- ============================================================
        PRIVATE CHAT PAGE
        ============================================================ -->
-  <div id="page-private-chat" class="page" style="background:#050505;z-index:200">
-    <div class="sub-header">
-      <button class="sub-back" onclick="App._closePrivateChat()">←</button>
-      <span class="sub-title" id="pc-title">私聊</span>
-      <button class="term-close-btn" style="margin-right:8px" onclick="App._clearPrivateChat()">清空</button>
-      <button class="term-close-btn" onclick="App._closePrivateChat()">关闭</button>
+  <div id="page-private-chat" class="page" style="background:var(--bg);z-index:200">
+    <div class="chat-topbar">
+      <button class="chat-back" onclick="App._closePrivateChat()">
+        <svg viewBox="0 0 24 24" fill="none" width="13" height="13"><polyline points="15 18 9 12 15 6" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+      <div class="chat-partner-info">
+        <div class="chat-partner-name">
+          <span id="pc-title">私聊</span>
+          <span class="status-dot-inline"></span>
+        </div>
+        <div class="chat-partner-sub" id="pc-relation"></div>
+      </div>
+      <div class="chat-aff">
+        <span class="chat-aff-label">好感</span>
+        <span class="chat-aff-val" id="pc-affection">--</span>
+      </div>
+      <button class="term-close-btn" style="margin-left:6px;flex-shrink:0" onclick="App._closePrivateChat()">关闭</button>
     </div>
-    <div id="pc-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
-    <div style="display:flex;align-items:center;padding:10px 14px;background:rgba(20,20,20,0.9);border-top:1px solid rgba(255,255,255,0.06)">
-      <input class="dock-input" id="pc-input" type="text" placeholder="输入消息…" style="flex:1;min-height:24px" onkeydown="if(event.key==='Enter')App._sendPrivateMsg()">
-      <button class="send-btn" id="pc-send-btn" onclick="App._sendPrivateMsg()" style="margin-left:6px">↑</button>
+    <div class="secure-banner">
+      <span class="secure-dot"></span>
+      <span class="secure-text">终端加密通讯 · VOID链路</span>
+      <span class="secure-dot"></span>
+    </div>
+    <div class="chat-messages" id="pc-messages"></div>
+    <div class="chat-input-bar">
+      <textarea class="chat-input" placeholder="输入消息..." rows="1" id="pc-input" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();App._sendPrivateMsg();}"></textarea>
+      <button class="chat-send-btn" id="pc-send-btn" onclick="App._sendPrivateMsg()">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
     </div>
   </div>
 
@@ -2206,12 +2355,22 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 <!-- ============================================================
      BOTTOM SHEET: 发帖
      ============================================================ -->
-<div class="panel-overlay" id="forum-post-overlay" onclick="App._closeForumPostSheet()">
-  <div class="user-panel" id="forum-post-sheet" style="max-height:65vh">
-    <div class="panel-drag-handle"></div>
+<div class="modal-overlay" id="forum-post-overlay" onclick="App._closeForumPostSheet()">
+  <div class="modal-dialog" id="forum-post-sheet" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span class="modal-title">发布帖子</span>
+      <button class="modal-close" onclick="App._closeForumPostSheet()">&times;</button>
+    </div>
     <div class="form-group">
-      <label class="form-label">板块</label>
-      <select class="form-select" id="fp-board">
+      <span class="form-label">板块</span>
+      <div class="chip-select" id="fp-chip-select">
+        <span class="chip-option selected" data-chip="intel">情报</span>
+        <span class="chip-option" data-chip="party">组队</span>
+        <span class="chip-option" data-chip="trade">交易</span>
+        <span class="chip-option" data-chip="will">遗言</span>
+        <span class="chip-option" data-chip="chat">杂谈</span>
+      </div>
+      <select class="form-select" id="fp-board" style="display:none">
         <option value="intel">情报交换</option>
         <option value="party">组队招募</option>
         <option value="trade">交易区</option>
@@ -2220,23 +2379,24 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
       </select>
     </div>
     <div class="form-group">
-      <label class="form-label">标题 *</label>
-      <input class="form-input" id="fp-title" type="text" maxlength="50" placeholder="帖子标题">
+      <span class="form-label">标题</span>
+      <input class="form-input" id="fp-title" type="text" maxlength="50" placeholder="输入帖子标题...">
     </div>
     <div class="form-group">
-      <label class="form-label">正文 *</label>
-      <textarea class="form-textarea" id="fp-content" rows="6" maxlength="2000" placeholder="帖子内容..."></textarea>
+      <span class="form-label">正文</span>
+      <textarea class="form-input form-textarea" id="fp-content" rows="6" maxlength="2000" placeholder="分享你的情报、经历或遗言..."></textarea>
     </div>
     <div class="form-group">
-      <label class="form-label">查看所需积分（0=免费）</label>
-      <input class="form-input" id="fp-price" type="number" value="0" min="0" max="10" oninput="App._validateForumPrice()">
+      <span class="form-label">积分悬赏</span>
+      <div class="points-row">
+        <input class="form-input" id="fp-price" type="number" value="0" min="0" max="10" oninput="App._validateForumPrice()">
+        <span class="points-hint">发布后从你的积分中扣除</span>
+      </div>
     </div>
-    <div class="form-group" style="font-size:10px;color:var(--text-3);font-family:var(--font-mono)">
-      发布者预览：ID:<span id="fp-preview-id">????</span>
-    </div>
-    <div class="form-actions">
-      <button class="btn-accent" id="fp-submit-btn">发布</button>
-      <button class="btn-secondary" onclick="App._closeForumPostSheet()">取消</button>
+    <span id="fp-preview-id" style="display:none"></span>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="App._closeForumPostSheet()">取消</button>
+      <button class="btn-publish" id="fp-submit-btn">发布</button>
     </div>
   </div>
 </div>
@@ -4520,11 +4680,15 @@ var App = {
 
   _openForumPostSheet: function(prefill) {
     prefill = prefill || {};
-    document.getElementById('fp-board').value = prefill.board || 'intel';
+    var board = prefill.board || 'intel';
+    document.getElementById('fp-board').value = board;
     document.getElementById('fp-title').value = prefill.title || '';
     document.getElementById('fp-content').value = prefill.content || '';
     document.getElementById('fp-price').value = prefill.price || 0;
     document.getElementById('fp-preview-id').textContent = Store.player().voidId || '0000';
+    // Sync chip-select
+    var chips = document.querySelectorAll('#fp-chip-select .chip-option');
+    chips.forEach(function(c) { c.classList.toggle('selected', c.dataset.chip === board); });
     document.getElementById('forum-post-overlay').classList.add('open');
   },
   _closeForumPostSheet: function() {
@@ -5192,8 +5356,8 @@ var App = {
     var container = document.getElementById('forum-list');
     var fp = Store._db.forumPosts;
     var allPosts = (fp && fp[board]) ? fp[board].slice() : [];
-    // Will board: only locked posts
     if (board === 'will') allPosts = allPosts.filter(function(p) { return p.locked; });
+    allPosts.forEach(function(p) { p._board = board; });
     var posts = allPosts.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});
     // Update post count in filter chips
     var boardCounts = { intel:0, party:0, trade:0, will:0, chat:0 };
@@ -5210,24 +5374,33 @@ var App = {
       }
     });
     if (posts.length === 0) { container.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 0;font-size:12px">暂无帖子</div>'; return; }
+    var boardLabels = { intel:'情报', party:'组队', trade:'交易', will:'遗言', chat:'杂谈' };
+    var boardClasses = { intel:'intel', party:'team', trade:'trade', will:'will', chat:'misc' };
     container.innerHTML = posts.map(function(p) {
-      var badges = '';
-      if (p.locked) badges += '<span class="f-badge f-badge-locked">不可回复</span>';
-      if (p.suspicious) badges += '<span class="f-badge f-badge-suspect">⚠ 存疑</span>';
-      if (p.price > 0) badges += '<span class="f-badge f-badge-cost">' + p.price + ' 积分</span>';
-      if (!p.price && p.price === 0) badges += '<span class="f-badge" style="color:var(--text-3);background:rgba(255,255,255,.02)">免费</span>';
+      var statusTags = '';
+      if (p.locked) statusTags += '<span class="post-status locked">不可回复</span>';
+      if (p.suspicious) statusTags += '<span class="post-status suspect">存疑</span>';
       var replyCount = (p.replies && p.replies.length) ? p.replies.length : 0;
-      var title = (p.locked ? '[遗言] ' : '') + App.escapeHtml(p.title);
-      return '<div class="forum-post">' +
-        '<div class="forum-post-title">' + title + (replyCount > 0 ? ' <span style="font-size:10px;color:var(--text-3);font-weight:400">' + replyCount + '条评论</span>' : '') + '</div>' +
-        '<div class="forum-post-meta">ID:' + App.escapeHtml(p.authorId || '????') + ' · ' + (p.createdAt ? App._relativeTime(p.createdAt) : '') + ' · 浏览:' + (p.views||0) + '</div>' +
-        (badges ? '<div class="forum-post-badges">' + badges + '</div>' : '') +
+      var title = App.escapeHtml(p.title).replace(/^\[(?:情报|组队|交易|遗言|杂谈)\]\s*/, '');
+      return '<div class="post-card' + (p.locked ? ' will-post' : '') + '">' +
+        '<div class="post-header">' +
+          '<span class="post-title">' + title + (replyCount > 0 ? ' <span style="font-size:10px;color:var(--text-3);font-weight:400">' + replyCount + '条评论</span>' : '') + '</span>' +
+          '<span class="post-badge ' + (boardClasses[p._board] || 'misc') + '">' + (boardLabels[p._board] || p._board || '') + '</span>' +
+        '</div>' +
+        '<div class="post-meta">' +
+          '<span class="meta-author">ID:' + App.escapeHtml(p.authorId || '????') + '</span>' +
+          '<span class="meta-dot"></span>' +
+          '<span>' + (p.createdAt ? App._relativeTime(p.createdAt) : '') + '</span>' +
+          '<span class="meta-dot"></span>' +
+          '<span>浏览 ' + (p.views||0) + '</span>' +
+          (statusTags ? statusTags : '') +
+          (p.price > 0 ? '<span class="meta-points">' + p.price + ' 积分</span>' : '') +
+        '</div>' +
       '</div>';
     }).join('');
     var self = this;
     var postsArr = posts;
-    container.querySelectorAll('.forum-post').forEach(function(el, i) {
-      el.style.cursor = 'pointer';
+    container.querySelectorAll('.post-card').forEach(function(el, i) {
       el.addEventListener('click', function() { self._openForumPost(postsArr[i]); });
     });
   },
@@ -5241,13 +5414,13 @@ var App = {
     var isMine = post.authorId === myId;
     var hasPaid = post._paidBy && post._paidBy.indexOf(myId) >= 0;
 
-    document.getElementById('forum-post-title').textContent = (post.locked ? '[遗言] ' : '') + (post.title || '帖子');
+    document.getElementById('forum-post-title').textContent = (post.title || '帖子').replace(/^\[(?:情报|组队|交易|遗言|杂谈)\]\s*/, '');
     var body = document.getElementById('forum-post-body');
     var showContent = (post.price === 0 || isMine || hasPaid);
     var preview = (post.content || '').slice(0, 30);
 
     body.innerHTML =
-      '<div class="forum-post-meta" style="margin-bottom:10px">ID:' + App.escapeHtml(post.authorId || '????') + ' · ' + (post.createdAt ? App._relativeTime(post.createdAt) : '') + ' · 浏览:' + (post.views||0) +
+      '<div class="post-meta" style="margin-bottom:10px">ID:' + App.escapeHtml(post.authorId || '????') + ' · ' + (post.createdAt ? App._relativeTime(post.createdAt) : '') + ' · 浏览:' + (post.views||0) +
       (post.price > 0 ? ' · ' + post.price + ' 积分' : ' · 免费') +
       (post.locked ? ' · <span style="color:var(--accent)">不可回复</span>' : '') +
       (post.suspicious ? ' · <span style="color:#8E7A2A">⚠ 存疑</span>' : '') +
@@ -5560,16 +5733,18 @@ var App = {
   renderAttributes: function() {
     var p = Store.player();
     var attrs = [
-      { key:'strength', label:'力量' },
-      { key:'agility', label:'敏捷' },
-      { key:'insight', label:'感知' },
-      { key:'calm', label:'意志' }
+      { key:'strength', abbr:'STR', name:'力量', desc:'攻击伤害 · 物理破坏，影响砸门/搬重物等蛮力行动成功率' },
+      { key:'agility', abbr:'AGI', name:'敏捷', desc:'命中率 · 闪避和逃跑成功率，潜行行动的核心属性' },
+      { key:'insight', abbr:'PER', name:'感知', desc:'洞察环境细节 · 发现隐藏线索和陷阱，可提前预警怪物存在' },
+      { key:'calm', abbr:'WIL', name:'意志', desc:'减少SAN值损失速度 · 抵抗精神攻击，心理崩溃前的最后防线' }
     ];
     var idEl = document.getElementById('term-attr-id');
-    var statusEl = document.getElementById('term-attr-status');
-    var rowsEl = document.getElementById('term-attr-rows');
     if (idEl) idEl.textContent = 'VOID-' + (p.voidId || '0000');
+    var statusEl = document.getElementById('term-attr-status');
     if (statusEl) statusEl.textContent = (p.san || 0) > 0 ? '存活' : '迷失';
+    var ptsEl = document.getElementById('term-attr-points');
+    if (ptsEl) ptsEl.textContent = (p.points || 0).toLocaleString();
+    var rowsEl = document.getElementById('term-attr-rows');
     if (!rowsEl) return;
     var maxAttr = 10;
     var pts = p.points || 0;
@@ -5582,14 +5757,24 @@ var App = {
       var label = atMax ? '已上限' : (noPts ? '积分不足' : '强化');
       var pips = '';
       for (var pi = 0; pi < maxAttr; pi++) {
-        pips += '<div class="attr-pip' + (pi < val ? ' fill' : '') + '"></div>';
+        pips += '<div class="pip' + (pi < val ? ' filled' : '') + '"></div>';
       }
-      return '<div class="attr-row"><span class="attr-name">' + a.label + '</span>' +
-        '<span class="attr-val">' + val + '</span>' +
-        '<div class="attr-pips">' + pips + '</div>' +
-        '<button class="attr-btn" data-attr="' + a.key + '"' + (disabled ? ' disabled' : '') + '>' + label + '</button></div>';
+      return '<div class="attr-card">' +
+        '<div class="attr-header">' +
+          '<div class="attr-identity">' +
+            '<span class="attr-abbr">' + a.abbr + '</span>' +
+            '<span class="attr-name-cn">' + a.name + '</span>' +
+          '</div>' +
+          '<div class="attr-level">Lv.<span>' + val + '</span></div>' +
+        '</div>' +
+        '<div class="pip-row">' + pips + '</div>' +
+        '<div class="attr-desc">' + a.desc + '</div>' +
+        '<div class="attr-footer">' +
+          '<span class="attr-cost">500 积分</span>' +
+          '<button class="attr-btn" data-attr="' + a.key + '"' + (disabled ? ' disabled' : '') + '>' + label + '</button>' +
+        '</div>' +
+      '</div>';
     }).join('');
-    // Attribute upgrade handlers
     var self = this;
     setTimeout(function() {
       document.querySelectorAll('#term-panel-attrs .attr-btn').forEach(function(btn) {
@@ -5614,12 +5799,15 @@ var App = {
 
   renderContacts: function() {
     var container = document.getElementById('term-contacts-list');
+    var emptyEl = document.getElementById('contacts-empty');
     if (!container) return;
     var chars = Store.characters().filter(function(c) { return !c.isNPC && !c.isArchived && c.contactEstablished !== false; });
     if (chars.length === 0) {
-      container.innerHTML = '<div style="text-align:center;color:var(--text-3);padding:40px 16px;font-size:12px;line-height:1.8">暂无联系人<br><span style="font-size:10px">在副本中遇到其他角色后可请求添加通讯</span></div>';
+      if (emptyEl) emptyEl.classList.remove('hidden');
+      container.innerHTML = '';
       return;
     }
+    if (emptyEl) emptyEl.classList.add('hidden');
     var self = this;
     container.innerHTML = chars.map(function(c) {
       var first = c.name ? c.name.charAt(0) : '?';
@@ -5629,23 +5817,22 @@ var App = {
       var online = c.present;
       var aff = c.affection || 0;
       var affLabel = aff > 60 ? '信任' : aff > 30 ? '友好' : aff > 0 ? '中立' : aff > -31 ? '冷淡' : '敌视';
-      return '<div class="entity-item">' +
-        '<div class="e-summary" onclick="App._openPrivateChat(\'' + c.id + '\')">' +
-          '<div class="e-avatar ' + (online ? 'online' : 'offline') + (c.isNPC && c.npcType ? ' avatar-' + c.npcType : '') + '" style="background:' + avBg + '">' +
-            '<span style="font-family:var(--font-serif);font-size:14px;color:#EAEAEA">' + App.escapeHtml(first) + '</span>' +
-          '</div>' +
-          '<div class="e-info">' +
-            '<div class="e-name">' + App.escapeHtml(c.name) + (hasUnread ? ' <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);vertical-align:middle;margin-left:2px"></span>' : '') + '</div>' +
-            '<div class="e-sub">' + affLabel + ' · ' + aff + ' · ' + (online ? '在场' : (c.position || '离线')) + '</div>' +
-          '</div>' +
-          '<div class="e-right">' +
-            '<div class="e-stat"><div class="e-stat-val">' + (online ? '在线' : '离线') + '</div><div class="e-stat-lbl">STATUS</div></div>' +
-            '<div class="status-dot ' + (online ? 'online' : 'offline') + '"></div>' +
-          '</div>' +
+      var alive = c.isAlive !== false;
+      var isLost = !alive && c.deathCause !== 'erased';
+      var statusCls = alive ? 'alive' : (isLost ? 'lost' : 'dead');
+      var relationText = (c.position || '未知') + ' · ' + affLabel;
+      return '<div class="contact-card" onclick="App._openPrivateChat(\'' + c.id + '\')">' +
+        '<div class="contact-avatar" style="background:' + avBg + '">' +
+          App.escapeHtml(first) +
+          '<span class="status-dot ' + statusCls + '"></span>' +
         '</div>' +
-        '<div style="padding:0 0 10px 42px;display:flex;gap:6px">' +
-          '<button class="btn-micro primary" onclick="event.stopPropagation();App._openPrivateChat(\'' + c.id + '\')">联络</button>' +
-          '<button class="btn-micro" onclick="event.stopPropagation();App.openCharMemories(\'' + c.id + '\',\'' + (c.name||'').replace(/'/g,'') + '\')">记忆</button>' +
+        '<div class="contact-info">' +
+          '<div class="contact-name">' + App.escapeHtml(c.name) + (hasUnread ? ' <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);vertical-align:middle;margin-left:2px"></span>' : '') + '</div>' +
+          '<div class="contact-relation">' + relationText + '</div>' +
+        '</div>' +
+        '<div class="contact-affection">' +
+          '<span class="aff-label">好感</span>' +
+          '<span class="aff-value">' + aff + '</span>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -5662,7 +5849,11 @@ var App = {
     var chats = Store._db.privateChats;
     if (!chats[charId]) chats[charId] = { messages: [], hasUnread: false };
     chats[charId].hasUnread = false; Store.save();
-    document.getElementById('pc-title').textContent = 'ID:' + (c.voidId||'????') + ' · ' + (c.name||'私聊');
+    document.getElementById('pc-title').textContent = c.name || '私聊';
+    var relEl = document.getElementById('pc-relation');
+    if (relEl) { var aff = c.affection || 0; var affLabel = aff > 60 ? '信任' : aff > 30 ? '友好' : aff > 0 ? '中立' : aff > -31 ? '冷淡' : '敌视'; relEl.textContent = (c.position || '未知') + ' · ' + affLabel; }
+    var affEl = document.getElementById('pc-affection');
+    if (affEl) affEl.textContent = c.affection || 0;
     // Hide main UI
     document.querySelectorAll('#app > .page').forEach(function(p) { p.classList.remove('active'); });
     document.getElementById('page-private-chat').classList.add('active');
@@ -5705,17 +5896,17 @@ var App = {
     var self = this;
     container.innerHTML = msgs.map(function(m) {
       if (m.role === 'user') {
-        return '<div style="display:flex;justify-content:flex-end"><div style="background:var(--bubble-user);border:1px solid rgba(255,255,255,0.08);border-radius:12px 12px 3px 12px;padding:8px 12px;max-width:75%;font-size:12px;line-height:1.5;color:var(--bubble-user-text)">' + App.escapeHtml(m.content) + '</div></div>';
+        return '<div class="msg-self-row"><div class="msg-self-bubble">' + App.escapeHtml(m.content) + '</div></div>';
       } else {
         var first = cName.charAt(0);
         var bg = self.getAvatarColor(cName, isNPC ? npcType : null);
         var avHTML;
         if (!isNPC && c && c.avatar) {
-          avHTML = '<img src="' + c.avatar + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%) brightness(.9)">';
+          avHTML = '<img src="' + c.avatar + '" style="width:100%;height:100%;object-fit:cover;filter:grayscale(100%) contrast(110%) brightness(.9);border-radius:50%">';
         } else {
-          avHTML = '<span style="font-family:var(--font-serif);font-size:10px;color:#EAEAEA">' + App.escapeHtml(first) + '</span>';
+          avHTML = App.escapeHtml(first);
         }
-        return '<div style="display:flex;align-items:flex-start;gap:8px"><div style="width:24px;height:24px;border-radius:50%;background:' + bg + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden">' + avHTML + '</div><div style="background:var(--bubble-npc);border:1px solid rgba(255,255,255,0.12);border-radius:12px 12px 12px 3px;padding:8px 12px;max-width:75%;font-size:12px;line-height:1.55;color:var(--bubble-npc-text)">' + App.escapeHtml(m.content) + '</div></div>';
+        return '<div class="msg-other-row"><div class="msg-other-avatar" style="background:' + bg + '">' + avHTML + '</div><div class="msg-other-bubble">' + App.escapeHtml(m.content) + '</div></div>';
       }
     }).join('');
     container.scrollTop = container.scrollHeight;
@@ -7866,6 +8057,15 @@ var App = {
     // Forum post submit
     var fpSubmitBtn = document.getElementById('fp-submit-btn');
     if (fpSubmitBtn) fpSubmitBtn.addEventListener('click', function() { self._submitForumPost(); });
+    // Forum chip-select sync
+    var fpChipSelect = document.getElementById('fp-chip-select');
+    if (fpChipSelect) fpChipSelect.addEventListener('click', function(e) {
+      var chip = e.target.closest('.chip-option');
+      if (!chip) return;
+      fpChipSelect.querySelectorAll('.chip-option').forEach(function(c) { c.classList.remove('selected'); });
+      chip.classList.add('selected');
+      document.getElementById('fp-board').value = chip.dataset.chip;
+    });
 
     // Dock input
     document.getElementById('input-msg').addEventListener('keydown', function(e) {

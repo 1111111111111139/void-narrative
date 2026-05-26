@@ -1693,6 +1693,15 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
         <label class="form-label">预设位置（选填）</label>
         <input class="form-input" id="ce-position" type="text" placeholder="如：东墟·旧公寓；留空则AI安排出场">
       </div>
+      <div class="form-group">
+        <label class="form-label">存活天数（选填）</label>
+        <input class="form-input" id="ce-survival" type="number" min="1" placeholder="留空默认7天以内（新手）" oninput="App._updatePointsHint()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">初始积分（选填）</label>
+        <input class="form-input" id="ce-points" type="number" min="100" max="5000" placeholder="留空则AI取范围中间值" oninput="App._clampPoints()">
+        <span class="form-hint" id="ce-points-hint" style="display:block;margin-top:4px;font-size:9px;color:var(--text-3)">范围：100-500</span>
+      </div>
       <!-- 高级设定（折叠） -->
       <div class="collapse-section">
         <div class="collapse-header" onclick="App._toggleCollapse('ce-advanced')">
@@ -2541,41 +2550,54 @@ var DEMO = {
 };
 
 // ============================================================
-// DEFAULT MAP REGIONS (6 regions, dual-layer topology)
+// DEFAULT MAP REGIONS (7 regions, dual-layer topology)
 // ============================================================
 var DEFAULT_MAP_REGIONS = [
-  { id: 'wasteland_east', name: '荒原·东段', threatLevel: 'safe', state: 'current', x: 25, y: 62,
+  { id: 'ruin_old_zone', name: '废城·旧区', threatLevel: 'medium', state: 'current', x: 20, y: 60,
+    connections: ['wasteland_east'],
+    subNodes: [
+      { id: 'old_street_district', name: '旧街区', type: 'location', state: 'current', dungeonState: null, x: 40, y: 65, connections: ['underground_mall', 'abandoned_hospital'] },
+      { id: 'underground_mall', name: '地下商场', type: 'location', state: 'visited', dungeonState: null, x: 55, y: 70, connections: [] },
+      { id: 'abandoned_hospital', name: '废弃医院', type: 'dungeon', state: 'visited', dungeonState: 'unknown', x: 60, y: 50, connections: [] },
+      { id: 'station_square', name: '车站广场', type: 'location', state: 'unknown', dungeonState: null, x: 30, y: 48, connections: [] }
+    ]
+  },
+  { id: 'wasteland_east', name: '荒原·东段', threatLevel: 'safe', state: 'current', x: 35, y: 55,
     connections: ['east_ruins'],
     subNodes: [
-      { id: 'wasteland_spawn', name: '初始点', type: 'location', state: 'current', dungeonState: null, x: 40, y: 68, connections: ['wasteland_camp'] },
-      { id: 'wasteland_camp', name: '废弃营地', type: 'location', state: 'visited', dungeonState: null, x: 58, y: 55, connections: [] }
+      { id: 'wasteland_camp', name: '废弃营地', type: 'location', state: 'visited', dungeonState: null, x: 45, y: 60, connections: [] },
+      { id: 'wasteland_ridge', name: '冷光山脊', type: 'location', state: 'unknown', dungeonState: null, x: 60, y: 45, connections: [] }
     ]
   },
-  { id: 'east_ruins', name: '东墟', threatLevel: 'medium', state: 'unknown', x: 60, y: 45,
+  { id: 'east_ruins', name: '东墟', threatLevel: 'medium', state: 'unknown', x: 50, y: 42,
     connections: ['south_ruins'],
     subNodes: [
-      { id: 'east_apt', name: '旧公寓', type: 'location', state: 'unknown', dungeonState: null, x: 45, y: 55, connections: [] }
+      { id: 'east_apt', name: '旧公寓', type: 'location', state: 'unknown', dungeonState: null, x: 40, y: 50, connections: [] },
+      { id: 'east_factory', name: '锈蚀厂房', type: 'dungeon', state: 'unknown', dungeonState: 'unknown', x: 58, y: 38, connections: [] }
     ]
   },
-  { id: 'south_ruins', name: '南墟', threatLevel: 'medium', state: 'unknown', x: 72, y: 68,
+  { id: 'south_ruins', name: '南墟', threatLevel: 'medium', state: 'unknown', x: 65, y: 65,
     connections: ['iron_dome'],
     subNodes: [
-      { id: 'south_tower', name: '塔·第一层', type: 'dungeon', state: 'unknown', dungeonState: 'unknown', x: 50, y: 50, connections: [] }
+      { id: 'south_tower', name: '塔·第一层', type: 'dungeon', state: 'unknown', dungeonState: 'unknown', x: 50, y: 50, connections: [] },
+      { id: 'south_docks', name: '沉没码头', type: 'location', state: 'unknown', dungeonState: null, x: 55, y: 70, connections: [] }
     ]
   },
-  { id: 'iron_dome', name: '铁穹', threatLevel: 'high', state: 'unknown', x: 50, y: 28,
+  { id: 'iron_dome', name: '铁穹', threatLevel: 'high', state: 'unknown', x: 45, y: 25,
     connections: ['border_zone'],
     subNodes: [
-      { id: 'iron_factory', name: '锈蚀工厂', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 55, connections: [] }
+      { id: 'iron_factory', name: '锈蚀工厂', type: 'location', state: 'unknown', dungeonState: null, x: 45, y: 55, connections: [] },
+      { id: 'iron_core', name: '熔炉核心', type: 'dungeon', state: 'unknown', dungeonState: 'unknown', x: 55, y: 40, connections: [] }
     ]
   },
-  { id: 'border_zone', name: '边界地带', threatLevel: 'fatal', state: 'unknown', x: 35, y: 18,
+  { id: 'border_zone', name: '边界地带', threatLevel: 'fatal', state: 'unknown', x: 30, y: 15,
     connections: ['sea_of_obsession'],
     subNodes: [
-      { id: 'border_waste', name: '扭曲荒原', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 55, connections: [] }
+      { id: 'border_waste', name: '扭曲荒原', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 55, connections: [] },
+      { id: 'border_mirror', name: '镜面废墟', type: 'dungeon', state: 'unknown', dungeonState: 'unknown', x: 40, y: 40, connections: [] }
     ]
   },
-  { id: 'sea_of_obsession', name: '执念之海', threatLevel: 'fatal', state: 'unknown', x: 12, y: 35,
+  { id: 'sea_of_obsession', name: '执念之海', threatLevel: 'fatal', state: 'unknown', x: 12, y: 30,
     connections: [],
     subNodes: [
       { id: 'sea_shore', name: '海岸线', type: 'location', state: 'unknown', dungeonState: null, x: 50, y: 60, connections: [] }
@@ -2592,7 +2614,7 @@ var DEFAULT_WORLD_PRESET = {
   isDefault: true,
   aiContext: {
     deathConsequence: "同化或抹杀",
-    knownAreas: ["荒原", "东墟", "南墟", "铁穹", "边界地带", "执念之海"],
+    knownAreas: ["废城", "荒原", "东墟", "南墟", "铁穹", "边界地带", "执念之海"],
     ruleCategories: ["视觉禁忌", "行为禁忌", "时间规则", "空间规则", "语言规则"],
     worldDefinition: "VOID是高维文明建造的灵魂筛选器。它从各个世界中挑选灵魂，通过副本测试和积分系统淘汰。筛选目的不明。积分排名前列的轮回者可能被选中进入下一阶段。VOID是一个无限延伸的大世界。已知区域仅占极小部分。边界之外是未生成的未知领域。当玩家向未知区域探索时，AI根据底层规则自行生成新区域。VOID没有管理者，没有代言人，只有沉默运转的规则。",
     generationRules: [
@@ -2618,7 +2640,7 @@ var DEFAULT_WORLD_PRESET = {
     affectionSpeed: 1.0,
     copyTypes: ["恐怖", "解谜", "生存", "混合"],
     difficultyLevels: ["C", "B", "A", "S"],
-    defaultStartLocation: "荒原·初始点",
+    defaultStartLocation: "废城·旧区·旧街区",
     timeSystem: "不稳定",
     copyTimeIndependent: true,
     monsterActiveCycle: "潮汐期"
@@ -2806,19 +2828,19 @@ var Store = {
       var spawnRoll = Math.random();
       var spawnRegion, spawnSubNode, spawnLocation, copyName, copyThreat;
       if (spawnRoll < 0.80) {
-        // 安全区域 80%
-        spawnRegion = 'wasteland_east';
-        spawnSubNode = 'wasteland_spawn';
-        spawnLocation = '荒原·初始点';
+        // 废城·旧区 80%
+        spawnRegion = 'ruin_old_zone';
+        spawnSubNode = 'old_street_district';
+        spawnLocation = '废城·旧区·旧街区';
         copyName = '404号公寓';
-        copyThreat = 'safe';
-      } else if (spawnRoll < 0.95) {
-        // 低威胁区域 15%
-        spawnRegion = 'east_ruins';
-        spawnSubNode = 'east_apt';
-        spawnLocation = '东墟·旧公寓';
-        copyName = '镜面怪谈';
         copyThreat = 'medium';
+      } else if (spawnRoll < 0.95) {
+        // 荒原·东段 15%
+        spawnRegion = 'wasteland_east';
+        spawnSubNode = 'wasteland_camp';
+        spawnLocation = '荒原·东段·废弃营地';
+        copyName = '镜面怪谈';
+        copyThreat = 'safe';
       } else {
         // 危险区域 5%
         spawnRegion = 'iron_dome';
@@ -2827,7 +2849,7 @@ var Store = {
         copyName = '铁穹深处';
         copyThreat = 'high';
       }
-      // Update mapRegions: set spawn subNode to 'current', wasteland_spawn to 'visited'
+      // Update mapRegions: set spawn subNode to 'current'
       var initMapRegions = JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS));
       initMapRegions.forEach(function(r) {
         r.subNodes.forEach(function(sn) {
@@ -2936,7 +2958,7 @@ var Store = {
     if (this._db.player.copiesCleared === undefined) this._db.player.copiesCleared = 0;
     if (this._db.player.killMark === undefined) this._db.player.killMark = false;
     if (!this._db.player.nextDeduction) this._db.player.nextDeduction = Date.now() + 86400000;
-    if (!this._db.player.position) this._db.player.position = { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn', copyId: null };
+    if (!this._db.player.position) this._db.player.position = { regionId: 'ruin_old_zone', subNodeId: 'old_street_district', copyId: null };
     if (!this._db.currentCopy.mapRegions) this._db.currentCopy.mapRegions = JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS));
     if (!this._db.currentCopy.type) this._db.currentCopy.type = '恐怖';
     if (!this._db.currentCopy.difficulty) this._db.currentCopy.difficulty = 'C';
@@ -3465,11 +3487,14 @@ function buildSystemPrompt() {
   presetText += '唯一ID：VOID-XXXX格式，由VOID分配，不可更改，是轮回者的唯一身份标识。\n';
   presetText += '终端：不是携带设备，是锚点的延伸——直接投射到意识中的交互界面。终端是纯粹的工具和监视器。不提供建议，不发表意见，不回应情感需求。它只显示数据，沉默地记录一切。\n';
   presetText += '积分规则：积分为负时直接抹杀。积分为0时存活但无法支付下次扣除。没有复活，没有重来。唯一离开方式：存活足够久、通关足够多副本——极少数人走到这一步。\n';
-  presetText += '击杀规则：击杀其他轮回者继承其全部积分。代价：理智值下降当前值的70%以上；终端永久记录击杀标记，近距离接触时其他轮回者可见。没有规则禁止击杀，但标记会让其他轮回者警惕或主动回避。\n';
+  presetText += '击杀规则：击杀其他轮回者继承其全部积分。代价：理智值下降当前值的30-50%（根据被击杀者的挣扎程度判定）；终端永久记录击杀标记，近距离接触时其他轮回者可见。好感度记录保留不重置。没有规则禁止击杀，但标记会让其他轮回者警惕或主动回避。\n';
   presetText += '生者与死者：在VOID中的能力无区别。生者对现实还有记忆，副本偶尔扭曲这些记忆作为心理攻击。死者没有退路，通关是唯一选择。\n';
+	  presetText += '目睹角色死亡：目睹好感度≥31的角色死亡额外扣除SAN 10-20；目睹好感度≥61的角色死亡额外扣除SAN 20-35。好感度越高扣除越多，由AI根据具体情况判定。\n';
+	  presetText += '组队SAN消耗：组队移动时各自独立扣除SAN，无减免也无叠加。目睹队友死亡适用上述目睹死亡额外扣除规则。\n';
+	  presetText += '物资交换规则：角色之间可自愿赠予或交换物资。积分不可交换。无程序强制，由双方好感度和AI叙事决定。\n';
   presetText += '轮回者关系：可合作组队通关、交换情报、同行荒原。可竞争，积分排名制造隐性压力。可击杀——但代价巨大，多数不会选择这条路。被标记的击杀者会被孤立或猎杀。\n';
   presetText += '## 角色与NPC区分\n';
-  presetText += '角色（isNPC:false）= 轮回者。有锚点、终端、ID、积分、排名。可组队、交易、被击杀。好感度系统启用，记忆模块完整，有独立动机和目的。击杀角色：继承全部积分+道具估值，SAN暴跌70%起，永久标记。\n';
+  presetText += '角色（isNPC:false）= 轮回者。有锚点、终端、ID、积分、排名。可组队、交易、被击杀。好感度系统启用，记忆模块完整，有独立动机和目的。击杀角色：继承全部积分+道具估值，SAN下降当前值30-50%（根据被击杀者挣扎程度），永久标记。好感度记录保留不重置。\n';
   presetText += 'NPC（isNPC:true）= 非选中者。无锚点、终端、积分、排名。好感度强制关闭。不适用好感度系统。用户不可手动创建NPC——NPC只能由AI在叙事中通过[CHAR_JOIN]标记引入。\n\n';
   presetText += '### NPC三类\n';
   presetText += '1. 执念投影（projection，最常见）：副本中执念主人记忆的投影。有自我意识但活在执念循环中——重复死前最后一段时间的片段。有些隐约感知到不对劲，极少数完全清醒。行为按执念循环的固定模式。对用户的帮助/伤害有因果反馈——但这不属于好感度，是执念循环的一部分，不能违背"设定"来感谢或报复。记忆：固定记忆（循环中的"过去"）+ 互动记忆。击杀：SAN下降0到-5，不掉积分，极小概率掉落执念残留物，可能在副本重置后重新出现。\n';
@@ -3525,6 +3550,9 @@ function buildSystemPrompt() {
 	  presetText += '- 至少一个性格特征或描述\n';
 	  presetText += '- 携带物品列表（可为空）\n';
 	  presetText += '- 如果缺少以上任何信息，仅记录为"提及"状态，不创建角色卡\n\n';
+	  presetText += '#### 玩家自创角色出场逻辑\n';
+	  presetText += '有预设位置时：AI在该位置附近自然安排出场，符合该区域遭遇概率触发。无预设位置时：AI根据角色背景和性格标签自动选择合适区域——冒险型/战斗型→威胁较高区域，警惕型/冷静型→相对安全区域，其余按角色背景逻辑判断。出场时机：玩家进入同一小区域时按遭遇概率触发；主动性开启时角色可能主动发消息。\n';
+	  presetText += '存活天数影响属性和物品分配：<7天属性总和4-8携带0-1件基础物品；7-30天属性总和8-16携带1-3件；30-90天属性总和16-24携带2-4件；>90天属性总和24-32携带3-5件。单项属性范围1-8不超过8。\n\n';
 	  presetText += 'AI注入上下文时包含：在场NPC列表（名称+类型+性格标签摘要）、每个NPC的设定文本前200字、用户与每个NPC的最近3条互动记忆、NPC之间的关系、每个NPC的类型。AI根据以上信息按角色卡设定扮演、按NPC类型决定行为逻辑。\n';
   presetText += '\n';
   presetText += '## 终端\n终端是锚点的延伸——直接投射到意识中的交互界面。在前臂上调用半透明显示屏，仅自己可见。终端不可移除，死亡后随锚点消失。终端不是AI、不是NPC、不是宠物——是VOID安插的监视器，沉默地记录一切，不提供建议不发表意见不回应情感。终端基础功能：积分查询、理智值、位置、背包(只读)、个人状态。在线功能（受副本干扰影响）：论坛、地图、通讯录(仅已建立联系的角色)、排名、属性强化(积分兑换)。\n';
@@ -3534,9 +3562,9 @@ function buildSystemPrompt() {
   presetText += '## 怪物系统\n';
   presetText += '怪物是VOID中被扭曲的存在。不是生物——是执念、被同化者、或VOID自身的清道夫。没有锚点终端积分。大多数没有完整意识。它们是VOID生态系统的一部分，不是"敌人"——只是在执行VOID的规则。\n\n';
   presetText += '### 四种类型\n';
-  presetText += '1. 游荡者（最常见）：被同化的轮回者残骸。在荒原上漫无目的移动。对活着的角色有模糊攻击性——不是恶意，是残存意识对"自己已经死了"的否认反应。击杀掉落积分5-30，极小概率掉落生前遗物。\n';
+  presetText += '1. 游荡者（最常见）：被同化的轮回者残骸。在荒原上漫无目的移动。对活着的角色有模糊攻击性——不是恶意，是残存意识对"自己已经死了"的否认反应。击杀掉落积分15-60（视普通/危险子类型），极小概率掉落生前遗物。\n';
   presetText += '2. 执念碎片：副本中执念腐烂后脱落的碎片。形态不稳定——类人形体或纯粹扭曲物。出现在副本附近或执念污染严重区域。攻击方式是理智侵蚀而非物理伤害。击杀掉落积分30-100，概率掉落执念残留物。\n';
-  presetText += '3. 清道夫：VOID自然产生的"免疫细胞"。清除卡在副本中既不前进也不死亡的角色。不会主动攻击正常推进剧情的角色。但如果角色长期停留在一个地方不前进，清道夫开始出现。击杀掉落积分高，极其危险——不建议主动猎杀。\n';
+  presetText += '3. 清道夫：VOID自然产生的"免疫细胞"。不会主动攻击正常推进剧情的角色。触发条件（满足任意一条即可能触发，越接近极限触发概率越高）：角色长期停留在同一地点不前进、积分<100、SAN<20。击杀掉落积分高，极其危险——不建议主动猎杀。\n';
   presetText += '4. 精英怪物（稀有）：被同化的高等级角色、腐烂过度的执念碎片、或多个怪物融合。体型更大，行为更不可预测。通常守护重要地点或副本入口。击杀掉落积分高+稀有物品。部分保留模糊语言能力——可能在被击杀前说出生前的执念。极少数"清醒者"保留了完整意识，选择变成怪物而非继续轮回——遇到是重大事件。\n\n';
   presetText += '### 区域分布\n';
   presetText += '荒原：游荡者为主密度低，东段安全西段增多。东墟/南墟：游荡者密度中等，执念碎片常见于副本入口附近，废弃建筑中有精英怪物。铁穹：游荡者密度高且更聪明，执念碎片密度高，精英怪物概率显著增加，清道夫巡逻。边界地带：所有类型混合密度极高，精英怪物常见。执念之海：无游荡者（靠近即被同化），执念碎片密度最高但不离开范围。未知区域：AI根据区域设定生成，越远越强越不可预测。\n\n';
@@ -3553,13 +3581,13 @@ function buildSystemPrompt() {
   presetText += '清道夫：力量5-8 敏捷5-8 感知6-9 意志8-10。极度危险，不应主动猎杀。\n';
   presetText += '精英怪物：力量5-10 敏捷4-8 感知4-8 意志5-10。守护重要地点或物品。\n';
   presetText += '\n### 击杀收益\n';
-  presetText += '游荡者（普通）：积分5-15 SAN-2~-4 掉落低。游荡者（危险）：积分15-30 SAN-3~-6 掉落低，概率角色遗物。\n';
-  presetText += '执念碎片：积分10-25 SAN-4~-8 掉落中，概率执念残留物。\n';
+  presetText += '游荡者（普通）：积分15-30 SAN-2~-4 掉落低。游荡者（危险）：积分30-60 SAN-3~-6 掉落低，概率角色遗物。\n';
+  presetText += '执念碎片：积分25-50 SAN-4~-8 掉落中，概率执念残留物。\n';
   presetText += '清道夫：积分30-50 SAN-6~-10 掉落高，概率稀有物品。\n';
-  presetText += '精英怪物：积分30-100 SAN-5~-10 掉落高，概率稀有物品+情报。\n';
+  presetText += '精英怪物：积分80-150 SAN-5~-10 掉落高，概率稀有物品+情报。\n';
   presetText += '\n### 战斗判定\n无回合制。AI后台使用数值判定，叙事描述过程，用户不看到怪物属性数值。不切画面不进入"战斗模式"。战斗SAN消耗通过[SAN -X]标记标注。\n';
   presetText += '攻击命中：用户敏捷 vs 怪物敏捷（敏捷≥怪物→命中率高，敏捷<怪物→命中率低）。攻击伤害：用户力量 vs 怪物力量。闪避：用户敏捷 vs 怪物感知。逃跑：用户敏捷 vs 怪物敏捷。SAN侵蚀（执念碎片）：用户意志 vs 怪物意志。\n';
-  presetText += '生成规则：荒原东段→游荡者普通为主；荒原西段/东墟/南墟→游荡者普通+危险+执念碎片；铁穹→游荡者危险+执念碎片+精英；边界地带→全部类型密度高；执念之海→执念碎片为主密度极高；副本内→根据难度类型生成。清道夫仅在角色长期停留时出现。精英怪物有固定守护地点，不随机游荡。\n';
+  presetText += '生成规则：荒原东段→游荡者普通为主；荒原西段/东墟/南墟→游荡者普通+危险+执念碎片；铁穹→游荡者危险+执念碎片+精英；边界地带→全部类型密度高；执念之海→执念碎片为主密度极高；副本内→根据难度类型生成。清道夫在角色长期停留、积分<100、或SAN<20时可能出现。精英怪物有固定守护地点，不随机游荡。\n';
   presetText += '\n';
   presetText += '## 时间系统\nVOID天空没有太阳星星月亮。光源来自地面——某些区域土壤发出微弱冷光。没有白天黑夜视觉变化，永远是一种昏暗的灰色。时间不是自然现象，是VOID的规则之一。VOID时间独立于现实时间，由AI在叙事中推进。关闭网页后VOID时间暂停，再次打开时继续。\n\n';
   presetText += '### 时间推进\nAI每次回复根据叙事内容推进VOID时间。参考：对话/观察几分钟、短距离移动十几分钟到半小时、探索副本房间十几分钟、跨区域移动数小时、休息恢复1小时以上、战斗几分钟到十几分钟。AI不需要每次明确标注推进量，时间自然融入叙事。\n\n';
@@ -3573,8 +3601,13 @@ function buildSystemPrompt() {
   presetText += '\n';
   presetText += '## 属性与判定\n';
   presetText += '四种属性（范围1-10）：力量（攻击/破坏/负重）、敏捷（闪避/潜行/命中）、感知（洞察/识别/发现隐藏）、意志（抵抗SAN下降/说服/压力判断）。每点属性消耗500积分强化，上限10，不可通过其他方式增减。\n\n';
-  presetText += '判定公式（无随机骰子，AI叙事决定）：成功率 = 相关属性值 × 10% - SAN惩罚 + 好感度加成(仅社交)。\n';
-  presetText += 'SAN惩罚：80-100:0%、60-79:-5%、40-59:-10%、20-39:-20%、1-19:-30%。好感度加成：±5-15%（仅社交事件）。成功率上限90%，下限5%。\n\n';
+  presetText += '### 道具在判定中的作用\n';
+	  presetText += '持有以下道具时，对应属性判定加成+10%：撬棍/钢管→力量判定加成；绳索→敏捷判定加成；手电筒→感知判定加成；耳塞→意志判定加成，同时降低执念碎片SAN侵蚀消耗30%；防护服→恐怖场景SAN消耗降低30%，持续穿戴生效。道具加成不叠加，同类型只取最高值。道具损耗由AI叙事判断。\n\n';
+	  presetText += '### 恐惧点触发规则\n';
+	  presetText += '角色遭遇与恐惧点相关的场景或怪物时：SAN消耗翻倍；相关判定成功率额外-15%；AI在叙事中描述角色的恐惧反应。恐惧点由AI根据背景故事生成，玩家可在角色设定页查看和修改。\n\n';
+	  presetText += '### 判定公式\n';
+	  presetText += '成功率 = 相关属性值×10% - SAN惩罚 + 好感度加成(仅社交) + 道具加成 - 恐惧点惩罚。无随机骰子，AI叙事决定。上限90%，下限5%。\n';
+  presetText += 'SAN惩罚：80-100:0%、60-79:-5%、40-59:-10%、20-39:-20%、1-19:-30%。好感度加成：±5-15%（仅社交事件）。道具加成：+10%（持有对应道具时，不叠加，同类型取最高值）。恐惧点惩罚：-15%（场景涉及角色恐惧点时）。成功率上限90%，下限5%。\n\n';
   presetText += 'AI判断用户行动是否有失败可能。无失败可能→直接描述成功。有失败可能→选择最相关的属性（可多个取平均）→应用公式→描述结果。失败后可重试，AI根据行动类型描述重试代价（消耗时间、引来怪物、好感度下降、受伤等）。\n';
   presetText += '\n';
   presetText += '## 角色互动与主动性\n';
@@ -3609,12 +3642,13 @@ function buildSystemPrompt() {
   presetText += '#### 五、状态变化\n';
   presetText += '- SAN自然消耗：每次后台周期-2~-5。额外消耗：战斗-3~-8、进副本-5~-10、恐怖场景-3~-15\n';
   presetText += '- SAN恢复：安全区休息每小时+2~+5、通关副本+10~+30、使用药物+5~+15\n';
+	  presetText += 'SAN濒危自救：角色SAN<30时优先使用携带的药剂/食物恢复SAN。无道具可用时优先逃离副本或向安全区移动。\n';
   presetText += '- 积分每日扣除：每24h(VOID时间)-100\n- 积分获取：通关副本+100~+1000、击杀怪物+5~+100\n';
   presetText += '- 受伤恢复：轻伤1-2天，重伤3-5天(需安全区或药物)\n- 属性强化：积分>1000时可能花费500强化1点(优先匹配角色风格的属性)\n\n';
   presetText += '#### 六、极端事件\n';
   presetText += '- 被同化：SAN归零→isAlive=false, deathCause=\'assimilated\'，变成被同化者NPC\n';
   presetText += '- 被抹杀：积分变负→isAlive=false, deathCause=\'erased\'，永久消失\n';
-  presetText += '- 击杀其他角色：冲突中胜出→继承对方全部积分，SAN暴跌当前值70%起，hasKillMark=true，killCount+1\n';
+  presetText += '- 击杀其他角色：冲突中胜出→继承对方全部积分，SAN下降当前值30-50%（根据被击杀者挣扎程度），好感度记录保留，hasKillMark=true，killCount+1\n';
   presetText += '- 被其他角色击杀：冲突中落败→isAlive=false, deathCause=\'killed\'\n';
   presetText += '极端事件发生后，用户再次遇到该角色时(还活着)或发现其痕迹时(已死)，AI在叙事中自然体现。\n';
   presetText += '角色状态变化通过[CHAR_UPDATE 角色名 field:value]标记写入系统。可用field：san, points, isAlive, deathCause, position,受伤状态。\n';
@@ -4528,6 +4562,9 @@ var App = {
     document.getElementById('ce-persona').value = c ? (c.persona || '') : '';
     document.getElementById('ce-appearance').value = c ? (c.appearance || '') : '';
     document.getElementById('ce-position').value = c ? (c.position || '') : '';
+    document.getElementById('ce-survival').value = c ? (c.survivalDays || '') : '';
+    document.getElementById('ce-points').value = c && c.points ? c.points : '';
+    if (!c || !c.points) { App._updatePointsHint(); }
     // Gender
     var gBtns = document.querySelectorAll('#ce-gender .toggle-btn');
     gBtns.forEach(function(b) { b.classList.toggle('active', b.textContent === (c && c.gender ? c.gender : '男')); });
@@ -4549,6 +4586,31 @@ var App = {
     this.navigateTo('char-edit');
   },
 
+  _updatePointsHint: function() {
+    var days = parseInt(document.getElementById('ce-survival').value) || 0;
+    var hint = document.getElementById('ce-points-hint');
+    var ptInput = document.getElementById('ce-points');
+    var range;
+    if (days <= 0) { range = [100, 500]; hint.textContent = '范围：100-500（<7天新手）'; }
+    else if (days < 7) { range = [100, 500]; hint.textContent = '范围：100-500（<7天新手）'; }
+    else if (days < 30) { range = [300, 1500]; hint.textContent = '范围：300-1500（7-30天）'; }
+    else if (days < 90) { range = [800, 3000]; hint.textContent = '范围：800-3000（30-90天）'; }
+    else { range = [2000, 5000]; hint.textContent = '范围：2000-5000（>90天）'; }
+    ptInput.min = range[0]; ptInput.max = range[1];
+    if (!ptInput.placeholder || ptInput.placeholder === '留空则AI取范围中间值') {
+      ptInput.placeholder = '留空则AI取' + Math.round((range[0]+range[1])/2) + '左右';
+    }
+    this._clampPoints();
+  },
+  _clampPoints: function() {
+    var ptInput = document.getElementById('ce-points');
+    var val = parseInt(ptInput.value);
+    if (isNaN(val)) return;
+    var min = parseInt(ptInput.min) || 100;
+    var max = parseInt(ptInput.max) || 5000;
+    if (val < min) ptInput.value = min;
+    if (val > max) ptInput.value = max;
+  },
   _toggleCollapse: function(id) {
     var body = document.getElementById(id + '-body');
     var arrow = document.getElementById(id + '-arrow');
@@ -4574,6 +4636,8 @@ var App = {
       speedDown: parseFloat((document.getElementById('ce-speed-down').value || '×1.0').replace('×','')) || 1,
       appearance: document.getElementById('ce-appearance').value.trim(),
       position: document.getElementById('ce-position').value.trim() || null,
+      survivalDays: parseInt(document.getElementById('ce-survival').value) || null,
+      points: parseInt(document.getElementById('ce-points').value) || null,
       initiativeEnabled: document.getElementById('ce-initiative-toggle').checked,
       tags: this._getTagTexts('ce-tags'),
       taboos: []
@@ -5234,7 +5298,7 @@ var App = {
 
     // Find current position node for distance calc
     var curNode = null;
-    var pos = p.position || { regionId: 'wasteland_east', subNodeId: 'wasteland_spawn' };
+    var pos = p.position || { regionId: 'ruin_old_zone', subNodeId: 'old_street_district' };
     regions.forEach(function(r) {
       if (r.id === pos.regionId) curNode = r;
       (r.subNodes || []).forEach(function(s) {

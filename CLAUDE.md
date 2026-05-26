@@ -28,7 +28,7 @@ SPA with **3 bottom-tab views** + sub-pages + modals/panels:
 |-------|--------------|
 | **Home** | Survival points, countdown, rank, SAN+EQ visualization, location threat, nearby dungeons |
 | **Forum** | 5 boards (intel/party/trade/will/chat), post/purchase/reply, AI auto-generation |
-| **Map** | Dual-layer topology (regions → subNodes), breathing dot states, coded connection lines, go-to popup |
+| **Map** | Dual-layer topology (7 preset regions + AI expansion), clue-based unlock, breathing dot states, coded connection lines, centered go-to modal with copy history |
 | **Attributes** | 4 stats (strength/agility/insight/calm) with pip bars and 500-point upgrade buttons |
 | **Contacts** | Established-contact character list, online status, private chat entry |
 
@@ -87,6 +87,7 @@ _db {
   characters: [{
     id, name, gender, affection, relation, present, persona, appearance, avatar,
     isNPC, npcType, isAutoCreated, memories: [], simpleMemories: [], tags: [],
+    background, personalGoal, fears: [],  // AI-auto-generated on CHAR_JOIN
     affectionEnabled, tabooEnabled, memoryEnabled, initiativeEnabled,
     contactAccepted, contactEstablished, contactRequested,
     isOnline, isAlive, deathCause, deathTime, lastSeenLocation, lastSeenTime,
@@ -142,10 +143,249 @@ mapRegions: [{
 }]
 ```
 
-**6 preset regions**: 荒原·东段, 东墟, 南墟, 铁穹, 边界地带, 执念之海  
+**7 preset regions**: 废城·旧区, 荒原·东段, 东墟, 南墟, 铁穹, 边界地带, 执念之海  
 **Breathing dot states**: `dot-unknown`(red,2s) / `dot-active`(blue,1.5s) / `dot-cleared`(green,3s) / `dot-visited`(dark-blue,2.5s) / `dot-current`(white,0.8s)  
 **Dungeon ring**: dashed circle (unknown) / solid (active) / solid+checkmark (cleared)  
 **Line colors**: `line-cleared`(#2E7D32) / `line-active`(#3A6B8C) / `line-partial`(#8E2A2A dashed) / `line-unknown`(gray dashed)
+
+---
+
+## Game Design: World & Systems
+
+### 地图与世界系统
+
+**世界观**：VOID是高维文明建造的灵魂筛选器，是无限延伸的黑暗精神世界。玩家无实体，一切伤害体现为SAN值下降。已知地图只是冰山一角，随游戏推进无限扩展。
+
+**大区域**：
+- 7个预设大区域（废城·旧区/荒原·东段/东墟/南墟/铁穹/边界地带/执念之海），AI可扩展新区域
+- 每个大区域包含3-5个小区域
+- 初始2个大区域（废城·旧区、荒原·东段）默认可探索，无需线索
+- 其余大区域需5条以上线索解锁，所需线索数与初始地距离成正比
+- 7个预设区域探索完后AI自动扩展新区域，必须符合底层规则：所有区域必须是被执念污染的扭曲空间，不存在"正常"的地方
+
+**小区域**：
+- 每个大区域含3-5个小区域
+- 解锁需1-3条线索，来源包括：论坛信息、角色对话、自主探索、副本线索
+- 玩家在终端地图手动解锁
+- 小区域间步行1-6小时，敏捷属性可缩短时间
+- 跨大区域移动按天计算
+
+**预设区域列表（7个）**：
+
+1. **废城·旧区**（默认出生点）— 威胁：中等。腐烂的城市投影，执念密度适中，新手友好。小区域：旧街区（出生点）/地下商场/废弃医院/车站广场。遭遇概率：角色40%/NPC20%/怪物20%/无事件20%。
+
+2. **荒原·东段** — 威胁：安全至中等。干裂的灰土荒野，空旷压抑，偶有微弱冷光。遭遇概率：角色30%/NPC15%/怪物20%/无事件35%。
+
+3. **东墟** — 威胁：中等。废弃工业区残骸，执念污染明显，副本密度增加。遭遇概率：角色25%/NPC20%/怪物30%/无事件25%。
+
+4. **南墟** — 威胁：中等至高。沉没的居民区，时间感扭曲，NPC密度高且行为异常。遭遇概率：角色20%/NPC30%/怪物35%/无事件15%。
+
+5. **铁穹** — 威胁：高。巨型工业构造体内部，空间法则开始失效，精英怪物频繁。遭遇概率：角色15%/NPC20%/怪物45%/无事件20%。
+
+6. **边界地带** — 威胁：致命。已知区域的尽头，物理法则严重扭曲，极少数轮回者到达过。遭遇概率：角色10%/NPC15%/怪物60%/无事件15%。
+
+7. **执念之海** — 威胁：致命。纯粹的执念聚合体，接近即被侵蚀，无游荡者只有执念碎片。遭遇概率：角色5%/NPC10%/怪物75%/无事件10%。
+
+废城·旧区和荒原·东段默认可探索，无需线索。其余5个大区域需5条以上线索解锁。
+
+**移动逻辑**：
+- 移动消耗游戏时间，同步消耗SAN
+- 移动SAN消耗公式：意志1=每小时5SAN，每+1意志减少0.5SAN。意志10=每小时0.5SAN
+- 后台自然消耗：每周期2-5SAN，与移动叠加计算
+- 移动途中随机事件触发概率随距离和时间增加
+- 移动中途遇到随机事件由旁白告知，玩家选择是否参与
+
+**跨区域随机事件**：
+- 类型：遇见熟人/陌生人（可沟通、交易、组队）、遭遇怪物（扣SAN）、神秘威胁
+- 不直接导致死亡，属于奇遇性质
+- 触发时旁白告知，玩家选择是否参与
+
+### 副本系统
+
+- 每个小区域含5-10个以上副本，难度根据所在大区域基础难度随机生成
+- 初始区域默认难度低，兼作新手教程
+- 通关后作为里程碑永久记录，不重置
+- 进入副本期间难以移动，离开小区域则副本判定失败
+- 通关副本可获传送奖励：由副本执念指向决定目标地点，不可跨度过大
+- 副本难度等级：C级/B级/A级/S级。难度不固定——未被处理的副本随时间自动升级
+- 终端干扰随副本等级增加：C级轻微延迟 → B级通讯不稳定 → A级论坛/地图瘫痪 → S级几乎瘫痪（仅显示基础状态）
+
+### SAN值系统
+
+**消耗**：
+- 移动消耗：意志1=每小时5SAN，意志每+1减少0.5SAN
+- 后台自然消耗：每周期2-5SAN
+- 战斗消耗：3-8SAN
+- 进入副本消耗：5-10SAN
+- 恐怖场景：3-15SAN
+- 目睹好感度≥31的角色死亡：额外扣除SAN 10-20
+- 目睹好感度≥61的角色死亡：额外扣除SAN 20-35
+- 好感度越高扣除越多，由AI根据具体情况判定
+
+**恢复途径**：
+- 通关副本奖励：+10~+30SAN
+- 药剂注射：+5~+15SAN（来源：副本奖励或论坛交易）
+- SAN<30时角色优先使用携带的药剂/食物自救；无道具时优先逃离副本或向安全区移动
+
+**归零后果**：SAN归零触发被同化事件，玩家不再是轮回者。
+
+### 积分系统
+
+- 每24小时扣除100积分（基于VOID大世界时间）
+- 扣除前1小时终端提醒，前10分钟持续警告文字变红
+- 积分<200标注低，<100持续警告，=0无法支付下次扣除，变负则抹杀
+- 获取途径：通关副本、击杀怪物、论坛帖子被购买
+
+### 死亡条件（仅两种）
+
+- **积分变负**：直接抹杀
+- **SAN归零**：被同化
+
+### 击杀轮回者
+
+- 继承被击杀者全部积分
+- 击杀者SAN下降当前值30-50%（根据被击杀者挣扎程度）
+- 好感度记录保留不重置
+- 获得永久击杀标记（hasKillMark=true），被孤立或猎杀风险增加
+
+### 组队
+
+- 队伍和独行SAN消耗完全相同，各自独立扣除，无减免也无叠加
+- 目睹队友死亡适用目睹死亡额外扣除规则
+
+### NPC分类
+
+- **执念投影**（projection）：副本中执念主人记忆的投影，活在执念循环中，行为受循环限制
+- **被同化者**（assimilated）：曾是轮回者，失去锚点和终端，行为混乱不可预测
+- **原住民**（native）：VOID中自然产生的意识体，极其罕见，完全自主
+
+### 玩家自创角色出场逻辑
+
+**位置选择**：
+- 有预设位置：AI在该位置附近自然安排出场，符合该区域遭遇概率触发
+- 无预设位置：AI根据角色背景和性格标签自动选择合适区域。冒险型/战斗型→威胁较高区域；警惕型/冷静型→相对安全区域；其余按角色背景逻辑判断
+
+**出场时机**：
+- 玩家进入同一小区域时按遭遇概率触发
+- 主动性开启时角色可能主动发消息
+
+**存活天数影响**：
+- <7天：属性总和4-8，携带0-1件基础物品
+- 7-30天：属性总和8-16，携带1-3件物品
+- 30-90天：属性总和16-24，携带2-4件物品
+- >90天：属性总和24-32，携带3-5件物品
+- 单项属性范围1-8，不超过8
+
+**初始积分**（新建角色界面可选填）：
+- <7天：100-500积分
+- 7-30天：300-1500积分
+- 30-90天：800-3000积分
+- >90天：2000-5000积分
+- 留空则AI取该范围中间值
+
+### 角色核心字段
+
+角色创建时由AI根据进入方式自动生成以下三个字段，存入角色卡并注入上下文：
+
+- **背景故事（background）**：1-2句。死者：为何而死、未了的执念是什么。生者：因何接触媒介被拉入、现实中留下了什么。背景影响角色在VOID里的动机和行为逻辑。
+- **个人目标（personalGoal）**：一个核心目标。例如找到失散的家人、查清VOID真相、活着离开、复仇、保护某人。目标影响行动优先级，高于性格标签。
+- **恐惧点（fears）**：1-2个特定恐惧。例如封闭空间、黑暗、溺水、被遗忘、失去控制。遇到恐惧相关场景时SAN消耗翻倍。玩家可在角色设定页查看和修改。AI叙事时据此调整描写重点。
+
+### 物品系统
+
+**消耗品**：
+- 药剂：恢复SAN +5到+15，质量不同效果不同
+- 食物：轻微恢复SAN +2到+8，来源待定
+- 符咒/护身符：抵挡一次精神攻击，消耗后消失
+
+**信息载体**：
+- 类型：日记、照片、录音、地图碎片
+- 作用：记录线索，帮助解锁区域
+- 由AI在叙事中自然生成，用`[ITEM +名称:描述]`写入背包
+
+**道具（基础版）**：
+
+每件道具对应一个属性判定加成，持有状态下AI在叙事判定时参考：
+
+| 道具 | 效果 | 关联属性 |
+|------|------|---------|
+| 撬棍 | 物理破坏辅助，力量判定加成 | 力量 |
+| 钢管 | 战斗时攻击判定成功率提升 | 力量 |
+| 防护服 | 降低恐怖场景SAN消耗，穿戴状态持续生效 | 意志 |
+| 耳塞 | 屏蔽语言规则类副本的部分干扰，意志判定加成 | 意志 |
+| 手电筒 | 视觉禁忌类副本中提升感知判定 | 感知 |
+| 绳索 | 辅助探索，敏捷判定加成 | 敏捷 |
+
+**道具规则**：
+- 程序上记录持有状态，AI在判定时参考
+- 道具损耗由AI叙事判断
+- 后期根据游戏推进继续扩展
+
+**物品交换**：
+- 角色之间可自愿赠予或交换物资
+- 积分不可交换
+- 无程序强制，由双方好感度和AI叙事决定
+- 论坛交易系统后期实现
+
+**物品来源**：
+- 副本奖励掉落
+- AI在叙事中自然给予
+- 玩家之间交换
+
+### 属性与判定
+
+**四种属性（范围1-10，每点500积分强化，上限10）**：
+- 力量：攻击/破坏/负重
+- 敏捷：闪避/潜行/命中
+- 感知：洞察/识别/发现隐藏
+- 意志：抵抗SAN下降/说服/压力判断
+
+**道具加成**：持有对应道具时属性判定+10%（不叠加，同类型取最高值）。撬棍/钢管→力量。绳索→敏捷。手电筒→感知。耳塞→意志，同时降低执念碎片SAN侵蚀消耗30%。防护服→恐怖场景SAN消耗降低30%，持续穿戴生效。道具损耗由AI叙事判断。
+
+**恐惧点触发**：遭遇恐惧相关场景时SAN消耗翻倍，判定成功率-15%。AI叙事中描述恐惧反应。
+
+**判定公式**：成功率 = 相关属性值×10% - SAN惩罚 + 好感度加成(仅社交) + 道具加成 - 恐惧点惩罚。无随机骰子，AI叙事决定。上限90%，下限5%。
+
+SAN惩罚分档：80-100:0%、60-79:-5%、40-59:-10%、20-39:-20%、1-19:-30%。好感度加成：±5-15%（仅社交事件）。
+
+### 时间系统
+
+**基础规则**：
+- VOID时间独立于现实时间，关闭网页后暂停，再次打开继续
+- 没有昼夜变化，永远昏暗灰色，光源来自地面冷光
+- 时间由AI在叙事中自然推进，不需要每次明确标注
+
+**时间推进参考**：
+- 对话/观察：几分钟
+- 短距离移动：十几分钟到半小时
+- 探索副本房间：十几分钟
+- 跨小区域移动：1-6小时
+- 跨大区域移动：按天计算
+- 休息恢复：1小时以上
+- 战斗：几分钟到十几分钟
+
+**积分扣除节点**：
+- 每24小时扣除100积分（基于VOID大世界时间）
+- 扣除前1小时终端提醒
+- 前10分钟持续警告，文字变红
+- 积分<200标注低，<100持续警告，=0无法支付，变负则抹杀
+
+**副本内时间异常（五种）**：
+- 正常
+- 时间膨胀（副本内一天=大世界一小时）
+- 时间压缩（积分扣除加速）
+- 时间循环
+- 时间倒流
+
+**待完善**：
+- 游戏内独立时间模块（与现实时间完全解耦）
+- 物品系统与时间系统的联动
+
+### AI权限
+
+**可生成**：新区域名称、地貌、氛围、怪物类型、副本入口、执念投影NPC、特殊规则（物理异常、时间流速差异）
+
+**不可生成**：与VOID底层规则矛盾的内容、安全无怪物的天堂、一次性揭示整个区域全貌、让玩家直接到达VOID尽头或真相
 
 ---
 
@@ -164,15 +404,19 @@ Player Current State          ← SAN/points/location/inventory/memories
 Active Character/NPC List     ← present characters with affection/persona
 Copy Status                   ← current copy name/rules/location
 World Preset                  ← VOID definition, generation rules, AI permissions
+Map & World System            ← 7 regions + AI expansion, clue unlock, movement SAN cost
 Monster System                ← 4 types, combat rules, kill rewards
-Time System                   ← objective time, tides, storms
+Copy System                   ← 5-10+ copies per sub-region, C/B/A/S difficulty, auto-level up
+Time System                   ← independent from real time, copy-internal time anomalies
 Item System                   ← 6 types, prohibitions, sources
 Attributes & Judgment         ← 4 stats, probability formula
 Character Interaction         ← initiative, background actions (6 categories)
-Points System                 ← deduction, earning, ranking
-World Geography               ← known areas, exploration, shortcuts
-Copy System                   ← types, rules, difficulties, completion
-SAN System                    ← triggers, recovery, 6 stages
+Points System                 ← daily -100, earning, ranking, negative = erased
+Movement Logic                ← willpower-based SAN cost, random events on route
+Cross-Region Events           ← encounters (characters/monsters/mysteries), non-lethal
+SAN System                    ← move/combat/copy/horror costs, recovery, 0 = assimilated
+Death System                  ← only 2 conditions: points ≤ 0 or SAN ≤ 0
+Team System                   ← solo/team same SAN cost, witnessing teammate death = extra SAN penalty
 Memory Compression Requests   ← triggered at partition limits
 ```
 
@@ -294,10 +538,13 @@ All in `<style>` tag (lines ~10-1000). Key design patterns:
 4. **CHAR_JOIN auto-attributes**: survival days → attribute total range → random distribution ≤8 per stat
 5. **NPC/Role distinction**: `isNPC` flag drives affection, memory, contact behavior
 6. **Memory 6-partition with priority injection**: character > copy > global ≥0.8 > forum > npc; ≤8 entries / ≤400 chars
-7. **MapRegion dual-layer**: regions (click → zoom) / subNodes (click → go-to popup); coordinates in percentage
-8. **Death single-backtrack**: `_hasBacktracked` prevents more than one resurrection
+7. **MapRegion dual-layer**: regions (click → zoom) / subNodes (click → go-to popup); coordinates in percentage; 7 preset regions + AI expansion; larger regions need 5+ clues to unlock; sub-regions need 1-3 clues
+8. **Death single-backtrack**: `_hasBacktracked` prevents more than one resurrection; only 2 death conditions: points ≤ 0 → erased, SAN ≤ 0 → assimilated
 9. **System Prompt hierarchy**: global rules at absolute top; 5-tier priority; markers parsed post-response
 10. **Streaming AI**: SSE `ReadableStream` with real-time bubble update via `_updateStreamBubble()`
+11. **Movement costs SAN**: willpower 1 = 5 SAN/h, each +1 will reduces by 0.5; willpower 10 = 0.5 SAN/h
+12. **Copy per sub-region**: each sub-region has 5-10+ copies; difficulty auto-generates based on region threat; copies auto-level up over time if not cleared
+13. **No distance calculation in goto**: map node click → centered modal (name + threat + copy history) → confirm go → update position + location string + node states → save → refresh; no AI trigger, no time/SAN/monster logic
 
 ---
 

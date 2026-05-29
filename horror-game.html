@@ -1153,22 +1153,120 @@ body.light .chat-input-bar{background:rgba(242,240,236,.9)}
 /* ============================================================
    INTRO ANIMATION
    ============================================================ */
+/* ============================================================
+   INTRO OVERLAY — 3-act cinematic
+   ============================================================ */
 #intro-overlay{
   position:fixed;inset:0;z-index:9999;background:#050505;
   display:flex;align-items:center;justify-content:center;flex-direction:column;
-  animation:overlay-fade .8s ease-in-out forwards 3.8s;
+  transition:opacity 1.5s cubic-bezier(.4,0,.2,1);
 }
-.term-text{font-family:var(--font-mono);font-size:14px;color:var(--text);letter-spacing:.1em;position:absolute;opacity:0;animation:term-anim 1s forwards}
+#intro-overlay.hidden{opacity:0;pointer-events:none}
+.term-text{font-family:var(--font-mono);font-size:14px;color:var(--text);letter-spacing:.1em;position:absolute;opacity:0}
+.term-text.play{animation:term-anim 1s forwards}
 .term-cursor{color:var(--accent);animation:blink .15s infinite}
-@keyframes term-anim{0%{opacity:1;transform:scale(1);filter:blur(0)}60%{opacity:1;transform:scale(1);filter:blur(0)}70%{transform:skewX(20deg);filter:drop-shadow(2px 0 0 #EAEAEA) drop-shadow(-2px 0 0 #8E2A2A)}80%{transform:scaleX(1.5) scaleY(.2);opacity:1}100%{transform:scaleX(0) scaleY(.01);opacity:0}}
+@keyframes term-anim{0%{opacity:1;transform:scale(1);filter:blur(0)}65%{opacity:1;transform:scale(1);filter:blur(0)}75%{transform:skewX(20deg);filter:drop-shadow(2px 0 0 #EAEAEA) drop-shadow(-2px 0 0 #8E2A2A)}85%{transform:scaleX(1.5) scaleY(.2);opacity:1}100%{transform:scaleX(0) scaleY(.01);opacity:0}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.title-box{position:absolute;display:flex;align-items:baseline;opacity:0;animation:title-fade 1.5s ease-out forwards 1s}
-.title-void{font-family:"Georgia","Songti SC",serif;font-size:36px;letter-spacing:.15em;color:#8E2A2A;position:relative}
-.title-narrative{font-size:14px;letter-spacing:.3em;color:#EAEAEA;margin-left:10px;font-weight:300;opacity:.7}
-@keyframes title-fade{0%{opacity:0;transform:scale(.95);filter:blur(4px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
-.title-void::after{content:'';position:absolute;top:50%;left:-10%;right:-10%;height:1.5px;background:#8E2A2A;box-shadow:0 0 8px #8E2A2A;opacity:0;transform:scaleX(0);transform-origin:left;animation:strike-anim .4s ease-in forwards 2.3s}
-@keyframes strike-anim{0%{opacity:1;transform:scaleX(0)}60%{opacity:1;transform:scaleX(1)}65%{opacity:0;transform:scaleX(1)}70%{opacity:1;transform:scaleX(1)}75%{opacity:0;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1)}}
-@keyframes overlay-fade{to{opacity:0;pointer-events:none;visibility:hidden}}
+
+.title-container{position:absolute;display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0}
+.title-container.play{animation:title-container-fade .8s ease-out forwards 1s}
+@keyframes title-container-fade{0%{opacity:0}100%{opacity:1}}
+.title-void{
+  font-family:"Georgia","Songti SC",serif;font-size:48px;letter-spacing:.3em;
+  color:#8E2A2A;position:relative;text-transform:uppercase;
+  filter:blur(8px);transform:scaleX(.3);opacity:0;
+  transition:filter 1.2s cubic-bezier(.2,.9,.4,1.1),transform 1s cubic-bezier(.2,.9,.4,1.1),opacity .8s ease,letter-spacing .8s ease;
+}
+.title-container.play .title-void{filter:blur(0);transform:scaleX(1);opacity:1;letter-spacing:.15em}
+.title-void::after{
+  content:'';position:absolute;top:55%;left:-15%;right:-15%;height:1.5px;
+  background:#8E2A2A;box-shadow:0 0 8px #8E2A2A;opacity:0;
+  transform:scaleX(0);transform-origin:left;
+}
+.title-void.strike::after{animation:strike-anim .4s ease-in forwards}
+@keyframes strike-anim{0%{opacity:1;transform:scaleX(0)}40%{opacity:1;transform:scaleX(1);top:55%}50%{opacity:0;transform:scaleX(1);top:50%}60%{opacity:1;transform:scaleX(1);top:60%}100%{opacity:0;transform:scaleX(1)}}
+.title-narrative-wrapper{display:inline-block;position:relative}
+.title-narrative{font-family:var(--font-mono);font-size:12px;letter-spacing:.2em;color:#EAEAEA;font-weight:300;opacity:.75;display:inline-block}
+.type-cursor{display:inline-block;width:2px;height:14px;background-color:var(--accent);margin-left:4px;vertical-align:middle;animation:cursor-blink .8s step-end infinite;opacity:0}
+.type-cursor.visible{opacity:1}
+@keyframes cursor-blink{0%,100%{opacity:1}50%{opacity:0}}
+.watermark-signature{
+  position:absolute;bottom:calc(var(--sab,24px) + 24px);right:24px;
+  font-family:"Dancing Script",cursive;font-size:26px;color:var(--text);
+  opacity:0;letter-spacing:.05em;transform:rotate(-5deg);
+}
+.watermark-signature.play{animation:signature-fade .8s ease-out forwards}
+@keyframes signature-fade{0%{opacity:0;transform:rotate(-5deg) translateY(8px)}100%{opacity:.4;transform:rotate(-5deg) translateY(0)}}
+
+/* Worldview screen */
+#worldview-screen{
+  position:fixed;inset:0;z-index:9998;background:#000;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity 1.5s ease;padding:0 24px;cursor:default;
+}
+#worldview-screen.active{display:flex;opacity:1}
+#worldview-screen.fade-out{opacity:0;pointer-events:none}
+#worldview-screen.clickable{cursor:pointer}
+.wv-title{font-family:var(--font-serif);font-size:32px;color:var(--accent);letter-spacing:.2em;margin-bottom:8px;opacity:0;animation:fade-up 1.5s ease forwards .5s}
+.wv-subtitle{font-family:var(--font-serif);font-size:14px;color:var(--text);letter-spacing:.1em;margin-bottom:40px;opacity:0;animation:fade-up 1.5s ease forwards 1.5s}
+.wv-text-container{display:flex;flex-direction:column;gap:12px;text-align:center}
+.wv-line{font-family:var(--font-ui);font-size:11px;color:#888;letter-spacing:.05em;line-height:1.6;opacity:0}
+.wv-line:nth-child(1){animation:fade-up 1.5s ease forwards 2.5s}
+.wv-line:nth-child(2){animation:fade-up 1.5s ease forwards 3.5s}
+.wv-line:nth-child(3){animation:fade-up 1.5s ease forwards 4.5s}
+.wv-line:nth-child(4){animation:fade-up 1.5s ease forwards 5.5s}
+.wv-line:nth-child(5){animation:fade-up 1.5s ease forwards 6.5s}
+.wv-line:nth-child(6){animation:fade-up 1.5s ease forwards 7.5s;color:var(--text)}
+@keyframes fade-up{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+
+/* Setup screen */
+#setup-screen{
+  position:fixed;inset:0;z-index:10000;background:#050505;
+  display:none;align-items:center;justify-content:center;flex-direction:column;
+  font-family:var(--font-mono);opacity:0;transition:opacity 1s ease;
+}
+#setup-screen.active{display:flex;opacity:1}
+.setup-content{width:100%;max-width:340px;display:flex;flex-direction:column;gap:8px;padding:0 24px}
+.log-line{font-size:12px;color:#444;letter-spacing:.08em;opacity:0;line-height:1.6}
+.log-line.show{animation:log-in .5s ease-out forwards}
+.log-line .highlight{color:var(--accent)}
+.log-line .dim{color:#333}
+@keyframes log-in{0%{opacity:0;transform:translateY(4px)}100%{opacity:1;transform:translateY(0)}}
+.input-line{display:flex;align-items:center;gap:8px;opacity:0;font-size:14px;letter-spacing:.05em;height:28px}
+.input-line.show{animation:log-in .5s ease-out forwards}
+.input-line.dimmed{opacity:.35;pointer-events:none}
+.input-prompt{color:var(--accent);flex-shrink:0}
+.setup-input{flex:1;background:transparent;border:none;outline:none;color:#EAEAEA;font-size:14px;caret-color:var(--accent);font-family:var(--font-mono);letter-spacing:.05em}
+.setup-input::placeholder{color:#333}
+.input-cursor{display:inline-block;width:8px;height:16px;background:var(--accent);animation:blink-cursor .8s infinite;flex-shrink:0}
+@keyframes blink-cursor{0%,100%{opacity:1}50%{opacity:0}}
+.choice-line{display:flex;gap:24px;opacity:0;height:0;overflow:hidden;transition:height .3s,opacity .3s}
+.choice-line.show{opacity:1;height:32px;animation:log-in .5s ease-out forwards}
+.choice-line.dimmed{opacity:.35;pointer-events:none}
+.choice-item{font-family:var(--font-mono);font-size:12px;color:#444;letter-spacing:.08em;cursor:pointer;transition:all .3s;padding:6px 0;border-bottom:1px solid transparent;background:none;border-left:none;border-right:none;border-top:none}
+.choice-item:hover{color:#888}
+.choice-item.selected{color:#EAEAEA;border-bottom-color:var(--accent)}
+.anchor-area{display:none;flex-direction:column;align-items:center;margin-top:32px;opacity:0}
+.anchor-area.show{display:flex;animation:log-in .8s ease-out forwards}
+.anchor-ring{width:100px;height:100px;border-radius:50%;border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all .4s;-webkit-tap-highlight-color:transparent;user-select:none}
+.anchor-ring:active,.anchor-ring.pressing{border-color:rgba(142,42,42,.5)}
+.anchor-ring-inner{width:60px;height:60px;border-radius:50%;border:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;transition:all .4s}
+.anchor-ring:active .anchor-ring-inner,.anchor-ring.pressing .anchor-ring-inner{border-color:rgba(142,42,42,.3);box-shadow:0 0 40px rgba(142,42,42,.08)}
+.anchor-dot{width:4px;height:4px;background:#555;border-radius:50%;transition:all .4s}
+.anchor-ring.pressing .anchor-dot{background:var(--accent);box-shadow:0 0 12px rgba(142,42,42,.6)}
+.anchor-ring .progress-ring{position:absolute;inset:-6px;transform:rotate(-90deg)}
+.anchor-ring .progress-ring circle{fill:none;stroke:transparent;stroke-width:1.5;stroke-dasharray:300;stroke-dashoffset:300;transition:stroke .4s}
+.anchor-ring.pressing .progress-ring circle{stroke:rgba(142,42,42,.5)}
+.anchor-label{font-family:var(--font-mono);font-size:10px;color:#444;letter-spacing:.15em;margin-top:20px;text-transform:uppercase;transition:color .4s}
+.anchor-ring.pressing~.anchor-label{color:var(--accent)}
+.anchor-hint{font-size:10px;color:#333;letter-spacing:.05em;margin-top:8px;transition:color .4s}
+.bind-complete-text{display:none;flex-direction:column;align-items:center;gap:8px;margin-top:32px;opacity:0;font-family:var(--font-mono)}
+.bind-complete-text.show{display:flex;animation:log-in .6s ease-out forwards}
+.bind-complete-text .done-line{font-size:11px;color:#555;letter-spacing:.1em}
+.bind-complete-text .done-id{font-size:13px;color:var(--accent);letter-spacing:.15em}
+.bind-flash{position:fixed;inset:0;z-index:10001;background:rgba(142,42,42,.1);opacity:0;pointer-events:none;transition:opacity .15s}
+.bind-flash.fire{opacity:1;transition:opacity 0s}
+
 #app,.dock-wrapper{opacity:0}
 .intro-done #app,.intro-done .dock-wrapper{animation:app-in 1.2s ease-out forwards}
 @keyframes app-in{to{opacity:1}}
@@ -1652,6 +1750,8 @@ body.light-theme #page-private-chat,
 body.light #page-private-chat{background:var(--bg)}
 body.light-theme #page-private-chat .sub-header,
 body.light #page-private-chat .sub-header{background:var(--glass)}
+body.light-theme .settings-header,
+body.light .settings-header{background:linear-gradient(var(--bg) 55%,transparent)}
 body.light-theme #notify-banner,
 body.light #notify-banner{background:var(--glass);border-color:var(--accent)}
 body.light-theme #death-bg,
@@ -1751,10 +1851,66 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 
 <!-- INTRO OVERLAY -->
 <div id="intro-overlay">
-  <div class="term-text"><span class="term-cursor">></span> SYS.INIT_</div>
-  <div class="title-box">
-    <div class="title-void">VOID</div>
-    <div class="title-narrative">/ NARRATIVE</div>
+  <div class="term-text" id="term-line"><span class="term-cursor">></span> SYS.INIT_</div>
+  <div class="title-container" id="title-container">
+    <div class="title-void" id="title-void">VOID</div>
+    <div class="title-narrative-wrapper" id="narrative-wrapper">
+      <span class="title-narrative" id="title-narrative"></span>
+      <span class="type-cursor" id="type-cursor"></span>
+    </div>
+  </div>
+  <div class="watermark-signature" id="brando-sign">Brando</div>
+</div>
+
+<div class="bind-flash" id="bind-flash"></div>
+
+<div id="worldview-screen" onclick="App._handleWorldviewClick()">
+  <div class="wv-title">VOID</div>
+  <div class="wv-subtitle">你已被选中。</div>
+  <div class="wv-text-container">
+    <div class="wv-line">VOID是一个死后世界。你和其他被选中者在这里挣扎求生。</div>
+    <div class="wv-line">每24小时扣除100积分。积分不足则抹杀。</div>
+    <div class="wv-line">副本是规则怪谈——规则不被告知，违反则死。</div>
+    <div class="wv-line">理智值归零将被同化。</div>
+    <div class="wv-line">没有复活。没有重来。</div>
+    <div class="wv-line">欢迎来到筛选。</div>
+  </div>
+</div>
+
+<div id="setup-screen">
+  <div class="setup-content">
+    <div class="log-line" id="log-1"><span class="dim">[SYS]</span> 检测到未注册个体...</div>
+    <div class="log-line" id="log-2"><span class="dim">[SYS]</span> 正在分配锚点...</div>
+    <div class="log-line" id="log-3"><span class="highlight">[ANCHOR]</span> 锚点就绪。需要身份标识。</div>
+    <div class="input-line" id="name-line">
+      <span class="input-prompt">></span>
+      <input type="text" class="setup-input" id="setup-name" placeholder="输入身份标识..." maxlength="20" autocomplete="off">
+      <span class="input-cursor" id="name-cursor"></span>
+    </div>
+    <div class="choice-line" id="gender-line">
+      <button class="choice-item" data-gender="male" onclick="App._selectGender(this)">[ 男 ]</button>
+      <button class="choice-item" data-gender="female" onclick="App._selectGender(this)">[ 女 ]</button>
+    </div>
+    <div class="choice-line" id="identity-line">
+      <button class="choice-item" data-identity="dead" onclick="App._selectIdentity(this)">[ 死者 ]</button>
+      <button class="choice-item" data-identity="alive" onclick="App._selectIdentity(this)">[ 生者 ]</button>
+    </div>
+    <div class="anchor-area" id="anchor-area">
+      <div class="anchor-ring" id="anchor-ring"
+           onmousedown="App._startBind(event)" onmouseup="App._cancelBind()" onmouseleave="App._cancelBind()"
+           ontouchstart="App._startBind(event)" ontouchend="App._cancelBind()" ontouchcancel="App._cancelBind()">
+        <div class="anchor-ring-inner"><div class="anchor-dot"></div></div>
+        <svg class="progress-ring" viewBox="0 0 112 112">
+          <circle cx="56" cy="56" r="48"/>
+        </svg>
+      </div>
+      <div class="anchor-label">ANCHOR BINDING</div>
+      <div class="anchor-hint" id="anchor-hint">长按以锚定存在</div>
+    </div>
+    <div class="bind-complete-text" id="bind-complete">
+      <div class="done-line">ANCHOR LOCKED</div>
+      <div class="done-id" id="done-id">ID: ----</div>
+    </div>
   </div>
 </div>
 
@@ -2050,7 +2206,6 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
       <div class="settings-group-label">其他</div>
       <div class="settings-list">
         <button class="settings-item" data-target="appearance">外观<span class="settings-arrow">›</span></button>
-        <button class="settings-item" data-target="term-settings">终端设置<span class="settings-arrow">›</span></button>
         <button class="settings-item" data-target="about">关于<span class="settings-arrow">›</span></button>
       </div>
     </div>
@@ -2408,7 +2563,7 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;margin-bottom:6px">角色</div><div style="font-size:11px;color:var(--text-2);line-height:1.7">其他轮回者。与你是同类。<br>可组队、交易、通讯。<br>击杀角色继承全部积分，但理智值暴跌70%起。<br>击杀标记永久存在。<br>好感度影响角色对你的态度。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;margin-bottom:6px">NPC</div><div style="font-size:11px;color:var(--text-2);line-height:1.7">执念投影、被同化者、原住民。<br>不是友善的存在。比怪物多了残存意识和记忆碎片。<br>遇到NPC不代表安全——下一秒可能攻击你。<br>击杀不掉积分，理智值消耗极少。<br>被同化者曾是角色，残存模糊记忆。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;margin-bottom:6px">终端</div><div style="font-size:11px;color:var(--text-2);line-height:1.7">前臂半透明显示屏。仅自己可见。<br>无自我意识。沉默记录一切。<br>功能：论坛、地图、通讯录、属性强化。<br>副本内受干扰程度取决于副本难度。</div></div>
-      <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;margin-bottom:6px">属性</div><div style="font-size:11px;color:var(--text-2);line-height:1.7">力量、敏捷、感知、意志。<br>初始全1，最高10。<br>每500积分强化1点。<br>事件成功率由相关属性决定。<br>AI自动判定，无需手动操作。</div></div>
+      <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;margin-bottom:6px">属性</div><div style="font-size:11px;color:var(--text-2);line-height:1.7">力量、敏捷、感知、意志。<br>初始全1，最高10。<br>每200积分强化1点。<br>事件成功率由相关属性决定。<br>AI自动判定，无需手动操作。</div></div>
       <div style="margin-bottom:16px"><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-3);letter-spacing:.06em;margin-bottom:6px">死亡</div><div style="font-size:11px;color:var(--text-2);line-height:1.7">同化：理智值归零。变成副本或怪物。<br>抹杀：积分为负。存在感完全消失。<br>死亡后可回溯到上一个存档点一次。<br>回溯保留所有数据，回到存档时的状态。<br>也可选择完全重新开始。</div></div>
     </div>
     <div style="text-align:center;padding:12px 0 calc(8px + var(--sab));font-family:var(--font-mono);font-size:8px;color:var(--text-3)">VOID不会告诉你更多。</div>
@@ -2607,44 +2762,6 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
     </div>
     <div id="gift-item-name" style="font-size:11px;color:var(--text-2);margin-bottom:12px;font-family:var(--font-mono)"></div>
     <div id="gift-char-list"></div>
-  </div>
-</div>
-
-<!-- ============================================================
-     SUB-PAGE: 终端设置
-     ============================================================ -->
-<div id="page-term-settings" class="page sub-page">
-  <div class="sub-header">
-    <button class="sub-back" data-back="settings">←</button>
-    <span class="sub-title">终端设置</span>
-  </div>
-  <div class="sub-content">
-    <div class="form-section">
-      <div class="form-section-title">终端显示</div>
-      <div class="form-group">
-        <label class="form-label">终端昵称</label>
-        <input class="form-input" id="ts-nickname" type="text" placeholder="输入终端显示名称" maxlength="20">
-        <span class="form-hint">显示在终端主页的昵称，默认为"VOID-XXXX"</span>
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title">通讯权限</div>
-      <div class="form-group">
-        <label class="form-label">终端通讯权限</label>
-        <select class="form-select" id="ts-comm-perm">
-          <option value="all">所有人 — 任何角色都可发送通讯请求</option>
-          <option value="contacts">仅已知联系人 — 只有通讯录中已有的角色可发消息</option>
-          <option value="none">关闭 — 不接受任何通讯请求和消息</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn-accent" style="width:100%;margin-top:8px" onclick="App._saveTermSettings()">保存</button>
-    <div class="toast" id="ts-toast">已保存</div>
-    <div class="form-section" style="margin-top:32px">
-      <div class="form-section-title">终端状态</div>
-      <div class="about-row"><span>终端ID</span><span id="ts-void-id" style="font-family:var(--font-mono);font-size:10px">--</span></div>
-      <div class="about-row"><span>运行状态</span><span id="ts-status" style="font-family:var(--font-mono);font-size:10px">--</span></div>
-    </div>
   </div>
 </div>
 
@@ -3930,8 +4047,9 @@ function buildSystemPrompt() {
   presetText += '积分规则：积分为负时直接抹杀。积分为0时存活但无法支付下次扣除。没有复活，没有重来。唯一离开方式：存活足够久、通关足够多副本——极少数人走到这一步。\n';
   presetText += '击杀规则：击杀其他轮回者继承其全部积分。代价：理智值下降当前值的30-50%（根据被击杀者的挣扎程度判定）；终端永久记录击杀标记，近距离接触时其他轮回者可见。好感度记录保留不重置。没有规则禁止击杀，但标记会让其他轮回者警惕或主动回避。\n';
   presetText += '生者与死者：在VOID中的能力无区别。生者对现实还有记忆，副本偶尔扭曲这些记忆作为心理攻击。死者没有退路，通关是唯一选择。\n';
-	  presetText += '目睹角色死亡：目睹好感度≥31的角色死亡额外扣除SAN 10-20；目睹好感度≥61的角色死亡额外扣除SAN 20-35。好感度越高扣除越多，由AI根据具体情况判定。\n';
-	  presetText += '组队SAN消耗：组队移动时各自独立扣除SAN，无减免也无叠加。目睹队友死亡适用上述目睹死亡额外扣除规则。\n';
+	  presetText += '目睹角色死亡：目睹好感度≥31的角色死亡额外扣除SAN 10-20；目睹好感度≥61的角色死亡额外扣除SAN 20-35。好感度越高扣除越多，由AI根据具体情况判定。目睹好感度≥81（深度信任）的角色死亡额外扣除SAN 25-40；目睹好感度≥91（恋爱对象）的角色死亡额外扣除SAN 20（叠加在档位扣除之上）。\n';
+	  presetText += '组队机制：队伍上限2人，发起邀请对方终端收到弹窗确认。超出副本人数的位置由AI角色自动补位。组队移动时各自独立扣除SAN，无减免也无叠加。目睹队友死亡适用上述目睹死亡额外扣除规则。\n';
+  presetText += '好感度系统：≥1可交易；≥31通讯可建立+主动性触发；≥61日常问候偶尔触发；≥81深度信任——危险时优先保护玩家；≥91解锁亲密关系——可触发表白/被表白事件（通讯录特殊标记♥，好感度掉落阈值提高，副本内主动挡伤害）。表白/被表白/分手均触发终端弹窗，拒绝后好感度-10，冷却期由AI判定。分手机制：玩家主动/角色主动/对方死亡三种，分手事件写入memories.character重要性0.9。背叛惩罚：击杀/出卖恋爱对象好感度归零SAN-50永久记录。支持同性关系，AI根据角色背景和互动历史自然推进。\n';
 	  presetText += '物资交换规则：角色之间可自愿赠予或交换物资。积分不可交换。无程序强制，由双方好感度和AI叙事决定。\n';
   presetText += '轮回者关系：可合作组队通关、交换情报、同行荒原。可竞争，积分排名制造隐性压力。可击杀——但代价巨大，多数不会选择这条路。被标记的击杀者会被孤立或猎杀。\n';
   presetText += '## 角色与NPC区分\n';
@@ -4041,7 +4159,7 @@ function buildSystemPrompt() {
   presetText += '## 物品系统\nVOID中没有生存需求——不渴不饿不困。所有物品只有两个标准：能用、有用。物品类型仅限：武器类(冷兵器/临时武器，耐久限制，伤害由力量+武器加成决定)、药物类(镇定剂+5~15SAN/绷带/精神稳定剂，有次数限制)、工具类(撬锁/手电/绳索/镜子，部分有耐久)、情报类(纸条/日记/录音，可反复查看)、执念残留物(通关概率获得，可兑换积分)、角色遗物(被同化者遗留)。\n\n不存在的物品：热武器/能量武器/魔法物品、食物/水、衣物/装饰品、通讯设备、载具、任何直接破解副本规则或读取NPC思想的物品、任何大幅改变属性的物品。无品质等级(稀有/史诗等)。\n\n物品来源：副本探索(最常见)、击杀怪物概率掉落、角色面对面赠送。初始背包为空。不存在终端兑换物品。\n\nAI可以通过[ITEM +物品名:类型]标记在叙事中引入物品、描述物品外观和用途、判定使用效果、通过怪物掉落引入。AI不可以引入违反规则的物品、引入"刚好解决当前问题"的完美道具、让某个物品过于强大、一次性给予大量物品。\n';
   presetText += '\n';
   presetText += '## 属性与判定\n';
-  presetText += '四种属性（范围1-10）：力量（攻击/破坏/负重）、敏捷（闪避/潜行/命中）、感知（洞察/识别/发现隐藏）、意志（抵抗SAN下降/说服/压力判断）。每点属性消耗500积分强化，上限10，不可通过其他方式增减。\n\n';
+  presetText += '四种属性（范围1-10）：力量（攻击/破坏/负重）、敏捷（闪避/潜行/命中）、感知（洞察/识别/发现隐藏）、意志（抵抗SAN下降/说服/压力判断）。每点属性消耗200积分强化，上限10，不可通过其他方式增减。\n\n';
   presetText += '### 道具在判定中的作用\n';
 	  presetText += '持有以下道具时，对应属性判定加成+10%：撬棍/钢管→力量判定加成；绳索→敏捷判定加成；手电筒→感知判定加成；耳塞→意志判定加成，同时降低执念碎片SAN侵蚀消耗30%；防护服→恐怖场景SAN消耗降低30%，持续穿戴生效。道具加成不叠加，同类型只取最高值。道具损耗由AI叙事判断。AI判定道具应在以下情况下损耗：承受剧烈冲击（爆炸/重物砸落/被怪物直接击中道具本身）、长期使用后自然老化、副本规则强制破坏。损耗后使用[ITEM -道具名]标记通知系统移除。损耗应合理且有叙事铺垫，不随意。携带槽仅限一件道具，玩家通过背包界面手动装备/卸下。\n\n';
 	  presetText += '### 物品使用记录\n每件物品维护history数组记录获得/使用/赠送/丢弃历史。物品新增时自动写入obtain记录，使用/赠送/丢弃时前端自动追加。AI无需关心。\n\n';
@@ -4102,7 +4220,7 @@ function buildSystemPrompt() {
   presetText += '- SAN恢复：安全区休息每小时+2~+5、通关副本+10~+30、使用药物+5~+15\n';
 	  presetText += 'SAN濒危自救：角色SAN<30时优先使用携带的药剂/食物恢复SAN。无道具可用时优先逃离副本或向安全区移动。\n';
   presetText += '- 积分每日扣除：每24h(VOID时间)-100\n- 积分获取：通关副本+100~+1000、击杀怪物+5~+100\n';
-  presetText += '- 受伤恢复：轻伤1-2天，重伤3-5天(需安全区或药物)\n- 属性强化：积分>1000时可能花费500强化1点(优先匹配角色风格的属性)\n\n';
+  presetText += '- 受伤恢复：轻伤1-2天，重伤3-5天(需安全区或药物)\n- 属性强化：积分>1000时可能花费200强化1点(优先匹配角色风格的属性)\n\n';
   presetText += '#### 六、极端事件\n';
   presetText += '- 被同化：SAN归零→isAlive=false, deathCause=\'assimilated\'，变成被同化者NPC\n';
   presetText += '- 被抹杀：积分变负→isAlive=false, deathCause=\'erased\'，永久消失\n';
@@ -4116,7 +4234,7 @@ function buildSystemPrompt() {
   presetText += '## 积分系统\n';
   presetText += '积分是VOID中的生命货币。每24小时自动扣除100积分。积分正数正常存活；积分为0时存活但无法支付下次扣除；积分为负立即抹杀。\n';
   presetText += '积分获取途径：通关副本（五档评分S/A/B/C/D+特殊加成叠加，S级最高3600+/C级基础100起）、击杀怪物（5-100视强度）、击杀轮回者（继承全部积分）、论坛出售情报。\n';
-  presetText += '积分消耗途径：每日固定扣除100、属性强化（每点500积分）、论坛购买情报。\n';
+  presetText += '积分消耗途径：每日固定扣除100、属性强化（每点200积分）、论坛购买情报。\n';
   presetText += '积分不可转赠。角色之间不能直接转移积分。不存在积分转赠、积分交易、积分池等任何积分转移功能。论坛交易是唯一的间接转移方式——通过发布付费帖实现情报与积分的交换。\n';
   presetText += '排名系统：按积分实时排名。前10名可见ID和积分。排名前列可能是盟友也可能是猎杀目标；末尾可能铤而走险。排名本身不提供奖励或惩罚。\n';
   presetText += '积分心理压力：新手初始100分刚好够第一次扣除。积分接近0时轮回者可能做出极端选择。积分极高者可能成为猎杀目标。\n';
@@ -4856,9 +4974,7 @@ var App = {
     }
 
     var self = this;
-    setTimeout(function() {
-      document.body.classList.add('intro-done');
-    }, 4200);
+    self._playIntro();
   },
 
   // ============================================================
@@ -4895,14 +5011,13 @@ var App = {
     if (page === 'saves') this.renderSaveSlots();
     if (page === 'memories-view') this.renderMemViewer();
     if (page === 'char-list') this.renderCharList();
-    if (page === 'term-settings') this._loadTermSettings();
     this.renderAll();
   },
 
   // Settings navigation
   openSettingsItem: function(target) {
     var modals = { api:'modal-api', appearance:'modal-appearance' };
-    var pages = { profile:1, 'char-list':1, 'global-rules':1, saves:1, 'memories-view':1, about:1, 'char-edit':1, 'term-settings':1 };
+    var pages = { profile:1, 'char-list':1, 'global-rules':1, saves:1, 'memories-view':1, about:1, 'char-edit':1 };
     if (modals[target]) {
       if (target === 'api') { this._openApiModal(); return; }
       if (target === 'appearance') { this._syncAppearanceModal(); }
@@ -6759,7 +6874,7 @@ var App = {
         '<div class="pip-row">' + pips + '</div>' +
         '<div class="attr-desc">' + a.desc + '</div>' +
         '<div class="attr-footer">' +
-          '<span class="attr-cost">500 积分</span>' +
+          '<span class="attr-cost">200 积分</span>' +
           '<button class="attr-btn" data-attr="' + a.key + '"' + (disabled ? ' disabled' : '') + '>' + label + '</button>' +
         '</div>' +
       '</div>';
@@ -6777,7 +6892,7 @@ var App = {
     if (!p.attributes) p.attributes = {};
     var cur = p.attributes[attrKey] || 0;
     if (cur >= 10) { alert('已达到上限（10）。'); return; }
-    var cost = 500;
+    var cost = 200;
     if ((p.points || 0) < cost) { alert('积分不足。需要 ' + cost + ' 积分，当前 ' + (p.points || 0) + '。'); return; }
     if (!confirm('花费 ' + cost + ' 积分将 ' + { strength:'力量', agility:'敏捷', insight:'感知', calm:'意志' }[attrKey] + '从 ' + cur + ' 提升到 ' + (cur + 1) + '？')) return;
     p.points -= cost; p.attributes[attrKey] = cur + 1;
@@ -8318,6 +8433,218 @@ var App = {
   scrollToBottom: function() {
     var c = document.getElementById('story-messages');
     requestAnimationFrame(function() { c.scrollTop = c.scrollHeight; });
+  },
+
+  // ============================================================
+  // INTRO ANIMATION
+  // ============================================================
+  _introCanProceedWorldview: false,
+  _introStage: 0,
+  _introSetupGender: null,
+  _introSetupIdentity: null,
+  _introBindTimer: null,
+  _introBindDuration: 2000,
+
+  _playIntro: function() {
+    var self = this;
+    var hasProfile = !!(Store.player().name && Store.player().name !== 'V' && Store.player().name !== '');
+
+    // Act 1 & 2: System init + VOID title (always play)
+    var term = document.getElementById('term-line');
+    var titleContainer = document.getElementById('title-container');
+    var titleVoid = document.getElementById('title-void');
+    if (term) term.classList.add('play');
+    if (titleContainer) titleContainer.classList.add('play');
+
+    setTimeout(function() { if (titleVoid) titleVoid.classList.add('strike'); }, 2200);
+
+    setTimeout(function() {
+      self._typeNarrativeText();
+      var sig = document.getElementById('brando-sign');
+      if (sig) sig.classList.add('play');
+    }, 2600);
+
+    if (hasProfile) {
+      // Returning user: skip worldview + setup, go straight to game
+      self._introStage = 2;
+      setTimeout(function() {
+        var overlay = document.getElementById('intro-overlay');
+        if (overlay) overlay.classList.add('hidden');
+        document.body.classList.add('intro-done');
+      }, 4600);
+    } else {
+      // New user: play full 3-act sequence
+      self._introStage = 0;
+      setTimeout(function() {
+        var overlay = document.getElementById('intro-overlay');
+        if (overlay) overlay.classList.add('hidden');
+        var wv = document.getElementById('worldview-screen');
+        if (wv) wv.classList.add('active');
+        setTimeout(function() {
+          self._introCanProceedWorldview = true;
+          if (wv) wv.classList.add('clickable');
+        }, 8500);
+      }, 4800);
+    }
+  },
+
+  _typeNarrativeText: function() {
+    var target = '/ NARRATIVE';
+    var span = document.getElementById('title-narrative');
+    var cursor = document.getElementById('type-cursor');
+    if (!span || !cursor) return;
+    span.innerHTML = '';
+    cursor.classList.add('visible');
+    var i = 0;
+    var self = this;
+    function next() {
+      if (i < target.length) { span.innerHTML += target.charAt(i); i++; setTimeout(next, 80); }
+      else { setTimeout(function() { cursor.classList.remove('visible'); }, 600); }
+    }
+    next();
+  },
+
+  _handleWorldviewClick: function() {
+    if (!this._introCanProceedWorldview) return;
+    this._introCanProceedWorldview = false;
+    this._introStage = 1;
+    var wv = document.getElementById('worldview-screen');
+    if (wv) wv.classList.add('fade-out');
+    var self = this;
+    setTimeout(function() {
+      if (wv) wv.style.display = 'none';
+      var setup = document.getElementById('setup-screen');
+      if (setup) setup.classList.add('active');
+      self._playSetupSequence();
+    }, 1500);
+  },
+
+  _playSetupSequence: function() {
+    var log1 = document.getElementById('log-1');
+    var log2 = document.getElementById('log-2');
+    var log3 = document.getElementById('log-3');
+    var nameLine = document.getElementById('name-line');
+    setTimeout(function() { if (log1) log1.classList.add('show'); }, 300);
+    setTimeout(function() { if (log2) log2.classList.add('show'); }, 900);
+    setTimeout(function() { if (log3) log3.classList.add('show'); }, 1500);
+    var self = this;
+    setTimeout(function() {
+      if (nameLine) nameLine.classList.add('show');
+      var input = document.getElementById('setup-name');
+      if (input) input.focus();
+    }, 2100);
+    var nameInput = document.getElementById('setup-name');
+    if (nameInput) {
+      nameInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^a-zA-Z一-鿿]/g, '');
+      });
+      nameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') { e.preventDefault(); this.blur(); self._showGenderChoice(); }
+      });
+      nameInput.addEventListener('blur', function() {
+        if (this.value.trim() && !self._introSetupGender) { setTimeout(function() { self._showGenderChoice(); }, 400); }
+      });
+    }
+  },
+
+  _showGenderChoice: function() {
+    var genderLine = document.getElementById('gender-line');
+    var cursor = document.getElementById('name-cursor');
+    if (!genderLine || genderLine.classList.contains('show')) return;
+    if (cursor) cursor.style.display = 'none';
+    genderLine.classList.add('show');
+  },
+
+  _selectGender: function(el) {
+    if (this._introSetupGender) return;
+    this._introSetupGender = el.getAttribute('data-gender');
+    document.querySelectorAll('#gender-line .choice-item').forEach(function(o) { o.classList.remove('selected'); });
+    el.classList.add('selected');
+    var self = this;
+    setTimeout(function() {
+      var gl = document.getElementById('gender-line'); if (gl) gl.classList.add('dimmed');
+      var nl = document.getElementById('name-line'); if (nl) nl.classList.add('dimmed');
+      var il = document.getElementById('identity-line'); if (il) il.classList.add('show');
+    }, 400);
+  },
+
+  _selectIdentity: function(el) {
+    if (this._introSetupIdentity) return;
+    this._introSetupIdentity = el.getAttribute('data-identity');
+    document.querySelectorAll('#identity-line .choice-item').forEach(function(o) { o.classList.remove('selected'); });
+    el.classList.add('selected');
+    var self = this;
+    setTimeout(function() {
+      var il = document.getElementById('identity-line'); if (il) il.classList.add('dimmed');
+      var aa = document.getElementById('anchor-area'); if (aa) aa.classList.add('show');
+    }, 400);
+  },
+
+  _startBind: function(e) {
+    e.preventDefault();
+    if (!this._introSetupIdentity || !this._introSetupGender) return;
+    var ring = document.getElementById('anchor-ring');
+    var hint = document.getElementById('anchor-hint');
+    if (!ring || !hint) return;
+    var circle = ring.querySelector('.progress-ring circle');
+    var circumference = 302;
+    ring.classList.add('pressing');
+    hint.textContent = '锚定中...';
+    var self = this;
+    var startTime = Date.now();
+    this._introBindTimer = setInterval(function() {
+      var elapsed = Date.now() - startTime;
+      var progress = Math.min(elapsed / self._introBindDuration, 1);
+      var offset = circumference - (circumference * progress);
+      if (circle) circle.style.strokeDashoffset = offset;
+      if (progress >= 1) self._completeBind();
+    }, 16);
+  },
+
+  _cancelBind: function() {
+    if (this._introBindTimer) { clearInterval(this._introBindTimer); this._introBindTimer = null; }
+    var ring = document.getElementById('anchor-ring');
+    var hint = document.getElementById('anchor-hint');
+    if (ring) ring.classList.remove('pressing');
+    if (hint) hint.textContent = '长按以锚定存在';
+    var circle = ring ? ring.querySelector('.progress-ring circle') : null;
+    if (circle) circle.style.strokeDashoffset = 302;
+  },
+
+  _completeBind: function() {
+    clearInterval(this._introBindTimer);
+    this._introBindTimer = null;
+    this._introStage = 2;
+    var name = (document.getElementById('setup-name') || {}).value || '';
+    name = name.trim() || 'UNKNOWN';
+    var gender = this._introSetupGender;
+    var identity = this._introSetupIdentity;
+    var uid = 'V-' + String(Math.floor(1000 + Math.random() * 9000));
+
+    var p = Store.player();
+    p.name = name;
+    p.gender = gender === 'male' ? '男' : '女';
+    p.identity = identity === 'dead' ? '死者' : '生者';
+    p.voidId = uid;
+    Store.save();
+
+    document.getElementById('done-id').textContent = 'ID: ' + uid;
+    var anchorArea = document.getElementById('anchor-area');
+    if (anchorArea) { anchorArea.classList.remove('show'); setTimeout(function() { anchorArea.style.display = 'none'; }, 400); }
+    var self = this;
+    setTimeout(function() { var bc = document.getElementById('bind-complete'); if (bc) bc.classList.add('show'); }, 400);
+
+    var flash = document.getElementById('bind-flash');
+    if (flash) { flash.classList.add('fire'); setTimeout(function() { flash.classList.remove('fire'); }, 150); }
+
+    setTimeout(function() {
+      var setup = document.getElementById('setup-screen');
+      if (setup) setup.style.opacity = '0';
+      setTimeout(function() {
+        if (setup) setup.style.display = 'none';
+        document.body.classList.add('intro-done');
+      }, 1000);
+    }, 2000);
   },
 
   _showValueToast: function(text, type) {

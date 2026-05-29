@@ -58,7 +58,7 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   display:flex;flex-direction:column;
   height:100dvh;height:100vh;
   max-width:430px;margin:0 auto;
-  position:relative;overflow:hidden;
+  position:relative;overflow:clip;
 }
 .page{
   flex:1;overflow-y:auto;overflow-x:hidden;
@@ -102,7 +102,7 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   flex:1;background:transparent;border:none;outline:none;
   color:var(--text);font-size:14px;font-family:var(--font-ui);
   line-height:1.4;resize:none;min-height:22px;max-height:80px;
-  padding:6px 0;
+  padding:6px 0;caret-color:#ff3a3a;
 }
 .dock-input::placeholder{color:var(--text-3);opacity:.6;font-size:13px}
 .dock-input:disabled{opacity:.25}
@@ -113,25 +113,44 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   background:var(--text-3);display:flex;align-items:center;justify-content:center;
   cursor:pointer;position:relative;transition:all .3s;
 }
-.ai-core.idle{background:var(--accent);box-shadow:0 0 10px var(--accent-dim);animation:aiPulse 2.5s infinite}
-.ai-core.loading{background:transparent;border:1.5px solid var(--accent);animation:aiSpin 1.5s linear infinite}
+.ai-core.idle{
+  background:var(--accent);
+  animation:aiPulse 2s ease-in-out infinite;
+}
+.ai-core.loading{
+  background:transparent;border:1.5px solid var(--accent);
+  animation:aiSpin 1.2s linear infinite;
+  box-shadow:0 0 12px var(--accent-dim);
+}
 .ai-core::after{content:'';width:5px;height:5px;background:var(--bg);border-radius:50%}
+.ai-core.loading::after{width:0;height:0;background:transparent}
 .ai-badge{
   position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;
   background:var(--accent);color:#EAEAEA;font-size:7px;font-family:var(--font-mono);
   display:none;align-items:center;justify-content:center;font-weight:600;
 }
 .ai-badge.show{display:flex}
-@keyframes aiPulse{0%,100%{box-shadow:0 0 6px var(--accent-dim)}50%{box-shadow:0 0 14px var(--accent-dim)}}
+@keyframes aiPulse{
+  0%,100%{opacity:.55;transform:scale(.85);box-shadow:0 0 4px var(--accent-dim)}
+  50%{opacity:1;transform:scale(1);box-shadow:0 0 16px var(--accent-dim)}
+}
 @keyframes aiSpin{to{transform:rotate(360deg)}}
 
 .send-btn{
   width:32px;height:32px;border-radius:50%;flex-shrink:0;margin-left:8px;
-  background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .2s;font-size:16px;font-weight:500;
+  background:var(--surface);color:var(--text-3);
+  border:1px solid var(--divider);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s ease;font-size:16px;font-weight:500;
 }
-.send-btn:active{transform:scale(.9);opacity:.8}
+.send-btn:active{transform:scale(.9)}
 .send-btn:disabled{opacity:.15;transform:none}
+.send-btn.active{
+  color:var(--danger-bright);
+  border-color:rgba(255,58,58,.35);
+  background:var(--accent-dim);
+  box-shadow:0 0 12px rgba(255,58,58,.15);
+}
 
 .dock-nav{display:flex;justify-content:space-around;padding:8px 20px 10px;border-top:0.5px solid var(--divider)}
 .nav-item{
@@ -146,7 +165,7 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
    STORY PAGE — MESSAGE LAYOUT
    ============================================================ */
 #page-story{padding-top:0}
-#story-messages{flex:1;padding:8px 14px 20px;display:flex;flex-direction:column;gap:14px}
+#story-messages{flex:1;padding:12px 14px 20px;display:flex;flex-direction:column;gap:14px}
 
 /* Narrative — left red accent border */
 .msg-narrative{padding:4px 0}
@@ -207,17 +226,17 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 .msg-user-row{display:flex;align-items:flex-start;gap:10px;width:100%;justify-content:flex-end}
 .msg-user-col{display:flex;flex-direction:column;align-items:flex-end;max-width:calc(100% - 44px);gap:2px}
 .msg-user-bubble{
-  background:rgba(255,58,58,0.04);border:0.5px solid rgba(255,58,58,0.1);
+  background:rgba(255,58,58,0.08);border:1px solid rgba(255,58,58,0.25);
   border-radius:14px 2px 14px 14px;padding:10px 14px;
   width:fit-content;max-width:100%;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   position:relative;
 }
 .msg-user-bubble::before{
-  content:'';position:absolute;top:0;right:-6px;
+  content:'';position:absolute;top:0;right:-7px;
   width:0;height:0;
-  border-left:6px solid rgba(255,58,58,0.04);
-  border-bottom:6px solid transparent;
+  border-left:7px solid rgba(255,58,58,0.08);
+  border-bottom:7px solid transparent;
 }
 .msg-user-bubble .msg-content{
   font-family:var(--font-mono);font-size:13px;line-height:1.5;
@@ -244,12 +263,52 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 .msg-character-col .msg-telemetry,.msg-npc-col .msg-telemetry{justify-content:flex-start}
 .msg-user-col .msg-telemetry{justify-content:flex-end}
 
-/* System message — centered minimal */
-.msg-system{align-self:center;text-align:center;max-width:100%;margin:4px 0}
+/* Item notification bar */
+.msg-item-notif{
+  display:flex;align-items:flex-start;gap:8px;
+  background:rgba(200,255,0,0.04);border:0.5px solid rgba(200,255,0,0.15);
+  border-radius:var(--radius);padding:8px 12px;
+  font-family:var(--font-mono);font-size:10px;
+  max-width:100%;box-sizing:border-box;overflow:hidden;
+}
+.msg-item-notif .item-notif-icon{
+  color:#c8ff00;font-weight:700;font-size:12px;flex-shrink:0;line-height:1.4;
+}
+.msg-item-notif .item-notif-name{
+  color:#c8ff00;letter-spacing:.04em;flex-shrink:0;line-height:1.4;
+}
+.msg-item-notif .item-notif-desc{
+  color:var(--text-2);font-size:9px;letter-spacing:.02em;
+  word-break:break-all;line-height:1.4;min-width:0;
+}
+
+/* System message — dashed card */
+.msg-system{align-self:center;text-align:center;max-width:100%;margin:6px 0}
 .msg-system .msg-content{
   display:inline-block;font-family:var(--font-mono);font-size:9px;
-  color:var(--text-2);letter-spacing:.06em;opacity:0.45;
-  padding:4px 12px;
+  color:var(--text-2);letter-spacing:.06em;
+  padding:5px 14px;border-radius:4px;
+  background:var(--surface);
+  border:1px dashed var(--divider);
+}
+
+/* Action message — dark card with italic text */
+.msg-action .msg-action-content{
+  font-family:var(--font-mono);font-size:12px;color:var(--text-2);
+  font-style:italic;line-height:1.5;letter-spacing:.02em;
+  padding:8px 12px;background:var(--surface);
+  border:1px solid var(--divider);border-radius:var(--radius);
+  max-width:100%;
+}
+
+/* Quest message — gold dashed card */
+.msg-quest{align-self:center;text-align:center;max-width:100%;margin:6px 0}
+.msg-quest .msg-quest-content{
+  display:inline-block;font-family:var(--font-mono);font-size:9px;
+  color:#c8a020;letter-spacing:.06em;
+  padding:5px 14px;border-radius:4px;
+  background:rgba(200,160,32,0.06);
+  border:1px dashed rgba(200,160,32,0.3);
 }
 
 /* Typing indicator */
@@ -260,13 +319,14 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 @keyframes typingBounce{0%,80%,100%{transform:scale(.5);opacity:.3}40%{transform:scale(1);opacity:.8}}
 
 /* ---- Scroll to bottom button ---- */
-/* ---- Story fixed topbar ---- */
+/* ---- Story sticky topbar (sticky avoids #app overflow trap) ---- */
 .story-topbar{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;
   background:var(--bg);
   border-bottom:1px solid var(--divider);
-  flex-shrink:0;position:sticky;top:0;z-index:10;
+  flex-shrink:0;position:sticky;top:0;z-index:100;
+  will-change:transform;
 }
 .story-glow-bar{position:relative}
 .story-glow-bar::after{
@@ -334,24 +394,109 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 .cm-btn-flee:active{color:var(--text);background:rgba(255,255,255,0.1)}
 .cm-result{font-size:11px;color:var(--text-2);line-height:1.5;min-height:20px;text-align:center}
 
-/* ---- Copy detail panel (top slide-down) ---- */
+/* ---- Copy info modal (centered dialog) ---- */
 .copy-panel-overlay{
-  position:fixed;inset:0;z-index:269;background:rgba(0,0,0,0.6);
-  display:none;
+  position:fixed;inset:0;z-index:269;background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
 }
-.copy-panel-overlay.open{display:block}
+.copy-panel-overlay.open{display:flex}
 .copy-panel{
-  position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-100%);
-  width:100%;max-width:480px;max-height:60vh;
-  background:rgba(10,10,14,0.97);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);
-  border:1px solid rgba(255,255,255,0.06);border-top:none;border-radius:0 0 20px 20px;
-  padding:calc(12px + var(--sat)) 20px 20px;overflow-y:auto;
-  transition:transform .3s ease-out;z-index:270;
-  display:flex;flex-direction:column;gap:10px;
+  width:100%;max-width:370px;max-height:80vh;
+  background:var(--bg);border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--radius-lg);
+  box-shadow:0 24px 64px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.05);
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:copy-modal-in .28s cubic-bezier(.34,1.56,.64,1);
 }
-.copy-panel.open{transform:translateX(-50%) translateY(0)}
-.copy-panel-close{position:absolute;top:calc(10px + var(--sat));right:16px;font-size:18px;color:var(--text-3);cursor:pointer}
-.copy-panel-drag{width:32px;height:4px;background:rgba(255,255,255,0.12);border-radius:2px;margin:0 auto 8px;flex-shrink:0}
+@keyframes copy-modal-in{
+  from{opacity:0;transform:scale(.92) translateY(12px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+.copy-panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 18px 12px;border-bottom:1px solid var(--divider);flex-shrink:0;
+}
+.copy-panel-title{
+  font-size:12px;font-weight:600;letter-spacing:.15em;color:var(--text);
+  text-transform:uppercase;
+}
+.copy-panel-close{
+  width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;color:var(--text-3);background:transparent;
+  border:none;font-size:18px;transition:all .2s;flex-shrink:0;
+}
+.copy-panel-close:hover{color:var(--text);background:var(--surface-hover)}
+.copy-panel-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px 18px 22px;display:flex;flex-direction:column;gap:14px;
+}
+.copy-panel-drag{display:none}
+
+/* Copy name */
+.copy-name-block{}
+.copy-name{
+  font-family:var(--font-serif);font-size:20px;font-weight:500;
+  color:var(--text);letter-spacing:.06em;line-height:1.2;
+}
+
+/* Tag row */
+.copy-tag-row{display:flex;flex-wrap:wrap;gap:6px}
+.copy-tag{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;
+  padding:3px 10px;border-radius:4px;border:.5px solid;
+}
+.copy-tag.type{color:var(--text-2);border-color:var(--text-3);background:var(--surface)}
+.copy-tag.difficulty{color:#c8a020;border-color:rgba(200,160,32,.3);background:rgba(200,160,32,.06)}
+.copy-tag.interference{color:var(--danger-bright);border-color:rgba(255,58,58,.3);background:rgba(200,40,40,.08)}
+
+/* Section divider */
+.copy-section-divider{display:flex;align-items:center;gap:10px}
+.copy-section-label{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;
+  color:var(--text-3);text-transform:uppercase;white-space:nowrap;
+}
+.copy-div-line{flex:1;height:1px;background:var(--divider)}
+
+/* Data row */
+.copy-data-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;background:var(--surface);
+  border:1px solid var(--divider);border-radius:var(--radius);
+}
+.copy-data-left{display:flex;align-items:center;gap:8px}
+.copy-data-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.copy-data-dot.time{
+  background:#4a9eff;box-shadow:0 0 6px rgba(74,158,255,.5);
+  animation:copy-dot-breathe-time 2.5s ease-in-out infinite;
+}
+.copy-data-dot.rules{
+  background:#c8ff00;box-shadow:0 0 6px rgba(200,255,0,.5);
+  animation:copy-dot-breathe-rules 2.8s ease-in-out infinite;
+}
+@keyframes copy-dot-breathe-time{
+  0%,100%{opacity:.35;box-shadow:0 0 3px rgba(74,158,255,.3)}
+  50%{opacity:1;box-shadow:0 0 10px rgba(74,158,255,.8)}
+}
+@keyframes copy-dot-breathe-rules{
+  0%,100%{opacity:.35;box-shadow:0 0 3px rgba(200,255,0,.3)}
+  50%{opacity:1;box-shadow:0 0 10px rgba(200,255,0,.8)}
+}
+.copy-data-label{font-size:11px;color:var(--text-2);letter-spacing:.03em}
+.copy-data-value{font-family:var(--font-mono);font-size:11px;color:var(--text);letter-spacing:.04em}
+.copy-data-value.accent{color:#c8ff00}
+
+/* Core obsession */
+.copy-core-obsession{
+  background:var(--surface);border:1px solid var(--divider);
+  border-left:2px solid var(--danger);border-radius:0 var(--radius) var(--radius) 0;
+  padding:12px 14px;
+}
+.copy-core-obsession-text{
+  font-family:var(--font-serif);font-size:13px;line-height:1.7;
+  color:var(--text-2);letter-spacing:.03em;font-style:italic;
+}
 
 .scroll-bottom-btn{
   position:fixed;right:16px;z-index:99;width:28px;height:28px;border-radius:50%;
@@ -392,6 +537,11 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
 #page-terminal{padding:0;overflow:hidden}
 #page-terminal.active{display:flex}
 .term-frame{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* Fixed header — in normal flow, flex-shrink:0 keeps height */
+.term-fixed-header{
+  flex-shrink:0;background:var(--bg);
+}
 
 /* Topbar — glass */
 .term-topbar{
@@ -451,7 +601,7 @@ body.light-theme .term-segment-tab.active{background:var(--text);color:var(--bg)
 /* ============================================================
    1. 倒计时 — 大数码管 + 秒变闪烁
    ============================================================ */
-.ttl-section{padding:18px 4px 8px;text-align:center;position:relative}
+.ttl-section{padding:4px 4px 8px;text-align:center;position:relative}
 .ttl-label{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;color:var(--text-3);text-transform:uppercase;margin-bottom:6px}
 .ttl-digits{font-family:var(--font-mono);font-size:52px;font-weight:100;letter-spacing:6px;color:var(--accent-bright);line-height:1;text-shadow:0 0 30px rgba(142,42,42,.5),0 0 60px rgba(142,42,42,.2);transition:text-shadow .3s ease}
 .ttl-digits.tick{text-shadow:0 0 40px rgba(180,50,50,.8),0 0 80px rgba(180,50,50,.4)}
@@ -1458,6 +1608,10 @@ body.light-theme .dock,
 body.light .dock{box-shadow:0 8px 32px rgba(0,0,0,.08)}
 body.light-theme .dock-input-area,
 body.light .dock-input-area{border-color:rgba(0,0,0,.05)}
+body.light-theme .send-btn,
+body.light .send-btn{background:var(--surface);border-color:rgba(0,0,0,.1);color:var(--text-3)}
+body.light-theme .send-btn.active,
+body.light .send-btn.active{color:var(--danger-bright);border-color:rgba(200,30,30,.4);background:rgba(200,20,20,.06);box-shadow:0 0 10px rgba(200,30,30,.1)}
 body.light-theme .msg-character-bubble,
 body.light .msg-character-bubble,
 body.light-theme .msg-npc-bubble,
@@ -1467,7 +1621,7 @@ body.light .msg-character-bubble::before,
 body.light-theme .msg-npc-bubble::before,
 body.light .msg-npc-bubble::before{border-right-color:rgba(245,245,250,0.96)}
 body.light-theme .msg-user-bubble,
-body.light .msg-user-bubble{background:rgba(255,245,245,0.97);border-color:rgba(200,40,40,0.1)}
+body.light .msg-user-bubble{background:rgba(255,245,245,0.97);border-color:rgba(200,40,40,0.2)}
 body.light-theme .msg-user-bubble::before,
 body.light .msg-user-bubble::before{border-left-color:rgba(255,245,245,0.97)}
 body.light-theme .msg-narrative .msg-content,
@@ -1485,7 +1639,9 @@ body.light .user-panel{background:rgba(248,248,246,0.97);border-color:rgba(0,0,0
 body.light-theme .dialog-box,
 body.light .dialog-box{background:var(--bg);border-color:rgba(0,0,0,0.1)}
 body.light-theme .copy-panel,
-body.light .copy-panel{background:rgba(248,248,246,0.97)}
+body.light .copy-panel{background:var(--bg);border-color:rgba(0,0,0,0.1)}
+body.light-theme .copy-panel-overlay,
+body.light .copy-panel-overlay{background:rgba(0,0,0,0.35)}
 body.light-theme #ctx-menu,
 body.light #ctx-menu{background:rgba(248,248,246,0.97);border-color:rgba(0,0,0,0.08)}
 body.light-theme .modal-sheet,
@@ -1636,6 +1792,7 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
   <!-- Terminal page -->
   <div id="page-terminal" class="page">
     <div class="term-frame">
+        <div class="term-fixed-header">
       <div class="term-topbar terminal-scan-bar">
         <span class="term-topbar-title">TERMINAL</span>
         <button class="term-rule-btn" onclick="App._openRulesPage()">规则</button>
@@ -1648,6 +1805,7 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
           <button class="term-segment-tab" data-term="attrs">属性</button>
           <button class="term-segment-tab" data-term="contacts">通讯录</button>
         </div>
+      </div>
       </div>
       <div class="term-content" id="term-content">
 
@@ -2298,12 +2456,14 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 
 </div><!-- /#app -->
 
-<!-- COPY DETAIL PANEL -->
+<!-- COPY INFO MODAL -->
 <div class="copy-panel-overlay" id="copy-panel-overlay" onclick="App._closeCopyPanel()">
   <div class="copy-panel" id="copy-panel" onclick="event.stopPropagation()">
-    <div class="copy-panel-drag"></div>
-    <div class="copy-panel-close" onclick="App._closeCopyPanel()">×</div>
-    <div id="copy-panel-content"></div>
+    <div class="copy-panel-header">
+      <span class="copy-panel-title">副本信息</span>
+      <button class="copy-panel-close" onclick="App._closeCopyPanel()">&times;</button>
+    </div>
+    <div class="copy-panel-body" id="copy-panel-content"></div>
   </div>
 </div>
 
@@ -2661,10 +2821,21 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 // ============================================================
 var DEMO = {
   messages: [
-    { type:'system', content:'终端已连接' }
+    { type:'system', content:'终端已连接' },
+    { type:'system', content:'副本《古寺惊变》已激活 · 类型：悬疑/中式恐怖 · 难度：B级' },
+    { type:'narrative', content:'<p>夜风穿过破损的窗棂，长明灯的火光被压得一低。你踏入大雄宝殿的瞬间，一股混杂着陈年檀香与<span class="hl-danger">淡淡血腥</span>的气味扑面而来。</p><p>殿内光线昏暗。三尊佛像投下巨大的阴影，影子在墙上的形状——你多看了两秒才确认——不是佛像的轮廓。是人的。三个不同姿势的人。</p>' },
+    { type:'npc', content:'你来了。我等了你很久。', characterName:'沈月棠', characterId:'c1' },
+    { type:'player', content:'这里发生了什么？' },
+    { type:'npc', content:'方丈在撒谎。我在他禅房暗格里找到了这个——<span class="hl-item">[ITEM 残破的符纸:一张被撕去一半的黄色符纸，上面用深褐色液体画着不属于任何宗教的符号。纸的边缘有灼烧痕迹。]</span>', characterName:'沈月棠', characterId:'c1' },
+    { type:'action', content:'沈月棠从袖中取出一张折叠的纸，在你面前展开。她的手在微微发抖。', characterName:'沈月棠' },
+    { type:'player', content:'这上面画的是什么？' },
+    { type:'narrative', content:'<p>她没有立刻回答。殿外传来木鱼声——三声长，两声短。沈月棠的脸色变了。</p>' },
+    { type:'npc', content:'他来了。我得走。记住——<span class="hl-danger">不要看佛像的眼睛。</span>', characterName:'沈月棠', characterId:'c1' },
+    { type:'narrative', content:'<p>她的脚步声迅速远去，消失在佛殿侧门后。木鱼声越来越近。长明灯突然灭了一盏。<span class="hl-san">[SAN -3]</span></p>' }
   ],
   characters: [
-    { id:'c1', name:'Terminal', affection:0, relation:'中立', present:true, isNPC:true, npcType:'native', lastSummary:'沉默的终端界面。只显示数据，不回应任何问题。', memories:[], simpleMemories:[], persona:'VOID终端界面。不是角色，不是AI。是锚点投射到意识中的交互界面。沉默地显示数据、记录一切、等待指令。不提供建议，不发表意见，不回应情感需求。' }
+    { id:'c1', name:'沈月棠', affection:45, relation:'信任', present:true, isNPC:true, npcType:'projection', lastSummary:'年轻女子，在这座寺庙的执念中循环。', memories:[], simpleMemories:[], persona:'曾是寺庙的信徒，死后执念化为投影。冷静、警觉，对寺庙的秘密了解甚多。', fears:['黑暗','被遗忘'] },
+    { id:'c2', name:'Terminal', affection:0, relation:'中立', present:true, isNPC:true, npcType:'native', lastSummary:'沉默的终端界面。只显示数据，不回应任何问题。', memories:[], simpleMemories:[], persona:'VOID终端界面。不是角色，不是AI。是锚点投射到意识中的交互界面。沉默地显示数据、记录一切、等待指令。不提供建议，不发表意见，不回应情感需求。' }
   ],
   forumPosts: {
     intel: [
@@ -2840,16 +3011,20 @@ var INIT_MESSAGES = {
 };
 
 function generateInitialMessages(threatLevel) {
-  var msgs = [{ id:'m0', type:'system', content:'终端已连接', timestamp: Date.now(), meta: {} }];
-  var pool = INIT_MESSAGES[threatLevel] || INIT_MESSAGES.safe;
-  // Pick 1-2 narrative messages
-  var pick = pool[Math.floor(Math.random() * pool.length)];
-  msgs.push({ id:'m1', type: pick.type, content: pick.content, timestamp: Date.now()+1, meta: {} });
-  if (Math.random() < 0.5 && pool.length > 1) {
-    var second;
-    do { second = pool[Math.floor(Math.random() * pool.length)]; } while (second === pick);
-    msgs.push({ id:'m2', type: second.type, content: second.content, timestamp: Date.now()+2, meta: {} });
-  }
+  var ts = Date.now();
+  var msgs = [
+    { id:'m0', type:'system', content:'终端已连接', timestamp: ts, meta: {} },
+    { id:'m0b', type:'system', content:'副本《古寺惊变》已激活 · 类型：悬疑/中式恐怖 · 难度：B级', timestamp: ts+1, meta: {} },
+    { id:'m1', type:'narrative', content:'<p>夜风穿过破损的窗棂，长明灯的火光被压得一低。你踏入大雄宝殿的瞬间，一股混杂着陈年檀香与<span class="hl-danger">淡淡血腥</span>的气味扑面而来。</p><p>殿内光线昏暗。三尊佛像投下巨大的阴影，影子在墙上的形状——你多看了两秒才确认——不是佛像的轮廓。是人的。三个不同姿势的人。</p>', timestamp: ts+2, meta: {} },
+    { id:'m2', type:'npc', content:'你来了。我等了你很久。', characterName:'沈月棠', characterId:'c1', timestamp: ts+3, meta: {} },
+    { id:'m3', type:'player', content:'这里发生了什么？', timestamp: ts+4, meta: {} },
+    { id:'m4', type:'npc', content:'方丈在撒谎。我在他禅房暗格里找到了这个——<span class="hl-item">[ITEM 残破的符纸:一张被撕去一半的黄色符纸，上面用深褐色液体画着不属于任何宗教的符号。纸的边缘有灼烧痕迹。]</span>', characterName:'沈月棠', characterId:'c1', timestamp: ts+5, meta: {} },
+    { id:'m5', type:'action', content:'沈月棠从袖中取出一张折叠的纸，在你面前展开。她的手在微微发抖。', characterName:'沈月棠', timestamp: ts+6, meta: {} },
+    { id:'m6', type:'player', content:'这上面画的是什么？', timestamp: ts+7, meta: {} },
+    { id:'m7', type:'narrative', content:'<p>她没有立刻回答。殿外传来木鱼声——三声长，两声短。沈月棠的脸色变了。</p>', timestamp: ts+8, meta: {} },
+    { id:'m8', type:'npc', content:'他来了。我得走。记住——<span class="hl-danger">不要看佛像的眼睛。</span>', characterName:'沈月棠', characterId:'c1', timestamp: ts+9, meta: {} },
+    { id:'m9', type:'narrative', content:'<p>她的脚步声迅速远去，消失在佛殿侧门后。木鱼声越来越近。长明灯突然灭了一盏。<span class="hl-san">[SAN -3]</span></p>', timestamp: ts+10, meta: {} }
+  ];
   return msgs;
 }
 
@@ -2955,6 +3130,51 @@ function generateInitialCharacters(threatLevel) {
 
   return chars;
 }
+
+// ============================================================
+// COPY TEMPLATE: 永乐园 (B-class, 多人社交博弈+生存探索)
+// 供AI系统提示词注入，buildSystemPrompt()拼接时引用
+// ============================================================
+// 基础信息：B级 · 3-5人 · 执念主体：精神科医生（伪装成小丑）
+// 执念核心："恐惧是可以被治愈的，只要你直面它" · 评分上限S · 首通+50%积分
+//
+// 背景：一座在VOID里持续运转的废弃游乐场。建造者是被无数恐惧症患者
+// 逼到极限的精神科医生，建造乐园强迫患者直面恐惧以达到治愈。死后执念
+// 让游乐场继续运转，治愈变成永无止境的折磨。医生伪装成小丑在园区游荡，
+// 不知道自己已死，仍在观察记录下一个病人。NPC依靠副本执念活着，
+// 以看玩家痛苦为乐，极少数保留部分人性，玩家无法轻易分辨。
+//
+// 入场问卷（入口小丑递上，AI根据回答判断玩家恐惧点）：
+// ①喜欢哪种天气出行（晴/阴/雨）②独自一人时通常在做什么
+// ③上一次感到非常放松是什么时候、在哪里 ④更愿意待在哪里（宽阔广场/安静小房间）
+// ⑤有没有特别不喜欢但说不清原因的事物
+// 填写=免费入场，AI判断恐惧点对应区域被同化者针对该玩家
+// 不填写=SAN-15，针对性降低折磨随机化。故意填错可迷惑医生。后续可升级为前端弹窗。
+//
+// 副本规则（5条，仅前2条为真）：
+// ①把你觉得下一个病重的人推进手术室（真）②别让医生发现你的恐惧（真）
+// ③不要进入白色建筑（误导）④听到音乐停止时立刻蹲下（干扰）⑤保持队伍不分散（误导）
+//
+// 园区区域：
+// 入口广场-小丑游荡+售货机(精神药物/病历碎片/镇静剂)，镇静剂可暂时抑制恐惧点触发
+// 摩天轮区-舱底透明恐高被同化者在顶端尖叫，路过SAN-3恐高额外-5，安全带是医院约束带
+// 鬼屋区-幽闭恐惧被同化者循环，内部真实手术刀器官标本，进入SAN-5出口是手术室走廊
+// 过山车区-咳疾被同化者，座椅轮椅改装安全扣医疗约束扣，观看SAN-2
+// 旋转木马区-最平静区域，木马轮椅改装，中心柱刻"第一批患者全部治愈"，SAN-1
+// 白色建筑/手术室-唯一与主题不符的建筑，内部完整手术室进入SAN-8，医生在此恢复白大褂
+//
+// 医生(小丑)：小丑装扮但动作语言是医生的，游荡全园观察玩家。进手术室恢复白大褂身份揭露。
+// 无法被击杀，强行攻击游乐场愤怒所有NPC攻击性提升。不知道自己已死也不知道自己是答案。
+//
+// 人性考验：无内鬼机制副本内杀人合法。击杀其他玩家夺取积分，SAN-30+永久击杀标记，
+// 游乐场对击杀者短暂降低NPC攻击性。
+//
+// 通关流程：①入场填问卷 ②探索各区域 ③任意玩家进白色建筑→倒计时NPC攻击性渐升
+// ④判断"最病重的人"推进手术室 ⑤推入医生→执念崩溃通关 ⑥推入其他玩家→被吞噬副本继续
+//
+// 评分：通关50% · 每体验一个设施+10% · 每条线索/违和细节+5% · 推入正确的人+20%
+// 副本内击杀不扣分但写入个人记录。S≥90% / A 70-89% / B 50-69% / C 通关不足50%
+// ============================================================
 
 // ============================================================
 // DATA LAYER
@@ -3068,7 +3288,7 @@ var Store = {
     }
     // Seed copy lore: 缝合
     if (!this._db.lores.some(function(l) { return l.type === 'copy' && l.title === '缝合'; })) {
-      this.addLore({ title:'缝合', type:'copy', keywords:['C级','荒原东段','单人','VOID自然生长','面具','商场','无执念主体'], content:'位置：荒原·东段。难度C级，评分上限A。基础积分100-200，首通+50%。单人强制进入。无执念主体——副本是VOID自然生长的产物，不是任何人的执念凝结。\n\n导购：外观正常，制服整洁，负责入场仪式。宣读规则后为玩家佩戴面具（触感温热，副本结束前玩家不知道面具是脸皮）即消失，此后不再出现直到结尾。\n\n副本规则：1.请全程佩戴您的专属面具；2.本商场客流量较大，请跟随人流有序参观；3.看到出口，请告知工作人员。商场内所有显眼位置有红字标识「相信规则！」，每件商品吊牌上也有同样字样。\n\n场景：商场内正常营业——灯光、音乐、广播一切如常。商品为人体肢体，排列整齐，吊牌标注尺码和价格。顾客正常挑选、佩戴、食用，行为举止文明有序。布局每次进入都不同，走廊自动延伸，楼层标识会随机变化。广播循环播放日常优惠信息，偶尔插播寻物启事（寻找的物品永远找不到）。\n\n关键节点：\n试衣间——大镜子前，半张血浸染的布搭在椅背。镜子照出玩家脸上戴的不是面具而是脸皮（别人的脸缝在自己的脸上），SAN-10。\n摘下面具——顾客缓慢转头，无言靠近包围。持续靠近不掉SAN但逐渐压缩空间。靠近后触发攻击（拉扯面具），引来更多顾客，SAN叠加消耗。重新戴好面具后顾客散开恢复常态。\n出口——商场内多个出口均无法开启。走到任意出口门前，广播立即播报"请告知工作人员"。玩家被迫回到入场处。\n通关方式——回到入口处，导购手持一件叠好的人皮登场："您的专属定制已准备好。"穿上人皮后正门开启，副本结束。\n\nSAN消耗节点：入场看到商品-5，第一次看到顾客行为-5，进试衣间看镜子-10，摘下面具后持续掉SAN（每轮-3到-5），被顾客包围攻击每轮-3到-8，看到导购拿着人皮-8，穿上人皮-10。\n\n评分判定：遵守所有规则、未进试衣间、未摘面具、正常通关=A；进过试衣间或摘过面具但最终通关=B；触发过顾客攻击=C（评分上限C，即使最终通关）。' });
+      this.addLore({ title:'缝合', type:'copy', keywords:['C级','荒原东段','1-2人','VOID自然生长','面具','商场','无执念主体'], content:'位置：荒原·东段。难度C级，评分上限A。基础积分100-200，首通+50%。1-2人进入。双人时各自独立完成入场仪式，各自获得专属面具，通关时各自穿上人皮离开，评分独立计算。无执念主体——副本是VOID自然生长的产物，不是任何人的执念凝结。\n\n导购：外观正常，制服整洁，负责入场仪式。宣读规则后为玩家佩戴面具（触感温热，副本结束前玩家不知道面具是脸皮）即消失，此后不再出现直到结尾。\n\n副本规则：1.请全程佩戴您的专属面具；2.本商场客流量较大，请跟随人流有序参观；3.看到出口，请告知工作人员。商场内所有显眼位置有红字标识「相信规则！」，每件商品吊牌上也有同样字样。\n\n场景：商场内正常营业——灯光、音乐、广播一切如常。商品为人体肢体，排列整齐，吊牌标注尺码和价格。顾客正常挑选、佩戴、食用，行为举止文明有序。布局每次进入都不同，走廊自动延伸，楼层标识会随机变化。广播循环播放日常优惠信息，偶尔插播寻物启事（寻找的物品永远找不到）。\n\n关键节点：\n试衣间——大镜子前，半张血浸染的布搭在椅背。镜子照出玩家脸上戴的不是面具而是脸皮（别人的脸缝在自己的脸上），SAN-10。\n摘下面具——顾客缓慢转头，无言靠近包围。持续靠近不掉SAN但逐渐压缩空间。靠近后触发攻击（拉扯面具），引来更多顾客，SAN叠加消耗。重新戴好面具后顾客散开恢复常态。\n出口——商场内多个出口均无法开启。走到任意出口门前，广播立即播报"请告知工作人员"。玩家被迫回到入场处。\n通关方式——回到入口处，导购手持一件叠好的人皮登场："您的专属定制已准备好。"穿上人皮后正门开启，副本结束。\n\nSAN消耗节点：入场看到商品-5，第一次看到顾客行为-5，进试衣间看镜子-10，摘下面具后持续掉SAN（每轮-3到-5），被顾客包围攻击每轮-3到-8，看到导购拿着人皮-8，穿上人皮-10。\n\n评分判定：遵守所有规则、未进试衣间、未摘面具、正常通关=A；进过试衣间或摘过面具但最终通关=B；触发过顾客攻击=C（评分上限C，即使最终通关）。' });
     }
     if (!this._db.masks || this._db.masks.length === 0) {
       this._db.masks = [{ id:'mask_default', name:'轮回者', gender:'男', identity:'死者', appearance:'', isDefault:true, genderLocked:false }];
@@ -4627,6 +4847,14 @@ var App = {
     this.applySanEffect();
     this.startSanJitter();
 
+    // Force sticky positioning via inline styles for rendering isolation
+    var topbar = document.querySelector('.story-topbar');
+    if (topbar) {
+      topbar.style.position = 'sticky';
+      topbar.style.top = '0';
+      topbar.style.zIndex = '100';
+    }
+
     var self = this;
     setTimeout(function() {
       document.body.classList.add('intro-done');
@@ -5142,45 +5370,45 @@ var App = {
   _renderCopyPanel: function() {
     var copy = Store._db.currentCopy;
     if (!copy) return;
-    var chars = Store.characters();
-    var presentList = chars.filter(function(c) { return c.present; });
     var now = Date.now();
 
-    // Calculate elapsed time in copy
     var elapsedStr = '--';
     if (copy.completionStatus === 'active') {
       if (!copy.enterTime) copy.enterTime = now;
       var elapsed = now - copy.enterTime;
       var eh = Math.floor(elapsed / 3600000);
       var em = Math.floor((elapsed % 3600000) / 60000);
-      elapsedStr = eh + '小时 ' + em + '分';
+      elapsedStr = '副本内 ' + eh + 'h ' + em + 'm';
     }
 
+    var rulesCount = (copy.discoveredRules || []).length;
+    var totalRules = (copy.rules || '').split('\n').filter(function(r) { return r.trim(); }).length || '?';
+    var rulesDisplay = rulesCount + ' / ' + totalRules;
+
     var html =
-      '<div style="font-family:var(--font-serif);font-size:16px;color:var(--text);margin-bottom:4px">' + App.escapeHtml(copy.name||'未知副本') + '</div>' +
-      '<div style="font-size:10px;color:var(--text-3);font-family:var(--font-mono);margin-bottom:12px">' + (copy.type||'未知') + ' · ' + (copy.difficulty||'C') + '级 · 终端干扰：' + (copy.terminalInterference||'轻度') + '</div>' +
-
-      '<div class="panel-section"><div class="panel-section-title">已用时长</div>' +
-        '<div style="font-size:11px;color:var(--text-2);padding:2px 0">' + elapsedStr + '</div>' +
+      '<div class="copy-name-block"><div class="copy-name">' + App.escapeHtml(copy.name || '未知副本') + '</div></div>' +
+      '<div class="copy-tag-row">' +
+        '<span class="copy-tag type">' + (copy.type || '未知') + '</span>' +
+        '<span class="copy-tag difficulty">' + (copy.difficulty || 'C') + '级</span>' +
+        '<span class="copy-tag interference">终端干扰 · ' + (copy.terminalInterference || '轻度') + '</span>' +
       '</div>' +
 
-      '<div class="panel-section"><div class="panel-section-title">已发现规则</div>' +
-        ((copy.discoveredRules||[]).length > 0
-          ? copy.discoveredRules.map(function(r) { return '<div style="font-size:11px;color:var(--text-2);padding:3px 0;border-bottom:1px solid var(--divider)">' + App.escapeHtml(r) + '</div>'; }).join('')
-          : '<div style="font-size:11px;color:#555">???</div>') +
+      '<div class="copy-section-divider"><span class="copy-section-label">进度</span><div class="copy-div-line"></div></div>' +
+
+      '<div class="copy-data-row">' +
+        '<div class="copy-data-left"><div class="copy-data-dot time"></div><span class="copy-data-label">已用时长</span></div>' +
+        '<span class="copy-data-value">' + elapsedStr + '</span>' +
       '</div>' +
 
-      '<div class="panel-section"><div class="panel-section-title">核心执念</div>' +
-        '<div style="font-size:11px;color:' + (copy.core && copy.core !== '未知' ? 'var(--text-2)' : '#555') + '">' + (copy.core && copy.core !== '未知' ? App.escapeHtml(copy.core) : '???') + '</div>' +
+      '<div class="copy-data-row">' +
+        '<div class="copy-data-left"><div class="copy-data-dot rules"></div><span class="copy-data-label">已发现规则</span></div>' +
+        '<span class="copy-data-value accent">' + rulesDisplay + '</span>' +
       '</div>' +
 
-      '<div class="panel-section"><div class="panel-section-title">在场角色/NPC</div>' +
-        (presentList.length > 0
-          ? presentList.map(function(c) {
-              var tag = c.isNPC ? (c.npcType === 'projection' ? '执念投影' : c.npcType === 'assimilated' ? '被同化者' : '原住民') : '角色';
-              return '<div style="font-size:11px;color:var(--text-2);padding:2px 0">' + App.escapeHtml(c.name) + ' <span style="font-size:9px;color:var(--text-3)">' + tag + '</span></div>';
-            }).join('')
-          : '<div style="font-size:11px;color:#555">无</div>') +
+      '<div class="copy-section-divider"><span class="copy-section-label">核心执念</span><div class="copy-div-line"></div></div>' +
+
+      '<div class="copy-core-obsession">' +
+        '<div class="copy-core-obsession-text">' + App.escapeHtml(copy.core && copy.core !== '未知' ? copy.core : '???') + '</div>' +
       '</div>';
 
     document.getElementById('copy-panel-content').innerHTML = html;
@@ -5267,21 +5495,29 @@ var App = {
 
     msgs.forEach(function(msg, idx) {
       var el = document.createElement('div');
-      el.className = 'msg msg-' + msg.type;
-      if (msg.type === 'player' && msg.pending) el.classList.add('pending');
+      var type = msg.type;
+      var ALLOWED = { narrative:1, npc:1, player:1, system:1, action:1, item:1, quest:1 };
+      if (!ALLOWED[type]) { type = 'system'; }
+      el.className = 'msg msg-' + type;
+      if (type === 'player' && msg.pending) el.classList.add('pending');
       el.dataset.msgId = msg.id;
+      var extracted = null;
 
-      if (msg.type === 'narrative') {
+      if (type === 'narrative') {
         el.className = 'msg msg-narrative';
-        el.innerHTML = '<div class="msg-content">' + App.formatContent(msg.content) + '</div>';
-      } else if (msg.type === 'npc') {
+        var narrItemResult = self._extractItemNotifs(msg.content);
+        extracted = narrItemResult;
+        el.innerHTML = '<div class="msg-content">' + App.formatContent(narrItemResult.cleaned) + '</div>';
+      } else if (type === 'npc') {
         var ch = Store.character(msg.characterId);
         var isCharacter = ch && !ch.isNPC;
-        var parsed = App.parseContent(msg.content);
+        var itemResult = self._extractItemNotifs(msg.content);
+        extracted = itemResult;
+        var parsed = App.parseContent(itemResult.cleaned);
         // NPC without dialogue → render as narrator
         if (parsed.dialogue.length === 0) {
           el.className = 'msg msg-narrative';
-          var narrContent = parsed.actions.length > 0 ? parsed.actions.join('\n') : msg.content;
+          var narrContent = parsed.actions.length > 0 ? parsed.actions.join('\n') : itemResult.cleaned;
           el.innerHTML = '<div class="msg-content">' + App.formatContent(narrContent) + '</div>';
         } else {
           var rowCls = isCharacter ? 'msg-character-row' : 'msg-npc-row';
@@ -5292,7 +5528,6 @@ var App = {
           var npcType = ch ? ch.npcType : null;
           var avBg = self.getAvatarColor(msg.characterName||'?', isCharacter ? null : npcType);
           var first = (msg.characterName||'?').charAt(0);
-          // Character avatar: use custom upload if available
           var npcTypeCls = (!isCharacter && npcType) ? ' avatar-' + npcType : '';
           var avHTML;
           if (isCharacter && ch && ch.avatar) {
@@ -5315,7 +5550,7 @@ var App = {
           }
           el.innerHTML = avHTML + '<div class="' + colCls + '">' + colHTML + '</div>';
         }
-      } else if (msg.type === 'player') {
+      } else if (type === 'player') {
         el.className = 'msg msg-user-row';
         var mask = Store.activeMask() || {};
         var player = Store.player();
@@ -5346,6 +5581,12 @@ var App = {
           colHTML += '</div>';
         }
         el.innerHTML = '<div class="msg-user-col">' + colHTML + '</div>' + avHTML;
+      } else if (type === 'action') {
+        el.className = 'msg msg-action';
+        el.innerHTML = '<div class="msg-action-content">' + App.formatContent(msg.content) + '</div>';
+      } else if (type === 'quest') {
+        el.className = 'msg msg-quest';
+        el.innerHTML = '<div class="msg-quest-content">' + App.formatContent(msg.content) + '</div>';
       } else {
         var sysHTML = '<div class="msg-content">' + App.formatContent(msg.content) + '</div>';
         if (msg.meta && msg.meta.isError) {
@@ -5355,8 +5596,8 @@ var App = {
       }
 
       // Long-press
-      var isLastUser = (msg.type === 'player' && idx === lastUserIdx && !msg.pending);
-      if (msg.type === 'narrative' || msg.type === 'npc' || isLastUser) {
+      var isLastUser = (type === 'player' && idx === lastUserIdx && !msg.pending);
+      if (type === 'narrative' || type === 'npc' || isLastUser) {
         var timer;
         el.addEventListener('touchstart', function(e) {
           timer = setTimeout(function() { self.showContextMenu(msg.id, e.touches[0].clientX, e.touches[0].clientY); }, 600);
@@ -5365,6 +5606,25 @@ var App = {
         el.addEventListener('touchmove', function() { clearTimeout(timer); });
       }
       container.appendChild(el);
+      // Render extracted items and quests as standalone messages
+      if (extracted) {
+        if (extracted.items && extracted.items.length > 0) {
+          extracted.items.forEach(function(item) {
+            var itemEl = document.createElement('div');
+            itemEl.className = 'msg msg-item';
+            itemEl.innerHTML = '<div class="msg-item-notif"><span class="item-notif-icon">+</span><span class="item-notif-name">' + App.escapeHtml(item.name) + '</span><span class="item-notif-desc">' + App.escapeHtml(item.desc) + '</span></div>';
+            container.appendChild(itemEl);
+          });
+        }
+        if (extracted.quests && extracted.quests.length > 0) {
+          extracted.quests.forEach(function(q) {
+            var questEl = document.createElement('div');
+            questEl.className = 'msg msg-quest';
+            questEl.innerHTML = '<div class="msg-quest-content">[QUEST] ' + App.escapeHtml(q.name) + '</div>';
+            container.appendChild(questEl);
+          });
+        }
+      }
     });
     requestAnimationFrame(function() { container.scrollTop = container.scrollHeight; });
   },
@@ -7769,6 +8029,7 @@ var App = {
     if (text.startsWith('/')) {
       var cmd = text.split(/\s+/);
       input.value = ''; input.style.height = 'auto';
+      document.getElementById('btn-send').classList.remove('active');
       if (cmd[0] === '/状态') { this._insertSystemMsg('SAN ' + Store.player().san + '/100 · 生存点 ' + Store.player().survivalPoints); return; }
       if (cmd[0] === '/背包') {
         var items = Store.inventory();
@@ -7798,6 +8059,7 @@ var App = {
     this._pendingQueue.push(msg.id);
 
     input.value = ''; input.style.height = 'auto';
+    document.getElementById('btn-send').classList.remove('active');
     this.renderMessages();
     this.updateBadge();
     this.scrollToBottom();
@@ -8834,6 +9096,15 @@ var App = {
     return div.innerHTML;
   },
   formatContent: function(text) {
+    // Preserve whitelisted AI-generated HTML tags through escaping
+    var preserved = [];
+    var idx = 0;
+    text = text.replace(/<span class="(hl-danger|hl-item|hl-safe|action-text)">|<\/span>|<p>|<\/p>|<br\s*\/?>|<b>|<\/b>|<i>|<\/i>/gi, function(match) {
+      var key = '\x00' + (idx++) + '\x00';
+      preserved.push(match);
+      return key;
+    });
+
     var self = this;
     var lines = text.split('\n');
     var result = lines.map(function(line) {
@@ -8848,7 +9119,13 @@ var App = {
       if (lastIdx < line.length) html += self.escapeHtml(line.slice(lastIdx));
       return html || self.escapeHtml(line);
     });
-    return result.join('<br>');
+    var final = result.join('<br>');
+
+    // Restore preserved HTML tags
+    final = final.replace(/\x00(\d+)\x00/g, function(_, i) {
+      return preserved[parseInt(i)];
+    });
+    return final;
   },
 
   parseContent: function(text) {
@@ -8866,6 +9143,26 @@ var App = {
       }
     });
     return { actions: actions, dialogue: dialogue };
+  },
+
+  _extractItemNotifs: function(content) {
+    var items = [];
+    var quests = [];
+    var cleaned = content
+      .replace(/<span class="hl-item">\[ITEM\s+([^\]:]+):\s*([^\]]*)\]<\/span>/g, function(_, name, desc) {
+        items.push({ name: name.trim(), desc: desc.trim() });
+        return '';
+      })
+      .replace(/\[ITEM\s+([^\]:]+):\s*([^\]]*)\]/g, function(_, name, desc) {
+        items.push({ name: name.trim(), desc: desc.trim() });
+        return '';
+      })
+      .replace(/\[QUEST\s+([^\]]+)\]/g, function(_, name) {
+        quests.push({ name: name.trim() });
+        return '';
+      });
+    cleaned = cleaned.replace(/<p>\s*<\/p>/g, '').replace(/<br>\s*<br>/g, '<br>').replace(/^\s*<br>|<br>\s*$/g, '');
+    return { cleaned: cleaned, items: items, quests: quests };
   },
 
   formatUserMsg: function(text) {
@@ -9055,6 +9352,8 @@ var App = {
     });
     document.getElementById('input-msg').addEventListener('input', function() {
       this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 72) + 'px';
+      var sendBtn = document.getElementById('btn-send');
+      if (sendBtn) { sendBtn.classList.toggle('active', this.value.trim().length > 0); }
     });
     document.getElementById('btn-send').addEventListener('click', function() { self.sendMessage(); });
 

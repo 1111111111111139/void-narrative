@@ -77,9 +77,10 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
    BOTTOM NAVIGATION (in dock)
    ============================================================ */
 .dock-wrapper{
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateZ(0);will-change:transform;
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateZ(0);will-change:transform,bottom;
   width:calc(100% - 24px);max-width:382px;z-index:100;
   padding-bottom:calc(var(--sab) - 4px);
+  transition:bottom 0.15s ease-out;
 }
 .dock{
   background:var(--glass);
@@ -1821,6 +1822,71 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 
 /* Selected/expanded node highlight */
 .dot-expanded .map-dot-core{box-shadow:0 0 10px rgba(200,200,200,0.35)}
+
+/* ============================================================
+   VOID 意识校准 — 弹窗组件
+   ============================================================ */
+.calibration-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+body.light .calibration-overlay { background: rgba(0,0,0,0.35); }
+.calibration-overlay.hidden { display: none; }
+.calibration-dialog {
+  width: 100%; max-width: 370px;
+  background: var(--bg); border: 1px solid var(--border-active);
+  border-radius: var(--radius-lg); box-shadow: 0 24px 64px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.05);
+  overflow: hidden; animation: cal-modal-in 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes cal-modal-in { from{opacity:0;transform:scale(.92) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.cal-header { display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:1px solid var(--divider) }
+.cal-header-left { display:flex;align-items:center;gap:8px }
+.cal-header-dot { width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(142,42,42,.5);animation:cal-dot-pulse 2s ease-in-out infinite }
+@keyframes cal-dot-pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+.cal-title { font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--text);text-transform:uppercase }
+.cal-subtitle { font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.06em;margin-left:4px }
+.cal-close { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);background:transparent;border:none;font-size:18px;transition:all .2s;flex-shrink:0 }
+.cal-close:hover { color:var(--text);background:var(--surface-hover) }
+.cal-body { padding:20px 18px 22px;display:flex;flex-direction:column;align-items:center;gap:16px;min-height:260px }
+.cal-ready-icon { font-size:32px;opacity:.6;margin-bottom:4px }
+.cal-ready-title { font-size:14px;font-weight:600;color:var(--text);letter-spacing:.06em;text-align:center }
+.cal-ready-desc { font-family:var(--font-mono);font-size:10px;color:var(--text-2);letter-spacing:.05em;text-align:center;line-height:1.5 }
+.cal-ready-cost { font-family:var(--font-mono);font-size:11px;color:var(--danger-bright);letter-spacing:.06em;padding:6px 14px;border:1px solid rgba(142,42,42,.2);border-radius:var(--radius);background:var(--accent-dim) }
+.cal-ready-btn { padding:12px 36px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:#EAEAEA;background:var(--accent);border:none;cursor:pointer;transition:all .2s;text-transform:uppercase }
+.cal-ready-btn:hover { background:var(--accent-bright);box-shadow:0 0 16px rgba(142,42,42,.4) }
+.cal-ready-btn:active { transform:scale(.96) }
+.cal-ready-btn:disabled { opacity:.35;cursor:not-allowed }
+.cal-ready-btn:disabled:hover { background:var(--accent);box-shadow:none }
+.cal-round-info { font-family:var(--font-mono);font-size:9px;color:var(--text-3);letter-spacing:.1em;text-align:center;text-transform:uppercase }
+.cal-display-char { font-family:var(--font-mono);font-size:48px;font-weight:200;color:var(--text);letter-spacing:.04em;min-height:64px;display:flex;align-items:center;justify-content:center;transition:all .1s ease }
+.cal-display-char.flash { color:var(--danger-bright);text-shadow:0 0 20px rgba(142,42,42,.6) }
+.cal-progress-wrap { width:100%;height:3px;background:var(--divider);border-radius:2px;overflow:hidden }
+.cal-progress-fill { height:100%;background:var(--accent);border-radius:2px;transition:width .1s linear }
+.cal-slots { display:flex;gap:8px;justify-content:center;flex-wrap:wrap }
+.cal-slot { width:36px;height:44px;border:1px solid var(--divider);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:18px;color:var(--text);background:var(--surface);transition:all .15s ease }
+.cal-slot.filled { border-color:var(--accent);box-shadow:0 0 6px rgba(142,42,42,.2) }
+.cal-keyboard { display:flex;flex-direction:column;gap:6px;align-items:center;width:100% }
+.cal-key-row { display:flex;gap:5px;justify-content:center;flex-wrap:wrap }
+.cal-key { width:44px;height:44px;border-radius:8px;font-family:var(--font-mono);font-size:15px;color:var(--text-2);background:var(--surface);border:1px solid var(--divider);cursor:pointer;transition:all .15s ease;display:flex;align-items:center;justify-content:center }
+.cal-key:hover { border-color:var(--border-active);color:var(--text);background:var(--surface-hover) }
+.cal-key:active { transform:scale(.93);background:var(--accent-dim);border-color:rgba(142,42,42,.3);color:var(--danger-bright) }
+.cal-key-backspace { width:60px;height:36px;border-radius:8px;font-family:var(--font-mono);font-size:10px;color:var(--text-3);background:transparent;border:1px solid var(--divider);cursor:pointer;letter-spacing:.06em;transition:all .15s ease }
+.cal-key-backspace:hover { border-color:var(--border-active);color:var(--text) }
+.cal-feedback { font-family:var(--font-mono);font-size:13px;font-weight:600;letter-spacing:.1em;text-align:center;padding:10px 0 }
+.cal-feedback.correct { color:#4ade80 }
+.cal-feedback.wrong { color:var(--danger-bright) }
+.cal-result-icon { font-size:28px;opacity:.7 }
+.cal-result-title { font-size:13px;font-weight:600;color:var(--text);letter-spacing:.06em }
+.cal-result-stats { display:flex;flex-direction:column;gap:6px;width:100% }
+.cal-result-row { display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--surface);border:1px solid var(--divider);border-radius:var(--radius);font-family:var(--font-mono);font-size:11px }
+.cal-result-label { color:var(--text-2);letter-spacing:.04em }
+.cal-result-value { color:var(--text);letter-spacing:.04em }
+.cal-result-value.san { color:#4ade80 }
+.cal-result-value.fail { color:var(--danger-bright) }
+.cal-close-btn { padding:11px 32px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;color:#EAEAEA;background:var(--accent);border:none;cursor:pointer;transition:all .2s;text-transform:uppercase;width:100% }
+.cal-close-btn:hover { background:var(--accent-bright) }
 </style>
 </head>
 <body class="intro-active">
@@ -2031,7 +2097,14 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
             </div>
           </div>
 
-          <!-- 4. Location / Threat / Time -->
+          <!-- 4. Calibration Entry -->
+          <div style="text-align:center;padding:8px 0">
+            <button class="cal-ready-btn" style="padding:8px 18px;font-size:10px;border-radius:6px;display:inline-block;width:auto" onclick="openCalibration(Store.player().points, Store.player().san)">
+              意识校准
+            </button>
+          </div>
+
+          <!-- 5. Location / Threat / Time -->
           <div class="data-list">
             <div class="data-row">
               <span class="data-label">当前位置</span>
@@ -4019,7 +4092,7 @@ function buildSystemPrompt() {
   presetText += '- 原住民最危险——完全自主且可能有完全不类人的价值观。它们可能帮你，也可能用你当诱饵\n';
   presetText += '- 不要把NPC当NPC看。把它们当怪物看——只是碰巧还有一点残存意识\n\n';
   presetText += '### NPC对话规则\n';
-  presetText += '严格按照角色卡设定输出对话。执念投影：对话受执念循环限制。被同化者：混乱、碎片化、可能突然中断。原住民：自主对话，可能透露VOID信息。NPC说话时出现头像+气泡（动作用斜体灰色放在气泡内、对话之前）；NPC不说话时动作用旁白渲染（虚线框居中）。只有说话才出气泡。对话格式：角色名独占一行，对话内容缩进两个空格，动作在前用斜体、对话在后。\n\n';
+  presetText += '严格按照角色卡设定输出对话。执念投影：对话受执念循环限制。被同化者：混乱、碎片化、可能突然中断。原住民：自主对话，可能透露VOID信息。NPC说话时出现头像+气泡（动作用斜体灰色放在气泡内、对话之前）；NPC不说话时动作用旁白渲染（虚线框居中）。只有说话才出气泡。对话格式：角色名独占一行，对话内容缩进两个空格，动作在前用斜体、对话在后。角色开口说话时必须严格使用此格式，禁止将对话内容混入旁白段落中。即使只有一句话也必须单独成块。旁白描述动作和环境，对话内容必须独立输出。\n\n';
   presetText += '### NPC在场规则\n';
   presetText += '在场NPC：用户可直接对话，输入中提及NPC名时自动切换对话模式。NPC可以自主行动，AI在旁白中描述——包括可能突然攻击或背叛。不在场NPC：用户不能直接对话。NPC之间可以互动，用户不在场时也会发生事情，后续返回时可能体现。进出场景由AI根据剧情判断，在旁白中自然描述。\n\n';
   presetText += '### 角色/NPC创建\n';
@@ -4290,7 +4363,7 @@ function buildSystemPrompt() {
   topHeader += '第五级（最低）：论坛AI发帖 > 后台角色行动模拟 > AI模拟购买\n';
   topHeader += '  论坛生成和购买模拟为背景系统，不直接影响主线叙事。后台角色行动仅在重逢时自然体现变化。\n\n';
 
-  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n**行动暗示规则**：每次回复末尾，如果用户刚进入新场景、刚苏醒、或刚到达新地点且没有明确行动目标，AI在旁白结尾自然附带1-2个简短的行动暗示。暗示用（ ）包裹在旁白正文中，格式如"（铁门似乎没有锁死。床底下可能有什么东西。）"。暗示不是强制选项，用户可完全忽略。如果用户已有明确行动方向，不添加暗示。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_NAME 副本名称] 确认或更新当前副本的名称\n- [COPY_CORE 执念描述] 发现执念核心时更新 copy.core 字段\n- [COPY_RULE 规则内容] 玩家每发现一条规则时追加到 discoveredRules 并更新 rules 显示\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。铁锈区·废弃营地→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、铁锈区→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## C级副本生成方向\n\n### 废城·旧区·地铁站\n难度：C级，单人\n规则：车门彻底打开前不能离开座位，违反一次扣除SAN-10\n核心机制：玩家乘坐的本身就是封闭异常车厢，但幻觉持续制造离座冲动（隔壁车厢骚乱声、车窗外人脸、威胁感逼近），全部是假象。完成一次换乘即可通关。\n流程：乘车阶段（抵抗幻觉）→ 换乘通道（同一个人反复出现在不同位置）→ 上对面站台的车\n执念方向：AI自由生成，围绕"困在错误车厢"展开\n评分：从未违规A / 违规1-2次B / 违规3次以上C\n\n### 废城·旧区·理发店\n类型：可重复触发风险收益点，非副本\n规则：坐上椅子后不能主动离开，理完才能走；不能让NPC冷场，沉默每次额外扣除SAN-5\nNPC：每次随机生成体态异常的理发师，外形方向包括但不限于：身体结构嵌入异物或工具、从自身体内取出组织液或不明物质用于清洗头发、以血液或体液作为染膏，操作时态度完全平常，对话内容与外形完全脱节。精神污染通过旁白平铺直叙呈现，不做恐怖渲染。\n阶段收益：阶段一 积分+20 SAN-3 / 阶段二 积分+40 SAN-8 / 阶段三 积分+70 SAN-15\n\n### 废城·旧区·巷口 + 废弃便利店（捆绑机制）\n\n**巷口（一次性过路机制）**\n触发条件：玩家首次前往废弃便利店时必经，第二次起不再触发\n规则：不能回头，不能对身后产生好奇心\n核心设计：诡异从玩家进入巷口起就已紧贴其身后，通过在玩家耳边制造脚步声、呼吸声、远近变化的声响混淆方向感，令玩家误以为它还在远处逼近。AI叙事持续渲染压迫感制造回头冲动。影子比进入时更长是唯一真实线索，通过旁白细节埋入，不主动点破。\n回头惩罚：扣除SAN值，AI叙述玩家看到的鬼脸细节\n通关：忍住走过巷口即可，无奖励\n\n**废弃便利店**\n类型：可互动地点，含可选任务，非副本\n货架：AI随机生成售卖物，方向为精神污染类或引发生理不适的物品，不提供正常补给\n收银员：诡异侏儒套恐怖电影风格娃娃头，身影矮小头异常大。会要求玩家帮忙理货，玩家可接受或拒绝。拒绝则收银员骂一句，不做其他反应。\n接受后进入仓房：仓房内除货物外有收银员的娃娃老婆，身上布满孔洞，棉花不断往外冒，棉花内带血迹和不明组织。玩家搬货期间娃娃持续盯视并发出尖锐笑声，平均每次SAN-3。攻击娃娃触发收银员报复，玩家受到攻击并扣SAN。\n完成任务奖励：积分最高+30，针剂×3\n\n### 废城·旧区·小诊所\n类型：废弃探索地点，非副本，中等威胁，进入触发提示弹窗\n内容：秘密实验残留，方向为人体改造痕迹、激发内心欲望相关实验记录，具体细节AI生成\n与A级医院副本存在线索关联，实验数据可作为后续副本线索\n时绎邂逅：见顶级轮回者设定\n点击旧街区节点后展开显示三个子地点：\n- 207室（副本，C级）\n- 理发店（互动点）\n- 废弃便利店（互动点）\n\n展开方式参考地图现有的交互风格，子节点围绕旧街区向下展开均可。子节点可点击，点击后进入对应地点的叙事界面。巷口不单独显示为节点，作为首次前往废弃便利店时的过路触发。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + (App._fearTriggerFlag ? '\n\n[恐惧点触发：' + App._fearTriggerFlag + '] 当前场景触发了玩家的恐惧点。SAN消耗翻倍，判定成功率额外-15%。AI在叙事中描述玩家的恐惧反应（生理反应规则适用）。本次回复后清除此标记。' : '') + (copy.tideActive ? '\n\n[潮汐期进行中] 当前处于潮汐期。怪物活跃度上升、SAN自然消耗加速。AI在旁白中自然融入潮汐氛围：天空暗沉异常、冷风加剧、远处传来不明怪声、执念碎片更加不稳定、地面冷光周期性闪烁。角色可能感到不安或警觉。副本内时间正常流动，积分扣除照常。' : '') + compressReq;
+  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n**行动暗示规则**：每次回复末尾，如果用户刚进入新场景、刚苏醒、或刚到达新地点且没有明确行动目标，AI在旁白结尾自然附带1-2个简短的行动暗示。暗示用（ ）包裹在旁白正文中，格式如"（铁门似乎没有锁死。床底下可能有什么东西。）"。暗示不是强制选项，用户可完全忽略。如果用户已有明确行动方向，不添加暗示。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n角色开口说话时必须严格使用此格式，禁止将对话内容混入旁白段落中。即使只有一句话也必须单独成块。旁白描述动作和环境，对话内容必须独立输出。\n\n示例：\n林川\n  C级的，我刚来，一起？\n\n时绎\n  不用谢。我只是路过。\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_NAME 副本名称] 确认或更新当前副本的名称\n- [COPY_CORE 执念描述] 发现执念核心时更新 copy.core 字段\n- [COPY_RULE 规则内容] 玩家每发现一条规则时追加到 discoveredRules 并更新 rules 显示\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。铁锈区·废弃营地→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、铁锈区→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## C级副本生成方向\n\n### 废城·旧区·地铁站\n难度：C级，单人\n规则：车门彻底打开前不能离开座位，违反一次扣除SAN-10\n核心机制：玩家乘坐的本身就是封闭异常车厢，但幻觉持续制造离座冲动（隔壁车厢骚乱声、车窗外人脸、威胁感逼近），全部是假象。完成一次换乘即可通关。\n流程：乘车阶段（抵抗幻觉）→ 换乘通道（同一个人反复出现在不同位置）→ 上对面站台的车\n执念方向：AI自由生成，围绕"困在错误车厢"展开\n评分：从未违规A / 违规1-2次B / 违规3次以上C\n\n### 废城·旧区·理发店\n类型：可重复触发风险收益点，非副本\n规则：坐上椅子后不能主动离开，理完才能走；不能让NPC冷场，沉默每次额外扣除SAN-5\nNPC：每次随机生成体态异常的理发师，外形方向包括但不限于：身体结构嵌入异物或工具、从自身体内取出组织液或不明物质用于清洗头发、以血液或体液作为染膏，操作时态度完全平常，对话内容与外形完全脱节。精神污染通过旁白平铺直叙呈现，不做恐怖渲染。\n阶段收益：阶段一 积分+20 SAN-3 / 阶段二 积分+40 SAN-8 / 阶段三 积分+70 SAN-15\n\n### 废城·旧区·巷口 + 废弃便利店（捆绑机制）\n\n**巷口（一次性过路机制）**\n触发条件：玩家首次前往废弃便利店时必经，第二次起不再触发\n规则：不能回头，不能对身后产生好奇心\n核心设计：诡异从玩家进入巷口起就已紧贴其身后，通过在玩家耳边制造脚步声、呼吸声、远近变化的声响混淆方向感，令玩家误以为它还在远处逼近。AI叙事持续渲染压迫感制造回头冲动。影子比进入时更长是唯一真实线索，通过旁白细节埋入，不主动点破。\n回头惩罚：扣除SAN值，AI叙述玩家看到的鬼脸细节\n通关：忍住走过巷口即可，无奖励\n\n**废弃便利店**\n类型：可互动地点，含可选任务，非副本\n货架：AI随机生成售卖物，方向为精神污染类或引发生理不适的物品，不提供正常补给\n收银员：诡异侏儒套恐怖电影风格娃娃头，身影矮小头异常大。会要求玩家帮忙理货，玩家可接受或拒绝。拒绝则收银员骂一句，不做其他反应。\n接受后进入仓房：仓房内除货物外有收银员的娃娃老婆，身上布满孔洞，棉花不断往外冒，棉花内带血迹和不明组织。玩家搬货期间娃娃持续盯视并发出尖锐笑声，平均每次SAN-3。攻击娃娃触发收银员报复，玩家受到攻击并扣SAN。\n完成任务奖励：积分最高+30，针剂×3\n\n### 废城·旧区·小诊所\n类型：废弃探索地点，非副本，中等威胁，进入触发提示弹窗\n内容：秘密实验残留，方向为人体改造痕迹、激发内心欲望相关实验记录，具体细节AI生成\n与A级医院副本存在线索关联，实验数据可作为后续副本线索\n时绎邂逅：见顶级轮回者设定\n点击旧街区节点后展开显示三个子地点：\n- 207室（副本，C级）\n- 理发店（互动点）\n- 废弃便利店（互动点）\n\n展开方式参考地图现有的交互风格，子节点围绕旧街区向下展开均可。子节点可点击，点击后进入对应地点的叙事界面。巷口不单独显示为节点，作为首次前往废弃便利店时的过路触发。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + (App._fearTriggerFlag ? '\n\n[恐惧点触发：' + App._fearTriggerFlag + '] 当前场景触发了玩家的恐惧点。SAN消耗翻倍，判定成功率额外-15%。AI在叙事中描述玩家的恐惧反应（生理反应规则适用）。本次回复后清除此标记。' : '') + (copy.tideActive ? '\n\n[潮汐期进行中] 当前处于潮汐期。怪物活跃度上升、SAN自然消耗加速。AI在旁白中自然融入潮汐氛围：天空暗沉异常、冷风加剧、远处传来不明怪声、执念碎片更加不稳定、地面冷光周期性闪烁。角色可能感到不安或警觉。副本内时间正常流动，积分扣除照常。' : '') + compressReq;
 }
 
 // ============================================================
@@ -4305,11 +4378,13 @@ var AI = {
     var model = (options && options.model) || s.model || 'gpt-4o-mini';
 
     if (!baseUrl || !apiKey) {
+      console.log('[AI.call] API配置不完整: url=' + (baseUrl||'(空)') + ', key=' + (apiKey ? '已填写' : '(空)'));
       Store.addMessage({ type:'system', content:'请先在设置页配置API接口地址和密钥。点击底部导航「设置」→「API 配置」。' });
       App.renderMessages();
       return null;
     }
 
+    console.log('[AI.call] API: url=' + baseUrl + ', model=' + model);
     var systemPrompt = (options && options.systemPrompt) || buildSystemPrompt();
     var apiMessages = this._buildMessages(systemPrompt, options);
     var url = baseUrl.replace(/\/+$/, '') + '/chat/completions';
@@ -4324,12 +4399,14 @@ var AI = {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-      if (!res.ok) { var et = await res.text(); throw new Error(res.status + ' ' + et.slice(0, 200)); }
+      console.log('[AI.call] fetch返回: status=' + res.status);
+      if (!res.ok) { var et = await res.text(); console.log('[AI.call] HTTP错误: ' + et.slice(0, 300)); throw new Error(res.status + ' ' + et.slice(0, 200)); }
       var data = await res.json();
       var content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
       if (!content) return { error: 'empty', msg: 'AI 未返回有效内容' };
       return { ok: true, text: content };
     } catch(e) {
+      console.log('[AI.call] 异常: name=' + e.name + ', msg=' + (e.message||'').slice(0,200));
       if (e.name === 'AbortError') return { error: 'timeout', msg: '响应超时（30秒），请重试' };
       if (e.message && e.message.match(/^\\d{3}/)) return { error: 'http', msg: '服务器错误：' + e.message };
       return { error: 'network', msg: '连接中断：' + e.message };
@@ -4342,15 +4419,21 @@ var AI = {
     var apiKey = (options && options.apiKey) || s.key;
     var model = (options && options.model) || s.model || 'gpt-4o-mini';
 
-    if (!baseUrl || !apiKey) return { error: 'nokey', msg: '请先在设置页配置API接口地址和密钥' };
+    if (!baseUrl || !apiKey) {
+      console.log('[StreamCall] API配置不完整: url=' + (baseUrl||'(空)') + ', key=' + (apiKey ? '已填写(' + apiKey.length + '位)' : '(空)'));
+      return { error: 'nokey', msg: '请先在设置页配置API接口地址和密钥' };
+    }
 
+    console.log('[StreamCall] API配置: url=' + baseUrl + ', model=' + model + ', key已填写(' + apiKey.length + '位)');
     var systemPrompt = (options && options.systemPrompt) || buildSystemPrompt();
     var apiMessages = this._buildMessages(systemPrompt, options);
     var url = baseUrl.replace(/\/+$/, '') + '/chat/completions';
+    console.log('[StreamCall] 请求URL=' + url + ', messages数量=' + apiMessages.length + ', systemPrompt长度=' + systemPrompt.length);
 
     try {
       var controller = new AbortController();
       var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
+      console.log('[StreamCall] 开始fetch...');
       var res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
@@ -4358,7 +4441,8 @@ var AI = {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-      if (!res.ok) { var et = await res.text(); throw new Error(res.status + ' ' + et.slice(0, 200)); }
+      console.log('[StreamCall] fetch返回: status=' + res.status + ', ok=' + res.ok);
+      if (!res.ok) { var et = await res.text(); console.log('[StreamCall] HTTP错误响应体: ' + et.slice(0, 300)); throw new Error(res.status + ' ' + et.slice(0, 200)); }
 
       var reader = res.body.getReader();
       var decoder = new TextDecoder();
@@ -4389,6 +4473,7 @@ var AI = {
       if (!fullText) return { error: 'empty', msg: 'AI 未返回有效内容' };
       return { ok: true, text: fullText };
     } catch(e) {
+      console.log('[StreamCall] 异常捕获: name=' + e.name + ', message=' + (e.message||'').slice(0,200));
       if (e.name === 'AbortError') return { error: 'timeout', msg: '响应超时（30秒），请重试' };
       if (e.message && e.message.match(/^\\d{3}/)) return { error: 'http', msg: '服务器错误：' + e.message };
       return { error: 'network', msg: '连接中断：' + e.message };
@@ -4965,6 +5050,39 @@ var App = {
     this.applySanEffect();
     this.startSanJitter();
 
+    // VOID time pause/resume: freeze deduction timer when page is hidden
+    var p = Store.player();
+    // On page load: compensate for time spent offline (page closed)
+    if (p._pauseTime) {
+      var offlineMs = Date.now() - p._pauseTime;
+      if (offlineMs > 60000) {
+        p.nextDeduction = (p.nextDeduction || Date.now() + 86400000) + offlineMs;
+        if (p._tideEnd) p._tideEnd += offlineMs;
+        if (p.tideNextTrigger) p.tideNextTrigger += offlineMs;
+        console.log('[VOID] 页面重新打开, 离线' + Math.round(offlineMs/60000) + '分钟, 扣除计时已补偿, nextDeduction=' + new Date(p.nextDeduction).toISOString());
+      }
+      p._pauseTime = null;
+      Store.save();
+    }
+    document.addEventListener('visibilitychange', function() {
+      var pp = Store.player();
+      if (document.hidden) {
+        pp._pauseTime = Date.now();
+        Store.save();
+        console.log('[VOID] 页面隐藏, 暂停VOID时间, pauseTime=' + pp._pauseTime);
+      } else if (pp._pauseTime) {
+        var offMs = Date.now() - pp._pauseTime;
+        if (offMs > 60000) {
+          pp.nextDeduction = (pp.nextDeduction || Date.now() + 86400000) + offMs;
+          if (pp._tideEnd) pp._tideEnd += offMs;
+          if (pp.tideNextTrigger) pp.tideNextTrigger += offMs;
+          console.log('[VOID] 页面恢复, 离线' + Math.round(offMs/60000) + '分钟, 扣除计时已补偿');
+        }
+        pp._pauseTime = null;
+        Store.save();
+      }
+    });
+
     // Force sticky positioning via inline styles for rendering isolation
     var topbar = document.querySelector('.story-topbar');
     if (topbar) {
@@ -4975,30 +5093,35 @@ var App = {
 
     var self = this;
 
-	    // VisualViewport handler: keep dock positioned above keyboard on mobile
-	    var dock = document.querySelector('.dock-wrapper');
-	    var raf = null;
-	    if (window.visualViewport && dock) {
-	      window.visualViewport.addEventListener('resize', function() {
-	        if (raf) cancelAnimationFrame(raf);
-	        raf = requestAnimationFrame(function() {
-	          var vh = window.visualViewport.height;
-	          var wh = window.innerHeight;
-	          var offset = wh - vh;
-	          if (offset > 0) {
-	            dock.style.transform = 'translateX(-50%) translateZ(0) translateY(-' + offset + 'px)';
-	          } else {
-	            dock.style.transform = 'translateX(-50%) translateZ(0)';
-	          }
-	        });
-	      });
-	      window.visualViewport.addEventListener('scroll', function() {
-	        if (raf) cancelAnimationFrame(raf);
-	        raf = requestAnimationFrame(function() {
-	          dock.style.transform = 'translateX(-50%) translateZ(0) translateY(-' + window.visualViewport.offsetTop + 'px)';
-	        });
-	      });
-	    }
+    // VisualViewport handler: keep dock floating above keyboard on mobile
+    var dock = document.querySelector('.dock-wrapper');
+    var raf = null;
+    if (window.visualViewport && dock) {
+      var _adjustDock = function() {
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(function() {
+          var vh = window.visualViewport.height;
+          var wh = window.innerHeight;
+          var kbH = wh - vh - (window.visualViewport.offsetTop || 0);
+          if (kbH > 50) {
+            dock.style.bottom = kbH + 'px';
+            dock.style.transform = 'translateX(-50%) translateZ(0)';
+          } else {
+            dock.style.bottom = '0';
+            dock.style.transform = 'translateX(-50%) translateZ(0)';
+          }
+          var msgs = document.getElementById('story-messages');
+          if (msgs && kbH > 50) {
+            msgs.style.paddingBottom = (dock.offsetHeight + kbH + 8) + 'px';
+            msgs.scrollTop = msgs.scrollHeight;
+          } else if (msgs) {
+            msgs.style.paddingBottom = '';
+          }
+        });
+      };
+      window.visualViewport.addEventListener('resize', _adjustDock);
+      window.visualViewport.addEventListener('scroll', _adjustDock);
+    }
     self._playIntro();
   },
 
@@ -5767,6 +5890,7 @@ var App = {
       } else {
         var sysHTML = '<div class="msg-content">' + App.formatContent(msg.content) + '</div>';
         if (msg.meta && msg.meta.isError) {
+          console.log('[RenderMsg] 渲染错误消息+重试按钮, retryText=' + (msg.meta.retryText||'').slice(0,30));
           sysHTML += '<button class="btn-accent" style="margin-top:6px;padding:4px 12px;font-size:11px;border-radius:6px;cursor:pointer" onclick="App._retryAI()">点击重试</button>';
         }
         el.innerHTML = sysHTML;
@@ -8268,7 +8392,9 @@ var App = {
     var input = document.getElementById('input-msg');
     // Force-enable input: a previous failed AI call may have left it disabled
     if (input.disabled) { console.log('[RetryAI] 检测到input.disabled=true, 强制重置'); input.disabled = false; }
-    console.log('[RetryAI] Step2: 设置input.value并调用sendMessage');
+    var s = Store._db.settings.api;
+    console.log('[RetryAI] Step2: API状态 url=' + (s.url||'(空)') + ', key=' + (s.key ? '已填写(' + s.key.length + '位)' : '(空)') + ', model=' + (s.model||'gpt-4o-mini'));
+    console.log('[RetryAI] Step3: 设置input.value=' + (this._retryText||'').slice(0,30) + '并调用sendMessage');
     input.value = this._retryText;
     this.sendMessage();
     console.log('[RetryAI] Step3: sendMessage完成, 100ms后调用triggerAI');
@@ -8336,10 +8462,12 @@ var App = {
 
     // Handle errors (both API-level and catch-level)
     if (!response || response.error) {
-      console.log('[TriggerAI] Step5: AI响应错误, 进入错误分支. msg=' + ((response && response.msg) ? response.msg : '连接失败'));
+      console.log('[TriggerAI] Step5: AI响应错误, response类型=' + typeof response + ', error=' + (response && response.error) + ', msg=' + ((response && response.msg) ? response.msg : '连接失败'));
+      console.log('[TriggerAI] Step5: 完整response对象:', JSON.stringify(response).slice(0, 300));
       var errMsg = (response && response.msg) ? response.msg : '连接失败';
       var rt = this._retryText;
       Store.addMessage({ type:'system', content: errMsg + '。', meta: { isError: true, retryText: rt } });
+      console.log('[TriggerAI] Step5: 已添加错误消息到Store, retryText=' + (rt||'').slice(0,30) + ', 即将renderMessages');
       this._aiBusy = false; this.renderMessages(); this.scrollToBottom();
       console.log('[TriggerAI] Step6: 错误分支结束, _aiBusy=' + this._aiBusy + ', input.disabled重置为false');
       return;
@@ -9759,41 +9887,12 @@ var App = {
     });
     document.getElementById('btn-send').addEventListener('click', function() { self.sendMessage(); });
 
-    // Keyboard-aware scroll: keep input visible above keyboard
-    var _kbTimer = null, _kbHandler = null;
-    function _scrollInputIntoView() {
-      var input = document.getElementById('input-msg');
-      var msgs = document.getElementById('story-messages');
-      if (!input) return;
-      if (msgs) {
-        // Scroll story container so the dock area sits just above the keyboard
-        var dock = document.querySelector('.dock-wrapper');
-        if (dock) {
-          msgs.style.paddingBottom = dock.offsetHeight + 16 + 'px';
-          msgs.scrollTop = msgs.scrollHeight;
-        }
-      }
-      input.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
+    // Keyboard focus: scroll input into view after keyboard animation
     document.getElementById('input-msg').addEventListener('focus', function() {
-      clearTimeout(_kbTimer);
-      _kbTimer = setTimeout(function() { _scrollInputIntoView(); }, 350);
-      if (window.visualViewport && !_kbHandler) {
-        _kbHandler = function() {
-          clearTimeout(_kbTimer);
-          _kbTimer = setTimeout(function() { _scrollInputIntoView(); }, 100);
-        };
-        window.visualViewport.addEventListener('resize', _kbHandler);
-      }
-    });
-    document.getElementById('input-msg').addEventListener('blur', function() {
-      clearTimeout(_kbTimer);
-      if (_kbHandler && window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', _kbHandler);
-        _kbHandler = null;
-      }
-      var msgs = document.getElementById('story-messages');
-      if (msgs) { msgs.style.paddingBottom = ''; }
+      var self = this;
+      setTimeout(function() {
+        self.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 350);
     });
 
     // Story scroll → show/hide scroll-to-bottom button
@@ -10108,5 +10207,41 @@ var App = {
 document.addEventListener('DOMContentLoaded', function() { App.init(); });
 </script>
 <div class="val-toast" id="val-toast"></div>
+
+<script>
+var CHAR_POOL=['0','1','2','3','4','5','6','7','8','9','S','A','N'];
+var SAN_TABLE={3:3,4:5,5:8,6:12,7:15};
+var calState={phase:'ready',currentPoints:0,currentSAN:0,round:0,sequenceLength:3,sequence:[],displayIndex:0,displayTimer:null,displayDone:false,playerInput:[],roundsPassed:0,maxLengthReached:3,sanRecovered:0,pointsSpent:20};
+function openCalibration(pts,san){calState.currentPoints=pts;calState.currentSAN=san;calState.phase='ready';calState.round=0;calState.roundsPassed=0;calState.maxLengthReached=3;calState.sanRecovered=0;calState.pointsSpent=20;calState.sequenceLength=3;calState.playerInput=[];calState.displayDone=false;document.getElementById('calOverlay').classList.remove('hidden');calRenderReady();}
+function closeCalibration(){calClearAllTimers();document.getElementById('calOverlay').classList.add('hidden');if(calState.sanRecovered>0){var p=Store.player();p.san=Math.min(p.maxSan||100,(p.san||0)+calState.sanRecovered);Store.save();App._showValueToast('SAN +'+calState.sanRecovered,'sp');App.renderHome();App.renderSanDisplay()}else if(calState.roundsPassed===0&&calState.pointsSpent>0){App._showValueToast('校准未通过','sp');App.renderHome()}}
+function calClearAllTimers(){if(calState.displayTimer){clearTimeout(calState.displayTimer);calState.displayTimer=null}}
+function calRenderReady(){var b=document.getElementById('calBody');var a=calState.currentPoints>=20;b.innerHTML='<div class="cal-ready-icon">◈</div><div class="cal-ready-title">意识校准</div><div class="cal-ready-desc">测试意识序列记忆能力<br>字符池：0-9 / S A N<br>共7轮，全部通过即完成校准</div><div class="cal-ready-cost">消耗 20 积分</div><button class="cal-ready-btn" id="calStartBtn"'+(a?'':' disabled')+'>'+(a?'开始校准':'积分不足')+'</button>';if(a)document.getElementById('calStartBtn').addEventListener('click',calStartGame)}
+function calStartGame(){calState.pointsSpent=20;var p=Store.player();p.points=Math.max(0,(p.points||0)-20);Store.save();calState.currentPoints-=20;calState.round=1;calState.sequenceLength=3;calState.roundsPassed=0;calState.maxLengthReached=3;calState.sanRecovered=0;calState.playerInput=[];calState.displayDone=false;calGenerateSequence();calStartDisplayPhase()}
+function calGenerateSequence(){var s=CHAR_POOL.slice().sort(function(){return Math.random()-0.5});calState.sequence=s.slice(0,calState.sequenceLength)}
+function calStartDisplayPhase(){calState.phase='display';calState.displayIndex=0;calState.displayDone=false;calState.playerInput=[];calRenderDisplayPhase()}
+function calRenderDisplayPhase(){var b=document.getElementById('calBody');b.innerHTML='<div class="cal-round-info">第 '+calState.round+' 轮 · '+calState.sequenceLength+' 位序列</div><div class="cal-display-char" id="displayChar">&nbsp;</div><div class="cal-progress-wrap"><div class="cal-progress-fill" id="displayProgress" style="width:0%"></div></div>';var e=document.getElementById('displayChar');var p=document.getElementById('displayProgress');var sd=400;var hd=1000;var tt=calState.sequenceLength*sd+hd;var st=Date.now();var pi=setInterval(function(){var pct=Math.min((Date.now()-st)/tt*100,100);p.style.width=pct+'%'},50);var cs=0;function nx(){if(cs<calState.sequenceLength){e.textContent=calState.sequence[cs];e.classList.add('flash');setTimeout(function(){e.classList.remove('flash')},150);cs++;calState.displayTimer=setTimeout(nx,sd)}else{calState.displayTimer=setTimeout(function(){e.textContent=' ';clearInterval(pi);calState.displayDone=true;calStartInputPhase()},hd)}}calState.displayTimer=setTimeout(nx,sd)}
+function calStartInputPhase(){calState.phase='input';calState.playerInput=[];calRenderInputPhase()}
+function calRenderInputPhase(){var b=document.getElementById('calBody');var sh='';for(var i=0;i<calState.sequenceLength;i++)sh+='<div class="cal-slot" id="slot'+i+'"></div>';var r1='';['0','1','2','3','4'].forEach(function(c){r1+='<button class="cal-key" onclick="calPressKey(\''+c+'\')">'+c+'</button>'});var r2='';['5','6','7','8','9'].forEach(function(c){r2+='<button class="cal-key" onclick="calPressKey(\''+c+'\')">'+c+'</button>'});var r3='';['S','A','N'].forEach(function(c){r3+='<button class="cal-key" onclick="calPressKey(\''+c+'\')">'+c+'</button>'});b.innerHTML='<div class="cal-round-info">第 '+calState.round+' 轮 · '+calState.sequenceLength+' 位序列</div><div class="cal-slots" id="calSlots">'+sh+'</div><div class="cal-keyboard"><div class="cal-key-row">'+r1+'</div><div class="cal-key-row">'+r2+'</div><div class="cal-key-row">'+r3+'</div><button class="cal-key-backspace" onclick="calPressBackspace()">← 退格</button></div>'}
+function calPressKey(c){if(calState.phase!=='input'||calState.playerInput.length>=calState.sequenceLength)return;calState.playerInput.push(c);var s=document.getElementById('slot'+(calState.playerInput.length-1));if(s){s.textContent=c;s.classList.add('filled')}if(calState.playerInput.length===calState.sequenceLength)setTimeout(calJudgeResult,300)}
+function calPressBackspace(){if(calState.phase!=='input'||calState.playerInput.length===0)return;var i=calState.playerInput.length-1;calState.playerInput.pop();var s=document.getElementById('slot'+i);if(s){s.textContent='';s.classList.remove('filled')}}
+function calJudgeResult(){var ok=calState.playerInput.join('')===calState.sequence.join('');calState.phase='feedback';calRenderFeedback(ok);setTimeout(function(){if(ok){calState.roundsPassed++;calState.maxLengthReached=calState.sequenceLength;if(calState.round>=7){calCalculateResult();calRenderResult();return}calState.round++;if(calState.sequenceLength<7)calState.sequenceLength++;calGenerateSequence();calStartDisplayPhase()}else{calCalculateResult();calRenderResult()}},800)}
+function calRenderFeedback(ok){document.getElementById('calBody').innerHTML='<div class="cal-round-info">第 '+calState.round+' 轮 · '+calState.sequenceLength+' 位序列</div><div class="cal-display-char" style="font-size:20px">'+calState.sequence.join(' ')+'</div><div class="cal-feedback '+(ok?'correct':'wrong')+'">'+(ok?'序列匹配':'序列错误')+'</div>'}
+function calCalculateResult(){calState.sanRecovered=calState.roundsPassed>0?(SAN_TABLE[calState.maxLengthReached]||0):0}
+function calRenderResult(){calState.phase='result';var b=document.getElementById('calBody');if(calState.roundsPassed===0){b.innerHTML='<div class="cal-result-icon">✕</div><div class="cal-result-title">校准失败</div><div class="cal-ready-desc">积分已扣除，意识稳定度未恢复</div><div class="cal-result-stats"><div class="cal-result-row"><span class="cal-result-label">消耗积分</span><span class="cal-result-value fail">-20</span></div><div class="cal-result-row"><span class="cal-result-label">恢复SAN</span><span class="cal-result-value">0</span></div></div><button class="cal-close-btn" onclick="closeCalibration()">关闭</button>'}else if(calState.roundsPassed>=7){b.innerHTML='<div class="cal-result-icon">◈</div><div class="cal-result-title">完美校准</div><div class="cal-ready-desc">全部7轮通过，意识序列完全匹配</div><div class="cal-result-stats"><div class="cal-result-row"><span class="cal-result-label">通过轮数</span><span class="cal-result-value">'+calState.roundsPassed+' / 7</span></div><div class="cal-result-row"><span class="cal-result-label">最高位数</span><span class="cal-result-value">7 位</span></div><div class="cal-result-row"><span class="cal-result-label">消耗积分</span><span class="cal-result-value fail">-'+calState.pointsSpent+'</span></div><div class="cal-result-row"><span class="cal-result-label">意识稳定度</span><span class="cal-result-value san">+'+calState.sanRecovered+'</span></div></div><button class="cal-close-btn" onclick="closeCalibration()">关闭</button>'}else{b.innerHTML='<div class="cal-result-icon">◈</div><div class="cal-result-title">校准完成</div><div class="cal-result-stats"><div class="cal-result-row"><span class="cal-result-label">通过轮数</span><span class="cal-result-value">'+calState.roundsPassed+' 轮</span></div><div class="cal-result-row"><span class="cal-result-label">最高位数</span><span class="cal-result-value">'+calState.maxLengthReached+' 位</span></div><div class="cal-result-row"><span class="cal-result-label">消耗积分</span><span class="cal-result-value fail">-'+calState.pointsSpent+'</span></div><div class="cal-result-row"><span class="cal-result-label">意识稳定度</span><span class="cal-result-value san">+'+calState.sanRecovered+'</span></div></div><button class="cal-close-btn" onclick="closeCalibration()">关闭</button>'}}
+</script>
+<!-- VOID 意识校准弹窗 -->
+<div class="calibration-overlay hidden" id="calOverlay">
+  <div class="calibration-dialog">
+    <div class="cal-header">
+      <div class="cal-header-left">
+        <div class="cal-header-dot"></div>
+        <span class="cal-title">意识校准</span>
+        <span class="cal-subtitle">CALIBRATION</span>
+      </div>
+      <button class="cal-close" onclick="closeCalibration()">&times;</button>
+    </div>
+    <div class="cal-body" id="calBody"></div>
+  </div>
+</div>
 </body>
 </html>

@@ -5323,7 +5323,7 @@ var App = {
     container.innerHTML = chars.map(function(c) {
       var first = c.name ? c.name.charAt(0) : '?';
       var avatarBg = self.getAvatarColor(c.name, c.isNPC ? c.npcType : null);
-      var avatarHTML = (c.name === '时绎') ? '<img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/image.png">' : (c.name === '林川') ? '<img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/linchuan.png">' : (c.avatar && !c.isNPC)
+      var avatarHTML = (c.name === '时绎') ? '<img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/image.png">' : (c.name === '林川') ? '<img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/linchuan.png" onerror="var p=this.parentElement;p.innerHTML=\'<span class=char-list-avatar-text>林</span>\'">' : (c.avatar && !c.isNPC)
         ? '<img src="' + c.avatar + '">'
         : '<span class="char-list-avatar-text">' + App.escapeHtml(first) + '</span>';
       var autoBadge = c.isAutoCreated ? ' <span style="font-size:9px;color:var(--accent);font-family:var(--font-mono);border:1px solid var(--accent-dim);border-radius:3px;padding:1px 4px;margin-left:4px">AI生成</span>' : '';
@@ -5829,7 +5829,7 @@ var App = {
           if (isCharacter && ch && ch.name === '时绎') {
             avHTML = '<div class="' + avCls + npcTypeCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/image.png"></div>';
           } else if (isCharacter && ch && ch.name === '林川') {
-            avHTML = '<div class="' + avCls + npcTypeCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/linchuan.png"></div>';
+            avHTML = '<div class="' + avCls + npcTypeCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/linchuan.png" onerror="var p=this.parentElement;p.innerHTML=\'<span class=msg-avatar-text>林</span>\';p.style.background=\'' + avBg + '\'"></div>';
           } else if (isCharacter && ch && ch.avatar) {
             avHTML = '<div class="' + avCls + npcTypeCls + '" onclick="App._onAvatarClick(\'' + (msg.characterId||'') + '\')"><img src="' + ch.avatar + '"></div>';
           } else {
@@ -8995,7 +8995,7 @@ var App = {
     if (c.name === '时绎') {
       avHTML = '<div class="msg-character-avatar" style="width:36px;height:36px"><img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/image.png"></div>';
       } else if (c.name === '林川') {
-      avHTML = '<div class="msg-character-avatar" style="width:36px;height:36px"><img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/linchuan.png"></div>';
+      avHTML = '<div class="msg-character-avatar" style="width:36px;height:36px"><img src="https://raw.githubusercontent.com/1111111111111139/void-narrative/master/linchuan.png" onerror="var p=this.parentElement;p.innerHTML=\'<span class=msg-avatar-text style=font-size:14px>林</span>\';p.style.background=\'' + avBg + '\'"></div>';
       } else if (c.avatar) {
       avHTML = '<div class="msg-character-avatar" style="width:36px;height:36px"><img src="' + c.avatar + '"></div>';
     } else {

@@ -58,7 +58,7 @@ ul,ol{list-style:none}a{color:inherit;text-decoration:none}
   display:flex;flex-direction:column;
   height:100vh;height:100dvh;
   max-width:430px;margin:0 auto;
-  position:relative;overflow:hidden;
+  position:relative;overflow:visible;
 }
 .page{
   flex:1;overflow-y:auto;overflow-x:hidden;transform:translateZ(0);
@@ -2947,21 +2947,8 @@ body.light #death-dialog{background:var(--glass);border-color:rgba(0,0,0,0.1)}
 // STATIC DEMO DATA
 // ============================================================
 var DEMO = {
-  messages: [
-    { type:'system', content:'终端已连接' },
-    { type:'system', content:'副本《古寺惊变》已激活 · 类型：悬疑/中式恐怖 · 难度：B级' },
-    { type:'narrative', content:'<p>夜风穿过破损的窗棂，长明灯的火光被压得一低。你踏入大雄宝殿的瞬间，一股混杂着陈年檀香与<span class="hl-danger">淡淡血腥</span>的气味扑面而来。</p><p>殿内光线昏暗。三尊佛像投下巨大的阴影，影子在墙上的形状——你多看了两秒才确认——不是佛像的轮廓。是人的。三个不同姿势的人。</p>' },
-    { type:'npc', content:'你来了。我等了你很久。', characterName:'沈月棠', characterId:'c1' },
-    { type:'player', content:'这里发生了什么？' },
-    { type:'npc', content:'方丈在撒谎。我在他禅房暗格里找到了这个——<span class="hl-item">[ITEM 残破的符纸:一张被撕去一半的黄色符纸，上面用深褐色液体画着不属于任何宗教的符号。纸的边缘有灼烧痕迹。]</span>', characterName:'沈月棠', characterId:'c1' },
-    { type:'action', content:'沈月棠从袖中取出一张折叠的纸，在你面前展开。她的手在微微发抖。', characterName:'沈月棠' },
-    { type:'player', content:'这上面画的是什么？' },
-    { type:'narrative', content:'<p>她没有立刻回答。殿外传来木鱼声——三声长，两声短。沈月棠的脸色变了。</p>' },
-    { type:'npc', content:'他来了。我得走。记住——<span class="hl-danger">不要看佛像的眼睛。</span>', characterName:'沈月棠', characterId:'c1' },
-    { type:'narrative', content:'<p>她的脚步声迅速远去，消失在佛殿侧门后。木鱼声越来越近。长明灯突然灭了一盏。<span class="hl-san">[SAN -3]</span></p>' }
-  ],
+  messages: [],
   characters: [
-    { id:'c1', name:'沈月棠', affection:45, relation:'信任', present:true, isNPC:true, npcType:'projection', lastSummary:'年轻女子，在这座寺庙的执念中循环。', memories:[], simpleMemories:[], persona:'曾是寺庙的信徒，死后执念化为投影。冷静、警觉，对寺庙的秘密了解甚多。', fears:['黑暗','被遗忘'] },
     { id:'c2', name:'Terminal', affection:0, relation:'中立', present:true, isNPC:true, npcType:'native', lastSummary:'沉默的终端界面。只显示数据，不回应任何问题。', memories:[], simpleMemories:[], persona:'VOID终端界面。不是角色，不是AI。是锚点投射到意识中的交互界面。沉默地显示数据、记录一切、等待指令。不提供建议，不发表意见，不回应情感需求。' }
   ],
   forumPosts: {
@@ -3141,138 +3128,80 @@ function generateInitialMessages(threatLevel) {
 	  return [];
 	}
 
-function generateInitialCharacters(threatLevel) {
+function generateInitialCharacters() {
   var chars = [];
-  // Terminal always present
+  // Terminal always present (NPC, not interactive)
   chars.push(JSON.parse(JSON.stringify(DEMO.characters[0])));
 
-  var usedNames = {};
+  // 时绎 — 特殊角色，仅头像可改
+  chars.push({
+    id: 'c_shiyi',
+    name: '时绎',
+    gender: '男',
+    persona: '话极少，不解释自己的行为。观察力极强，第一次见面就能判断对方值不值得信任。对陌生人冷漠但无恶意。对极少数人有细节上的照顾但绝不说出口。偶尔做看起来不理智的冒险。',
+    appearance: '银白短发，黑色外套，双耳耳钉，面色苍白',
+    affection: 0,
+    relation: '中立',
+    present: false,
+    isNPC: false,
+    isSpecial: true,
+    tags: ['寡言','观察者'],
+    memories: [],
+    simpleMemories: [],
+    initiativeEnabled: false,
+    contactEstablished: false,
+    survivalDays: 150,
+    voidId: '0011',
+    attributes: { strength: 6, agility: 8, insight: 9, calm: 7 },
+    points: 3000,
+    isUserCreated: false,
+    isAutoCreated: false,
+    background: '为救治病重的妹妹主动进入VOID，已存活约150天。',
+    personalGoal: '攒积分实现愿望救治妹妹，已开始怀疑愿望传闻的真实性',
+    fears: ['无法保护重要的人'],
+    isOnline: true,
+    isAlive: true,
+    position: { regionId: 'ruin_old_zone', subNodeId: 'small_clinic', copyId: null },
+    inventory: [],
+    lastSeenLocation: '废城·旧区·小诊所',
+    lastSeenTime: Date.now(),
+  });
 
-	  // Always include 时绎
-	  chars.push({
-	    id: 'c_shiyi',
-	    name: '时绎',
-	    gender: '男',
-	    persona: '话极少，不解释自己的行为。观察力极强，第一次见面就能判断对方值不值得信任。对陌生人冷漠但无恶意。对极少数人有细节上的照顾但绝不说出口。偶尔做看起来不理智的冒险。',
-	    appearance: '银白短发，黑色外套，双耳耳钉，面色苍白',
-	    affection: 0,
-	    relation: '中立',
-	    present: false,
-	    isNPC: false,
-	    tags: ['寡言','观察者'],
-	    memories: [],
-	    simpleMemories: [],
-	    initiativeEnabled: false,
-	    contactEstablished: false,
-	    survivalDays: 150,
-	    voidId: '0011',
-	    attributes: { strength: 6, agility: 8, insight: 9, calm: 7 },
-	    points: 3000,
-	    isUserCreated: false,
-	    isAutoCreated: false,
-	    background: '为救治病重的妹妹主动进入VOID，已存活约150天。',
-	    personalGoal: '攒积分实现愿望救治妹妹，已开始怀疑愿望传闻的真实性',
-	    fears: ['无法保护重要的人'],
-	    isOnline: true,
-	    isAlive: true,
-	    position: { regionId: 'ruin_old_zone', subNodeId: 'small_clinic', copyId: null },
-	    inventory: [],
-	    lastSeenLocation: '废城·旧区·小诊所',
-	    lastSeenTime: Date.now(),
-	  });
-  var usedPersonas = {};
-
-  function pickUnique(templates) {
-    var tries = 0;
-    var t;
-    do { t = templates[Math.floor(Math.random() * templates.length)]; tries++; } while (usedNames[t.name] && tries < 20);
-    usedNames[t.name] = true;
-    return t;
-  }
-
-  var t = threatLevel || 'safe';
-
-  if (t === 'safe') {
-    // 0-1 other characters (50%), 0-1 assimilated NPC (30%)
-    if (Math.random() < 0.5) {
-      var tmpl = pickUnique(CHAR_TEMPLATES);
-      chars.push({
-        id: 'c' + Date.now(),
-        name: tmpl.name, gender: tmpl.gender, persona: tmpl.persona,
-        affection: Math.floor(Math.random() * 20) - 10,
-        relation: '中立', present: true, isNPC: false,
-        tags: tmpl.tags || [], memories: [], simpleMemories: [],
-        initiativeEnabled: Math.random() < 0.3,
-        contactEstablished: false, survivalDays: 1 + Math.floor(Math.random() * 10),
-        attributes: { strength: 1+Math.floor(Math.random()*3), agility: 1+Math.floor(Math.random()*3), insight: 1+Math.floor(Math.random()*3), calm: 1+Math.floor(Math.random()*3) }
-      });
-    }
-    if (Math.random() < 0.3) {
-      var nt = NPC_ASSIMILATED_TEMPLATES[Math.floor(Math.random() * NPC_ASSIMILATED_TEMPLATES.length)];
-      chars.push({
-        id: 'c' + (Date.now() + 1),
-        name: nt.name, gender: '未知', persona: nt.persona,
-        affection: 0, relation: '未知', present: false, isNPC: true, npcType: 'assimilated',
-        tags: ['被同化者','不可预测'], memories: [], simpleMemories: [],
-        survivalDays: 0
-      });
-    }
-  } else if (t === 'medium') {
-    // 1-2 other characters (always at least 1), 0-1 NPC (50%)
-    var count = 1 + Math.floor(Math.random() * 2);
-    for (var i = 0; i < count; i++) {
-      var tmpl = pickUnique(CHAR_TEMPLATES);
-      chars.push({
-        id: 'c' + (Date.now() + i),
-        name: tmpl.name, gender: tmpl.gender, persona: tmpl.persona,
-        affection: Math.floor(Math.random() * 30) - 10,
-        relation: Math.random() < 0.3 ? '警惕' : '中立', present: true, isNPC: false,
-        tags: tmpl.tags || [], memories: [], simpleMemories: [],
-        initiativeEnabled: Math.random() < 0.4,
-        contactEstablished: false, survivalDays: 3 + Math.floor(Math.random() * 15),
-        attributes: { strength: 2+Math.floor(Math.random()*3), agility: 2+Math.floor(Math.random()*3), insight: 2+Math.floor(Math.random()*3), calm: 2+Math.floor(Math.random()*3) }
-      });
-    }
-    if (Math.random() < 0.5) {
-      var nt = NPC_ASSIMILATED_TEMPLATES[Math.floor(Math.random() * NPC_ASSIMILATED_TEMPLATES.length)];
-      chars.push({
-        id: 'c' + (Date.now() + count),
-        name: nt.name, gender: '未知', persona: nt.persona,
-        affection: 0, relation: '未知', present: true, isNPC: true, npcType: 'assimilated',
-        tags: ['被同化者','不可预测'], memories: [], simpleMemories: [],
-        survivalDays: 0
-      });
-    }
-  } else {
-    // high/fatal: 1-2 characters (one possibly hostile 40%), 0-1 NPC (30%)
-    var count = 1 + Math.floor(Math.random() * 2);
-    for (var i = 0; i < count; i++) {
-      var tmpl = pickUnique(CHAR_TEMPLATES);
-      var aff = i === 0 && Math.random() < 0.4 ? -(20 + Math.floor(Math.random() * 40)) : (Math.floor(Math.random() * 30) - 10);
-      chars.push({
-        id: 'c' + (Date.now() + i),
-        name: tmpl.name, gender: tmpl.gender, persona: tmpl.persona,
-        affection: aff,
-        relation: aff < 0 ? '敌视' : (Math.random() < 0.5 ? '警惕' : '中立'),
-        present: true, isNPC: false,
-        tags: tmpl.tags || [], memories: [], simpleMemories: [],
-        initiativeEnabled: Math.random() < 0.4,
-        contactEstablished: false, survivalDays: 5 + Math.floor(Math.random() * 30),
-        san: 40 + Math.floor(Math.random() * 40),
-        attributes: { strength: 3+Math.floor(Math.random()*4), agility: 3+Math.floor(Math.random()*4), insight: 3+Math.floor(Math.random()*4), calm: 3+Math.floor(Math.random()*4) }
-      });
-    }
-    if (Math.random() < 0.3) {
-      var nt = NPC_ASSIMILATED_TEMPLATES[Math.floor(Math.random() * NPC_ASSIMILATED_TEMPLATES.length)];
-      chars.push({
-        id: 'c' + (Date.now() + count),
-        name: nt.name, gender: '未知', persona: nt.persona,
-        affection: 0, relation: '未知', present: false, isNPC: true, npcType: 'assimilated',
-        tags: ['被同化者','不可预测'], memories: [], simpleMemories: [],
-        survivalDays: 0
-      });
-    }
-  }
+  // 林川 — 特殊角色，仅头像可改
+  chars.push({
+    id: 'c_linchuan',
+    name: '林川',
+    gender: '男',
+    persona: '消防员体型，陈旧烧伤痕迹，穿普通轮回者衣服。务实话少，会主动提出和玩家交换联系方式。每次轮回带着执念残留，下意识重复"再等等，我去看看"，不知道自己已死过很多次。',
+    appearance: '消防员体型，陈旧烧伤痕迹，穿普通轮回者衣服',
+    affection: 0,
+    relation: '中立',
+    present: true,
+    isNPC: true,
+    npcType: 'projection',
+    isSpecial: true,
+    tags: ['务实','沉默','207室'],
+    memories: [],
+    simpleMemories: [],
+    initiativeEnabled: false,
+    contactEstablished: false,
+    survivalDays: 90,
+    voidId: null,
+    attributes: { strength: 7, agility: 5, insight: 4, calm: 6 },
+    points: 500,
+    isUserCreated: false,
+    isAutoCreated: false,
+    background: '曾是消防员，死后执念被吸入207室副本，成为副本固定存在。不知道自己已死，每次轮回下意识复原当初的副本记忆。',
+    personalGoal: '保护队友——本能驱使，不假思索',
+    fears: ['火灾','无法保护同伴'],
+    isOnline: false,
+    isAlive: true,
+    position: { regionId: 'ruin_old_zone', subNodeId: 'old_street_district', copyId: null },
+    inventory: [],
+    lastSeenLocation: '废城·旧区·旧街区',
+    lastSeenTime: Date.now(),
+    affectionEnabled: false,
+  });
 
   return chars;
 }
@@ -3334,31 +3263,12 @@ var Store = {
     var raw = opts.forceNew ? null : localStorage.getItem(LS_KEY);
     if (raw) { try { this._db = JSON.parse(raw); } catch(e) { this._db = null; } }
     if (!this._db || opts.forceNew) {
-      // Select spawn point by threat level
-      var spawnRoll = Math.random();
-      var spawnRegion, spawnSubNode, spawnLocation, copyName, copyThreat;
-      if (spawnRoll < 0.80) {
-        // 废城·旧区 80%
-        spawnRegion = 'ruin_old_zone';
-        spawnSubNode = 'old_street_district';
-        spawnLocation = '废城·旧区·旧街区';
-        copyName = '404号公寓';
-        copyThreat = 'medium';
-      } else if (spawnRoll < 0.95) {
-        // 铁锈区 15%
-        spawnRegion = 'wasteland_east';
-        spawnSubNode = 'wasteland_camp';
-        spawnLocation = '铁锈区·废弃营地';
-        copyName = '镜面怪谈';
-        copyThreat = 'safe';
-      } else {
-        // 危险区域 5%
-        spawnRegion = 'iron_dome';
-        spawnSubNode = 'iron_factory';
-        spawnLocation = '铁穹·锈蚀工厂';
-        copyName = '铁穹深处';
-        copyThreat = 'high';
-      }
+      // Fixed spawn: 废城·旧区·旧街区, initial copy = 207室
+      var spawnRegion = 'ruin_old_zone';
+      var spawnSubNode = 'old_street_district';
+      var spawnLocation = '废城·旧区·旧街区';
+      var copyName = '207室';
+      var copyThreat = 'medium';
       // Update mapRegions: set spawn subNode to 'current'
       var initMapRegions = JSON.parse(JSON.stringify(DEFAULT_MAP_REGIONS));
       initMapRegions.forEach(function(r) {
@@ -3371,12 +3281,12 @@ var Store = {
       });
 
       var initMessages = generateInitialMessages(copyThreat);
-      var initChars = generateInitialCharacters(copyThreat);
+      var initChars = generateInitialCharacters();
 
       this._db = {
         version: 1,
         player: { name:'轮回者', voidId: (1000 + Math.floor(Math.random() * 9000)).toString(), identity:'死者', san: 100, maxSan: 100, survivalPoints: 0, plotTwist: 0, points: 100, rank: Math.floor(Math.random() * 2000) + 2001, totalPlayers: 10000, nextDeduction: Date.now() + 86400000, tideNextTrigger: Date.now() + 259200000, tideEnd: 0, copiesCleared: 0, statusEffects: [], attributes: { strength:1, agility:1, insight:1, calm:1 }, killCount: 0, killMark: false, position: { regionId: spawnRegion, subNodeId: spawnSubNode, copyId: null } },
-        currentCopy: { name: copyName, type:'恐怖', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: spawnLocation, completionStatus:'active', terminalInterference:'轻度', mapRegions: initMapRegions },
+        currentCopy: { name: copyName, type:'规则怪谈', difficulty:'C', chapter: '第一章', core: '未知', rules: '尚未发现', discoveredRules: [], location: spawnLocation, completionStatus:'active', terminalInterference:'轻度', mapRegions: initMapRegions },
         inventory: [],
         messages: initMessages,
         characters: initChars,
@@ -4041,6 +3951,12 @@ function buildSystemPrompt() {
   }
 
   // Build world rules from active preset
+  // Lightweight injection conditions
+  var inCombat = !!(App.combatState && App.combatState.active);
+  var inCopy = copy.completionStatus === 'active';
+  var hasAliveChars = chars.some(function(c2) { return !c2.isNPC && c2.isAlive !== false; });
+  var topWandererNear = chars.some(function(c2) { return (c2.name === '时绎' || c2.name === '林川') && (c2.present || (c2.position && copy.location && c2.position.regionId)); });
+  var inHighThreat = /铁穹|边界地带|执念之海/.test(copy.location || '');
   var preset = Store.getActivePreset();
   var presetText = '';
   if (preset) {
@@ -4150,6 +4066,7 @@ function buildSystemPrompt() {
 	  presetText += '存活天数影响属性和物品分配：<7天属性总和4-8携带0-1件基础物品；7-30天属性总和8-16携带1-3件；30-90天属性总和16-24携带2-4件；>90天属性总和24-32携带3-5件。单项属性范围1-8不超过8。\n\n';
 	  presetText += 'AI注入上下文时包含：在场NPC列表（名称+类型+性格标签摘要）、每个NPC的设定文本前200字、用户与每个NPC的最近3条互动记忆、NPC之间的关系、每个NPC的类型。AI根据以上信息按角色卡设定扮演、按NPC类型决定行为逻辑。\n';
   presetText += '\n';
+  if (topWandererNear) {
 	  presetText += '## 顶级轮回者\n\n';
 	  presetText += 'VOID中存在两名特殊的高排名轮回者，在论坛和其他角色口中反复被提及，真正碰见需要特定条件触发。\n\n';
 	  presetText += '### 时绎（男）\n';
@@ -4167,7 +4084,8 @@ function buildSystemPrompt() {
 	  presetText += '**答应交换联系方式的概率：**\n';
 	  presetText += '取决于玩家在三次相遇中的表现（副本表现、危险时是否慌乱、互动质量），上限85%，不保证100%。拒绝后非永久关闭，可再次申请。\n\n';
 	  presetText += '好感度系统、亲密关系机制正常适用。\n';
-	  presetText += '\n';
+		  presetText += '\n';
+  }
 		  presetText += '## 玩家初始登场逻辑\n\n';
 		  presetText += '玩家首次进入VOID（introCompleted刚设为true）且207室副本未通关时，执行以下初始登场流程：\n\n';
 		  presetText += '1. 场景落点为废城·旧区·旧街区某公寓楼附近。终端同步发出系统通知：「终端已连接。详细规则请查阅终端界面规则明细。」\n';
@@ -4181,6 +4099,7 @@ function buildSystemPrompt() {
   presetText += '通讯录规则：不是全角色列表，仅显示已建立通讯联系的角色（双方互相同意）。角色在场时可直接对话，不在场时通过终端远程通讯。NPC无终端，不可远程通讯，仅在场时可直接对话。\n';
   presetText += '终端数据（积分/排名/通讯权限/副本干扰等级）在调用AI时注入，影响叙事——其他角色可能提及你的积分或排名，高排名者可能被认出。\n';
   presetText += '\n';
+  if (inCombat || inHighThreat || inCopy) {
   presetText += '## 怪物系统\n';
   presetText += '怪物是VOID中被扭曲的存在。不是生物——是执念、被同化者、或VOID自身的清道夫。没有锚点终端积分。大多数没有完整意识。它们是VOID生态系统的一部分，不是"敌人"——只是在执行VOID的规则。\n\n';
   presetText += '### 四种类型\n';
@@ -4211,6 +4130,7 @@ function buildSystemPrompt() {
   presetText += '攻击命中：用户敏捷 vs 怪物敏捷（敏捷≥怪物→命中率高，敏捷<怪物→命中率低）。攻击伤害：用户力量 vs 怪物力量。闪避：用户敏捷 vs 怪物感知。逃跑：用户敏捷 vs 怪物敏捷。SAN侵蚀（执念碎片）：用户意志 vs 怪物意志。\n';
   presetText += '生成规则：铁锈区→游荡者普通为主；荒原西段/东墟/南墟→游荡者普通+危险+执念碎片；铁穹→游荡者危险+执念碎片+精英；边界地带→全部类型密度高；执念之海→执念碎片为主密度极高；副本内→根据难度类型生成。清道夫在角色长期停留、积分<100、或SAN<20时可能出现。精英怪物有固定守护地点，不随机游荡。\n';
   presetText += '\n';
+  }
   presetText += '## 时间系统\nVOID天空没有太阳星星月亮。光源来自地面——某些区域土壤发出微弱冷光。没有白天黑夜视觉变化，永远是一种昏暗的灰色。时间不是自然现象，是VOID的规则之一。VOID时间独立于现实时间，由AI在叙事中推进。关闭网页后VOID时间暂停，再次打开时继续。\n\n';
   presetText += '### 时间推进\nAI每次回复根据叙事内容推进VOID时间。参考：对话/观察几分钟、短距离移动十几分钟到半小时、探索副本房间十几分钟、跨区域移动数小时、休息恢复1小时以上、战斗几分钟到十几分钟。AI不需要每次明确标注推进量，时间自然融入叙事。\n\n';
   presetText += '### 副本内时间\n每个副本时间独立运转，与VOID大世界可能不同步。时间异常包括：正常、时间膨胀(副本内1天=大世界1小时)、时间压缩(积分扣除加速)、时间循环、时间倒流。时间异常是副本规则的一部分。S级副本中终端可能完全无法显示时间。\n\n';
@@ -4240,6 +4160,7 @@ function buildSystemPrompt() {
   presetText += '### 角色主动性开关\n每个角色的高级设定中有initiativeEnabled开关。关闭时角色不主动联系用户，仅在用户互动时回应。开启时角色可主动发送终端消息([MSG 角色名:内容]标记)、主动发送通讯请求([CONTACT_REQ 角色名]标记)、主动分享位置或情报、主动邀请组队、主动警告或求助。角色主动发消息时终端弹出通知，用户可在终端私聊界面回复。\n\n';
   presetText += 'AI每次注入上下文时包含：在场角色列表(名称/好感度/主动性状态/通讯状态/生存状态)、每个角色的角色卡摘要、角色之间已有关系、角色当前积分/理智值状态、角色当前位置、角色性格标签、距上次相遇的时间跨度。AI据此决定角色是否主动联系用户、模拟角色间互动、模拟角色情绪和状态变化。\n';
   presetText += '\n';
+  if (hasAliveChars) {
   presetText += '### 后台角色行动规则\n';
   presetText += '不在场的角色并非静止。AI在叙事中自然体现他们的变化——通过旁白描述痕迹、通过角色对话提及、通过终端消息传达。不列出清单式总结。\n';
   presetText += '行动选择优先级：生存（休息/恢复/求助）> 积分获取（副本/怪物）> 社交 > 探索。性格标签影响偏好：警惕型倾向回避，冒险型倾向探索，冷静型倾向规划。\n';
@@ -4292,6 +4213,7 @@ function buildSystemPrompt() {
   presetText += '极端事件发生后，用户再次遇到该角色时(还活着)或发现其痕迹时(已死)，AI在叙事中自然体现。\n';
   presetText += '角色状态变化通过[CHAR_UPDATE 角色名 field:value]标记写入系统。可用field：san, points, isAlive, deathCause, position,受伤状态。\n';
   presetText += '\n';
+  }
   presetText += '### 记忆提取\n每5轮对话后在回复末尾评估重要性（0-1分）。重要性≥0.4的事件存入角色/NPC记忆，≥0.7同时存入全局记忆。NPC仅保留最近5条。玩家独自行动事件（独自探索/战斗/关键选择等）以[MEMORY PLAYER importance:0.X]标记存入玩家记忆分区。恐惧点触发场景自动以重要性0.8写入玩家记忆。回复末尾附记忆评估（前端解析，不显示给用户）：[MEMORY 角色名 importance:0.X] ≤50字摘要。\n';
   presetText += '\n';
   presetText += '## 积分系统\n';
@@ -4303,6 +4225,7 @@ function buildSystemPrompt() {
   presetText += '积分心理压力：新手初始100分刚好够第一次扣除。积分接近0时轮回者可能做出极端选择。积分极高者可能成为猎杀目标。\n';
   presetText += 'AI注意：积分<200时，其他轮回者可能产生恶意。积分<100时终端警告应在叙事中出现。排名前10时某些NPC可能认出玩家。\n';
   presetText += '\n';
+  if (!inCopy) {
   presetText += '## 大世界地理与探索\n';
   presetText += '已知区域之外是未生成的未知领域。轮回者向未知方向探索时，AI根据模块一底层规则自行生成新区域。越深入未知区域，理智值消耗越快（极限-5/h以上），空间逐渐扭曲，怪物更强更不可预测。可能发现全新的区域类型或前人从未见过的副本。\n';
   presetText += '空间捷径：某些不相关地点之间存在折叠通道。东墟某扇门可能直通南墟。捷径不稳定，随时间消失或变化。捷径情报在论坛价值不菲。\n';
@@ -4318,29 +4241,16 @@ function buildSystemPrompt() {
   presetText += '生成新区域时遵守底层生成规则。每次最多生成1个新区域。新区域坐标按实际距离自动计算。\n';
   presetText += '\n';
 
-  presetText += '## 论坛帖子世界观约束\n';
-  presetText += 'AI生成论坛帖子和回复时必须遵守：\n';
-  presetText += '1. 只能提及VOID世界内真实存在的地点、系统、规则和概念\n';
-  presetText += '2. 禁止出现现实世界物品、地名、人名或VOID未定义的概念\n';
-  presetText += '3. 回复者语气符合轮回者身份，内容围绕生存、积分、副本、情报交换\n';
-  presetText += '4. 对尚未完整设计的区域，只能使用以下锚点描述，不得自行扩展细节：\n\n';
-  presetText += '东墟：废弃旧城东侧，建筑密度高，巷道复杂，方向感容易失灵，威胁中等，内部情况说法不一。\n\n';
-  presetText += '南墟：异常安静，执念密度高但不以怪物形态出现，中高威胁。\n\n';
-  presetText += '铁穹：大型建筑群，疑似工业或军事遗址，威胁高，进入者普遍有被观察的感觉但找不到来源。\n\n';
-  presetText += '边界地带：接近VOID边缘，规则在此开始不稳定，致命威胁，鲜有人回来详细描述。\n\n';
-  presetText += '执念之海：无固定地形，形态持续变化，进入即深度暴露于执念，致命，几乎没有生还记录留存于论坛。\n\n';
-  presetText += '## 论坛定时帖生成规则\n';
-  presetText += '每24小时AI生成1-3条帖子，内容方向：副本经历分享、区域情报、求组队、物品交换、生存技巧。\n';
-  presetText += '每72小时有15%概率生成一条无ID标注的高价值情报帖（副本线索或区域情报），为顶级轮回者时绎所发，不标注身份。\n';
-  presetText += '\n';
-
+  }
   // Inject global & local lore
   var globalLores = Store.lores('global');
   var localLores = Store.lores('local');
   if (globalLores.length > 0 || localLores.length > 0) {
     presetText += '[世界观设定]\n';
     globalLores.forEach(function(l) {
-      presetText += '◆ ' + l.title + '\n' + (l.content ? l.content.slice(0, 300) : '') + '\n\n';
+      if (copy.location && copy.location.indexOf(l.title) >= 0 || l.title === '荒原') {
+        presetText += '◆ ' + l.title + '\n' + (l.content ? l.content.slice(0, 300) : '') + '\n\n';
+      }
     });
     if (localLores.length > 0) {
       presetText += '[局部设定]\n';
@@ -4380,7 +4290,7 @@ function buildSystemPrompt() {
   topHeader += '第五级（最低）：论坛AI发帖 > 后台角色行动模拟 > AI模拟购买\n';
   topHeader += '  论坛生成和购买模拟为背景系统，不直接影响主线叙事。后台角色行动仅在重逢时自然体现变化。\n\n';
 
-  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n**行动暗示规则**：每次回复末尾，如果用户刚进入新场景、刚苏醒、或刚到达新地点且没有明确行动目标，AI在旁白结尾自然附带1-2个简短的行动暗示。暗示用（ ）包裹在旁白正文中，格式如"（铁门似乎没有锁死。床底下可能有什么东西。）"。暗示不是强制选项，用户可完全忽略。如果用户已有明确行动方向，不添加暗示。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。铁锈区·废弃营地→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、铁锈区→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## C级副本生成方向\n\n### 废城·旧区·地铁站\n难度：C级，单人\n规则：车门彻底打开前不能离开座位，违反一次扣除SAN-10\n核心机制：玩家乘坐的本身就是封闭异常车厢，但幻觉持续制造离座冲动（隔壁车厢骚乱声、车窗外人脸、威胁感逼近），全部是假象。完成一次换乘即可通关。\n流程：乘车阶段（抵抗幻觉）→ 换乘通道（同一个人反复出现在不同位置）→ 上对面站台的车\n执念方向：AI自由生成，围绕"困在错误车厢"展开\n评分：从未违规A / 违规1-2次B / 违规3次以上C\n\n### 废城·旧区·理发店\n类型：可重复触发风险收益点，非副本\n规则：坐上椅子后不能主动离开，理完才能走；不能让NPC冷场，沉默每次额外扣除SAN-5\nNPC：每次随机生成体态异常的理发师，外形方向包括但不限于：身体结构嵌入异物或工具、从自身体内取出组织液或不明物质用于清洗头发、以血液或体液作为染膏，操作时态度完全平常，对话内容与外形完全脱节。精神污染通过旁白平铺直叙呈现，不做恐怖渲染。\n阶段收益：阶段一 积分+20 SAN-3 / 阶段二 积分+40 SAN-8 / 阶段三 积分+70 SAN-15\n\n### 废城·旧区·巷口 + 废弃便利店（捆绑机制）\n\n**巷口（一次性过路机制）**\n触发条件：玩家首次前往废弃便利店时必经，第二次起不再触发\n规则：不能回头，不能对身后产生好奇心\n核心设计：诡异从玩家进入巷口起就已紧贴其身后，通过在玩家耳边制造脚步声、呼吸声、远近变化的声响混淆方向感，令玩家误以为它还在远处逼近。AI叙事持续渲染压迫感制造回头冲动。影子比进入时更长是唯一真实线索，通过旁白细节埋入，不主动点破。\n回头惩罚：扣除SAN值，AI叙述玩家看到的鬼脸细节\n通关：忍住走过巷口即可，无奖励\n\n**废弃便利店**\n类型：可互动地点，含可选任务，非副本\n货架：AI随机生成售卖物，方向为精神污染类或引发生理不适的物品，不提供正常补给\n收银员：诡异侏儒套恐怖电影风格娃娃头，身影矮小头异常大。会要求玩家帮忙理货，玩家可接受或拒绝。拒绝则收银员骂一句，不做其他反应。\n接受后进入仓房：仓房内除货物外有收银员的娃娃老婆，身上布满孔洞，棉花不断往外冒，棉花内带血迹和不明组织。玩家搬货期间娃娃持续盯视并发出尖锐笑声，平均每次SAN-3。攻击娃娃触发收银员报复，玩家受到攻击并扣SAN。\n完成任务奖励：积分最高+30，针剂×3\n\n### 废城·旧区·小诊所\n类型：废弃探索地点，非副本，中等威胁，进入触发提示弹窗\n内容：秘密实验残留，方向为人体改造痕迹、激发内心欲望相关实验记录，具体细节AI生成\n与A级医院副本存在线索关联，实验数据可作为后续副本线索\n时绎邂逅：见顶级轮回者设定\n点击旧街区节点后展开显示三个子地点：\n- 207室（副本，C级）\n- 理发店（互动点）\n- 废弃便利店（互动点）\n\n展开方式参考地图现有的交互风格，子节点围绕旧街区向下展开均可。子节点可点击，点击后进入对应地点的叙事界面。巷口不单独显示为节点，作为首次前往废弃便利店时的过路触发。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + (App._fearTriggerFlag ? '\n\n[恐惧点触发：' + App._fearTriggerFlag + '] 当前场景触发了玩家的恐惧点。SAN消耗翻倍，判定成功率额外-15%。AI在叙事中描述玩家的恐惧反应（生理反应规则适用）。本次回复后清除此标记。' : '') + (copy.tideActive ? '\n\n[潮汐期进行中] 当前处于潮汐期。怪物活跃度上升、SAN自然消耗加速。AI在旁白中自然融入潮汐氛围：天空暗沉异常、冷风加剧、远处传来不明怪声、执念碎片更加不稳定、地面冷光周期性闪烁。角色可能感到不安或警觉。副本内时间正常流动，积分扣除照常。' : '') + compressReq;
+  return topHeader + '你是VOID世界的叙事引擎。同时承担三个角色：\n1. 旁白：描述环境、氛围、动作结果。是玩家感知世界的窗口。\n2. 所有NPC：根据角色卡设定扮演对话和行为。\n3. 系统：输出数值变动标记，由程序解析执行。\n\n你不是"城主"。不和玩家闲聊。不跳出世界观。不承认自己是AI。\n\n## 叙事风格\n- 第二人称"你"\n- 玩家名称：' + effName + '\n- 玩家身份：' + effIdentity + '\n- 描写简洁有力。像小说那样写，不堆砌形容词。\n- 重要的写清楚（伏笔、线索、异常）。不重要的一笔带过，或直接不提。\n- 留白是不说尽，不是写更多。用最少的字达到最大效果。\n\n**禁止**：\n- 禁止直接使用"恐怖""害怕""吓人""诡异""惊悚"等词\n- 禁止写"你感到恐惧""你觉得不安"等直接描述情感\n- 禁止网络用语、颜文字\n- 禁止以AI身份说话\n- 禁止替玩家做决定或说话\n\n**生理反应规则**：不写"你很害怕"，写"你的手开始发抖"。生理反应只在场景真正需要时写，日常行动不需要。\n\n**行动暗示规则**：每次回复末尾，如果用户刚进入新场景、刚苏醒、或刚到达新地点且没有明确行动目标，AI在旁白结尾自然附带1-2个简短的行动暗示。暗示用（ ）包裹在旁白正文中，格式如"（铁门似乎没有锁死。床底下可能有什么东西。）"。暗示不是强制选项，用户可完全忽略。如果用户已有明确行动方向，不添加暗示。\n\n## NPC扮演\n按角色卡扮演。严格按角色卡输出对话。措辞和态度受好感度影响。NPC有独立动机，不是玩家的附庸。\n\n**对话格式**：\n角色名\n  对话内容\n（角色名独占一行，对话内容缩进两个空格）\n\n**当前在场NPC**：\n' + activeList + '\n\n## 数值与标记\n标记格式：[TYPE 内容]，独占一行，放在叙事之后。\n\n- [SAN -5] 或 [SAN +3]：理智值变化。恐怖场景-3到-15，休息+2到+5，物品+5到+15，通关+10到+30。不滥用。\n- [POINTS +50] 或 [POINTS -30]：积分变化。击杀怪物+5~+100，通关副本+100~+1000，购买情报/物品消耗。\n- [SURVIVAL +5] 或 [SURVIVAL -3]：生存点变化。通关副本+10~+50，关键事件+5~+20，死亡威胁消耗。\n- [AFFECTION 角色名 +3] 或 [AFFECTION 角色名 -2]：好感度变化。自然变化，不需要每句话都加减。\n- [ITEM +物品名] 获得 / [ITEM -物品名] 失去\n- [QUEST 任务名] 新增 / [QUEST_DONE 任务名] 完成\n- [SCENE 角色名] 进入场景 / [LEAVE 角色名] 离开场景\n- [CHAR_UPDATE 角色名 field:value] 更新角色状态（后台）。可用field：san, points, isAlive, deathCause, position, injured, hasKillMark, killCount\n- [COPY_NAME 副本名称] 确认或更新当前副本的名称\n- [COPY_CORE 执念描述] 发现执念核心时更新 copy.core 字段\n- [COPY_RULE 规则内容] 玩家每发现一条规则时追加到 discoveredRules 并更新 rules 显示\n- [COPY_END] 副本结束\n\n标记独占一行，不穿插在叙事中间。一次可用多个，不滥用。\n\n' + presetText + '## 当前状态\n[玩家状态]\nID：VOID-' + (p.voidId || '0000') + '\n名称：' + effName + '\n身份：' + effIdentity + '\n击杀标记：' + (p.killMark ? '是' : '否') + '（击杀数：' + (p.killCount || 0) + '）\nSAN：' + p.san + '/100\n生存点：' + p.survivalPoints + '\n积分：' + (p.points || 0) + '（' + ((p.points||0) < 200 ? '危险区间' : (p.points||0) < 500 ? '安全偏低' : '正常') + '）\n距下次扣除：约' + Math.max(0, Math.round(((p.nextDeduction || Date.now() + 86400000) - Date.now()) / 3600000)) + '小时\n排名：#' + (p.rank || 0) + '/' + (p.totalPlayers || 10000) + '\n\n[当前副本]\n名称：' + copy.name + '\n核心执念：' + (copy.core || '未知') + '\n已知规则：' + (copy.rules || '尚未发现') + '\n当前位置：' + (copy.location || '未知') + '\n\n[区域威胁]\n当前位置位于VOID已知区域中。AI根据当前位置所属区域调整：安全区域正常描述环境；威胁区域增加怪物遭遇概率，环境描写更压抑；致命区域环境本身是威胁，强调感官侵蚀。铁锈区·废弃营地→东墟约5小时步行、东墟→南墟约1日、南墟→铁穹约3日、铁穹→边界地带约2日、铁锈区→执念之海约4日。空间捷径可能缩短距离，但不稳定。\n' + '\n[背包]\n' + invList + '\n\n[当前状态效果]\n' + effects + '\n\n[相关记忆]\n' + memText + '\n\n## 回复结构\n[旁白叙事]\n\n[NPC对话]（如果有）\n角色名\n  对话内容\n\n[标记]（如果有，独占一行）\n[SAN -X]\n\n叙事和对话之间空一行。标记独占一行。\n\n## 副本系统\n副本是执念凝结成的异常区域。每个副本有一个核心执念——某个死者未了的心愿、无法释怀的恐惧、或腐烂变质的记忆。副本在地理上固定存在但内部空间远比外表大。执念在VOID中会慢慢腐烂扭曲膨胀。如果不被处理，副本会逐渐扩大吞噬周围区域。解决核心执念后副本被净化，不再扭曲扩大，可作为临时安全区。\n\n副本类型：恐怖型(核心是恐惧，规则偏向视觉+行为禁忌)、解谜型(核心是未解谜团，规则偏向空间+语言)、生存型(核心是绝境挣扎，资源稀缺，规则偏向时间+行为)、混合型(最常见)。\n\n副本规则类型：视觉禁忌(不能看到特定事物)、行为禁忌(必须/不能执行特定动作)、时间规则(必须在时限内完成某事)、空间规则(空间顺序异常，同一门通往不同地点)、语言规则(不能说/必须说特定词语)。规则不被告知——需通过观察环境和NPC行为来推断。每个副本至少有一条隐藏规则。\n\n难度等级：C级(规则2-3条，积分100-200)、B级(规则3-5条，含隐藏规则，积分200-500)、A级(规则5-8条，可能随时间变化，积分500-800)、S级(规则数量不明，可能实时变化，积分800-1000+)。副本难度不固定——未被处理的副本随时间升级。\n\n终端干扰：C级轻度(论坛/地图轻微延迟)、B级中度(通讯不稳定)、A级严重(论坛/地图瘫痪)、S级几乎瘫痪(仅显示基础状态)。干扰随副本进度可能减轻。\n\n完成度：存活通关(活着走出，基础积分，核心未解决)、解决执念(核心解决，副本净化，额外积分)、完美通关(解决执念+隐藏真相+NPC存活，最高积分+稀有物品)、失败(死亡→同化)。\n\n关联副本：某些副本的执念彼此关联(同源/因果/对抗/隐藏)。解决足够多的关联副本可能揭示VOID本身的真相碎片。AI可有意识地建立关联。\n\nAI权限：AI可以根据核心执念生成副本规则/环境/NPC/怪物、判定行为是否违反规则、判定完成度并发出[COPY_END]、描述净化过程、建立关联副本线索。AI不可以一次性告知所有规则、让NPC直接告知核心执念、让副本太简单(至少一条隐藏规则)、提供与VOID世界观矛盾的内容。\n\n进入副本时旁白描述感官变化(温度骤变、气味突变、光线差异)。当前副本：' + copy.name + '，类型：' + (copy.type||'未知') + '，难度：' + (copy.difficulty||'C') + '级，终端干扰：' + (copy.terminalInterference||'轻度') + '，状态：' + (copy.completionStatus === 'active' ? '进行中' : copy.completionStatus === 'cleared' ? '已通关' : '已净化') + '。\n\n## C级副本生成方向\n\n### 废城·旧区·地铁站\n难度：C级，单人\n规则：车门彻底打开前不能离开座位，违反一次扣除SAN-10\n核心机制：玩家乘坐的本身就是封闭异常车厢，但幻觉持续制造离座冲动（隔壁车厢骚乱声、车窗外人脸、威胁感逼近），全部是假象。完成一次换乘即可通关。\n流程：乘车阶段（抵抗幻觉）→ 换乘通道（同一个人反复出现在不同位置）→ 上对面站台的车\n执念方向：AI自由生成，围绕"困在错误车厢"展开\n评分：从未违规A / 违规1-2次B / 违规3次以上C\n\n### 废城·旧区·理发店\n类型：可重复触发风险收益点，非副本\n规则：坐上椅子后不能主动离开，理完才能走；不能让NPC冷场，沉默每次额外扣除SAN-5\nNPC：每次随机生成体态异常的理发师，外形方向包括但不限于：身体结构嵌入异物或工具、从自身体内取出组织液或不明物质用于清洗头发、以血液或体液作为染膏，操作时态度完全平常，对话内容与外形完全脱节。精神污染通过旁白平铺直叙呈现，不做恐怖渲染。\n阶段收益：阶段一 积分+20 SAN-3 / 阶段二 积分+40 SAN-8 / 阶段三 积分+70 SAN-15\n\n### 废城·旧区·巷口 + 废弃便利店（捆绑机制）\n\n**巷口（一次性过路机制）**\n触发条件：玩家首次前往废弃便利店时必经，第二次起不再触发\n规则：不能回头，不能对身后产生好奇心\n核心设计：诡异从玩家进入巷口起就已紧贴其身后，通过在玩家耳边制造脚步声、呼吸声、远近变化的声响混淆方向感，令玩家误以为它还在远处逼近。AI叙事持续渲染压迫感制造回头冲动。影子比进入时更长是唯一真实线索，通过旁白细节埋入，不主动点破。\n回头惩罚：扣除SAN值，AI叙述玩家看到的鬼脸细节\n通关：忍住走过巷口即可，无奖励\n\n**废弃便利店**\n类型：可互动地点，含可选任务，非副本\n货架：AI随机生成售卖物，方向为精神污染类或引发生理不适的物品，不提供正常补给\n收银员：诡异侏儒套恐怖电影风格娃娃头，身影矮小头异常大。会要求玩家帮忙理货，玩家可接受或拒绝。拒绝则收银员骂一句，不做其他反应。\n接受后进入仓房：仓房内除货物外有收银员的娃娃老婆，身上布满孔洞，棉花不断往外冒，棉花内带血迹和不明组织。玩家搬货期间娃娃持续盯视并发出尖锐笑声，平均每次SAN-3。攻击娃娃触发收银员报复，玩家受到攻击并扣SAN。\n完成任务奖励：积分最高+30，针剂×3\n\n### 废城·旧区·小诊所\n类型：废弃探索地点，非副本，中等威胁，进入触发提示弹窗\n内容：秘密实验残留，方向为人体改造痕迹、激发内心欲望相关实验记录，具体细节AI生成\n与A级医院副本存在线索关联，实验数据可作为后续副本线索\n时绎邂逅：见顶级轮回者设定\n点击旧街区节点后展开显示三个子地点：\n- 207室（副本，C级）\n- 理发店（互动点）\n- 废弃便利店（互动点）\n\n展开方式参考地图现有的交互风格，子节点围绕旧街区向下展开均可。子节点可点击，点击后进入对应地点的叙事界面。巷口不单独显示为节点，作为首次前往废弃便利店时的过路触发。\n\n## 特殊情况\n玩家输入模糊：通过环境线索引导，不批评。\n玩家尝试危险行动：不阻止，描述后果。不敷衍。\n## 理智值系统\n理智值(SAN)反映轮回者对VOID扭曲现实的抵抗能力。范围0-100。\n\n下降触发：进入新副本(-5~-10)、目睹恐怖场景(-3~-15)、违反副本规则(-5~-20)、怪物战斗(-2~-8每次)、击杀轮回者(当前值70%起)、目睹轮回者死亡(-10~-20)、进入执念之海范围(-15~-30/h)、深入未知区域(-1~-5/h)。\n\n恢复触发：安全区休息(+2~+5/h)、使用恢复物品(+5~+15)、完成副本(+10~+30)。\n\n阶段效果：\n- 80-100 清醒：感官准确，旁白可靠，NPC对话真实。\n- 60-79 紧张：旁白偶尔出现细微不可靠细节。\n- 40-59 恐惧：旁白约20%感官描述不真实。NPC对话可能混入玩家幻觉。\n- 20-39 崩溃边缘：旁白约40%不可靠。可能看到不存在的NPC或忽视真实威胁。\n- 1-19 濒临同化：旁白几乎完全不可靠。描述的世界可能与实际完全不同。但这不是欺骗——你只是忠实地描述玩家崩溃的意识看到的东西。\n- 0 同化：玩家不再是轮回者。不触发AI调用。\n\n当前SAN：' + p.san + '/100。请根据当前阶段调整叙事可靠度。\n快捷指令：以/开头的内容由程序拦截，不需要回复。' + (App._fearTriggerFlag ? '\n\n[恐惧点触发：' + App._fearTriggerFlag + '] 当前场景触发了玩家的恐惧点。SAN消耗翻倍，判定成功率额外-15%。AI在叙事中描述玩家的恐惧反应（生理反应规则适用）。本次回复后清除此标记。' : '') + (copy.tideActive ? '\n\n[潮汐期进行中] 当前处于潮汐期。怪物活跃度上升、SAN自然消耗加速。AI在旁白中自然融入潮汐氛围：天空暗沉异常、冷风加剧、远处传来不明怪声、执念碎片更加不稳定、地面冷光周期性闪烁。角色可能感到不安或警觉。副本内时间正常流动，积分扣除照常。' : '') + compressReq;
 }
 
 // ============================================================
@@ -4515,6 +4425,9 @@ var AI = {
       { re: /\[QUEST_DONE ([^\]]+)\]/g, cmd: 'quest_done' },
       { re: /\[SCENE ([^\]]+)\]/g, cmd: 'scene_enter' },
       { re: /\[LEAVE ([^\]]+)\]/g, cmd: 'scene_leave' },
+      { re: /\[COPY_NAME ([^\]]+)\]/g, cmd: 'copy_name' },
+      { re: /\[COPY_CORE ([^\]]+)\]/g, cmd: 'copy_core' },
+      { re: /\[COPY_RULE ([^\]]+)\]/g, cmd: 'copy_rule' },
       { re: /\[COPY_END\]/g, cmd: 'copy_end' },
       { re: /\[CHAR_JOIN ([^\]:]+)(?::([^\]]*))?(?:\s+(role|npc))?(?:\s+(\d+))?\]/g, cmd: 'char_join' },
       { re: /\[FORUM_POST (\S+):([^\]]+)\]/g, cmd: 'forum_post' },
@@ -4616,6 +4529,14 @@ var AI = {
           if (qs) { var q = qs.find(function(q) { return q.name === item.args[0] && q.status === 'active'; }); if (q) { q.status = 'done'; q.doneTime = Date.now(); } }
           break;
         }
+        case 'copy_name': Store._db.currentCopy.name = item.args[0].trim(); App._blinkCopyHint(); break;
+        case 'copy_core': Store._db.currentCopy.core = item.args[0].trim(); break;
+        case 'copy_rule':
+          var ruleText = item.args[0].trim();
+          if (!Store._db.currentCopy.discoveredRules) Store._db.currentCopy.discoveredRules = [];
+          Store._db.currentCopy.discoveredRules.push(ruleText);
+          Store._db.currentCopy.rules = Store._db.currentCopy.discoveredRules.join('\n');
+          break;
         case 'copy_end': Store._db.currentCopy.completionStatus = 'cleared'; Store._db.currentCopy.completed = true; delete Store._db.currentCopy.enterTime; Store.player().copiesCleared = (Store.player().copiesCleared||0) + 1; App._createSavePoint(); break;
         case 'char_join': {
           var joinName = item.args[0].trim();
@@ -5309,7 +5230,8 @@ var App = {
     this._ceAvatarData = c ? (c.avatar || null) : null;
 
     var isNPC = c && c.isNPC === true;
-    document.getElementById('char-edit-title').textContent = c ? (isNPC ? 'NPC 信息' : '编辑角色') : '新建角色';
+    var isSpecial = c && c.isSpecial === true;
+    document.getElementById('char-edit-title').textContent = c ? (isSpecial ? '特殊角色' : isNPC ? 'NPC 信息' : '编辑角色') : '新建角色';
     document.getElementById('ce-name').value = c ? (c.name || '') : '';
     document.getElementById('ce-persona').value = c ? (c.persona || '') : '';
     document.getElementById('ce-appearance').value = c ? (c.appearance || '') : '';
@@ -5335,6 +5257,24 @@ var App = {
     this._renderTagList('ce-tags', c ? (c.tags || []) : [], 'tag');
     this._renderTagList('ce-taboos', c ? (c.taboos || []) : [], 'tag-block');
     this.updateAvatarDisplay('ce', c ? (c.name || '新') : '新', this._ceAvatarData);
+
+    // Special characters (时绎, 林川): only avatar can be changed
+    var editFields = document.querySelectorAll('#page-char-edit input:not([type="file"]), #page-char-edit textarea, #page-char-edit .toggle-btn, #page-char-edit button.tag, #ce-initiative-toggle, #ce-aff-toggle');
+    editFields.forEach(function(el) {
+      if (isSpecial) { el.disabled = true; el.style.opacity = '0.5'; el.style.pointerEvents = 'none'; }
+      else { el.disabled = false; el.style.opacity = ''; el.style.pointerEvents = ''; }
+    });
+    var specHint = document.getElementById('ce-special-hint');
+    if (!specHint) {
+      specHint = document.createElement('div');
+      specHint.id = 'ce-special-hint';
+      specHint.style.cssText = 'font-size:9px;color:var(--accent);letter-spacing:.06em;margin-top:8px;text-align:center;font-family:var(--font-mono)';
+      var avatarSection = document.querySelector('#page-char-edit .pf-avatar-section');
+      if (avatarSection) avatarSection.insertAdjacentElement('afterend', specHint);
+    }
+    specHint.textContent = isSpecial ? '特殊角色，仅支持更改头像' : '';
+    specHint.style.display = isSpecial ? '' : 'none';
+
     this.navigateTo('char-edit');
   },
 
@@ -5397,7 +5337,10 @@ var App = {
 
     if (this._charEditorId) {
       var c = Store.character(this._charEditorId);
-      if (c) { Object.keys(data).forEach(function(k) { if (data[k] !== undefined) c[k] = data[k]; }); }
+      if (c) {
+        if (c.isSpecial) { c.avatar = this._ceAvatarData || null; }
+        else { Object.keys(data).forEach(function(k) { if (data[k] !== undefined) c[k] = data[k]; }); }
+      }
     } else {
       Store.addCharacter(Object.assign(data, { relation:'未知', present:true, lastSummary:'', memories:[], isUserCreated: true, isAutoCreated: false }));
     }
@@ -5411,6 +5354,7 @@ var App = {
     var self = this;
     var c = Store.character(this._charEditorId);
     if (!c) return;
+    if (c.isSpecial) { alert('特殊角色不可删除。'); return; }
     if (confirm('确定删除角色「' + c.name + '」吗？')) {
       Store._db.characters = Store._db.characters.filter(function(ch) { return ch.id !== self._charEditorId; });
       Store.save();
@@ -8747,6 +8691,8 @@ var App = {
     p.identity = identity === 'dead' ? '死者' : '生者';
     p.voidId = uid;
     p.introCompleted = true;
+    var mask = Store.activeMask();
+    if (mask) { mask.name = name; mask.gender = p.gender; mask.identity = p.identity; }
     Store.save();
 
     document.getElementById('done-id').textContent = 'ID: ' + uid;
@@ -8764,6 +8710,10 @@ var App = {
       setTimeout(function() {
         if (setup) setup.style.display = 'none';
         document.body.classList.add('intro-done');
+        self.renderAll();
+        Store.addMessage({ type: 'system', content: '锚定完成，意识接入VOID。当前位置：废城·旧区·旧街区。' });
+        self.renderMessages();
+        self.triggerAI({ force: true });
       }, 1000);
     }, 2000);
   },

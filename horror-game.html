@@ -4408,7 +4408,7 @@ var AI = {
     } catch(e) {
       console.log('[AI.call] 异常: name=' + e.name + ', msg=' + (e.message||'').slice(0,200));
       if (e.name === 'AbortError') return { error: 'timeout', msg: '响应超时（30秒），请重试' };
-      if (e.message && e.message.match(/^\\d{3}/)) return { error: 'http', msg: '服务器错误：' + e.message };
+      if (e.message && e.message.match(/^\d{3}/)) return { error: 'http', msg: '服务器错误：' + e.message };
       return { error: 'network', msg: '连接中断：' + e.message };
     }
   },
@@ -4475,7 +4475,7 @@ var AI = {
     } catch(e) {
       console.log('[StreamCall] 异常捕获: name=' + e.name + ', message=' + (e.message||'').slice(0,200));
       if (e.name === 'AbortError') return { error: 'timeout', msg: '响应超时（30秒），请重试' };
-      if (e.message && e.message.match(/^\\d{3}/)) return { error: 'http', msg: '服务器错误：' + e.message };
+      if (e.message && e.message.match(/^\d{3}/)) return { error: 'http', msg: '服务器错误：' + e.message };
       return { error: 'network', msg: '连接中断：' + e.message };
     }
   },
@@ -7057,7 +7057,7 @@ var App = {
       var val = (p.attributes && p.attributes[a.key] !== undefined) ? p.attributes[a.key] : 0;
       val = Math.min(val, maxAttr);
       var atMax = val >= maxAttr;
-      var noPts = pts < 500;
+      var noPts = pts < 200;
       var disabled = atMax || noPts;
       var label = atMax ? '已上限' : (noPts ? '积分不足' : '强化');
       var pips = '';
@@ -7539,17 +7539,18 @@ var App = {
         '<div class="gr-rule-text" style="flex:1;min-width:0;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none">' +
           '<div style="font-size:13px;font-weight:500;color:#e0e0e0;letter-spacing:.02em;line-height:1.3;padding-bottom:2px">' + App.escapeHtml(r) + '</div>' +
         '</div>' +
-        '<button class="btn-sm btn-ghost" onclick="var p=this.parentElement;p.remove()" style="flex-shrink:0;color:#666">×</button>' +
+        '<button class="btn-sm btn-ghost" onclick="Store._db.globalRules.splice(' + i + ',1);Store.save();App.renderGlobalRules()" style="flex-shrink:0;color:#666">×</button>' +
         '</div>';
     }).join('');
   },
 
   _saveGlobalRules: function() {
+    var rules = Store._db.globalRules ? Store._db.globalRules.slice() : [];
     var inputs = document.querySelectorAll('#global-rules-list .form-input');
-    var rules = [];
     inputs.forEach(function(inp) { var v = inp.value.trim(); if (v) rules.push(v); });
     Store._db.globalRules = rules;
     Store.save();
+    this.renderGlobalRules();
     var toast = document.getElementById('gr-toast');
     toast.textContent = '已保存'; toast.classList.add('show');
     setTimeout(function() { toast.classList.remove('show'); }, 1500);
@@ -8826,7 +8827,7 @@ var App = {
     name = name.trim() || 'UNKNOWN';
     var gender = this._introSetupGender;
     var identity = this._introSetupIdentity;
-    var uid = 'V-' + String(Math.floor(1000 + Math.random() * 9000));
+    var uid = String(Math.floor(1000 + Math.random() * 9000));
 
     var p = Store.player();
     p.name = name;
